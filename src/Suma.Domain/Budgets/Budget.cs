@@ -5,6 +5,12 @@ namespace Suma.Domain.Budgets;
 
 public sealed class Budget : Entity
 {
+    private Budget()
+    {
+        Name = null!;
+        ExpectedIncome = null!;
+    }
+
     public Budget(
         string name,
         DateOnly periodStart,

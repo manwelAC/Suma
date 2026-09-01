@@ -5,6 +5,12 @@ namespace Suma.Domain.Savings;
 
 public sealed class SavingsGoal : Entity
 {
+    private SavingsGoal()
+    {
+        Name = null!;
+        TargetAmount = null!;
+    }
+
     public SavingsGoal(
         string name,
         Money targetAmount,

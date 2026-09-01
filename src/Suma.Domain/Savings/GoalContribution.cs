@@ -5,6 +5,11 @@ namespace Suma.Domain.Savings;
 
 public sealed class GoalContribution : Entity
 {
+    private GoalContribution()
+    {
+        Amount = null!;
+    }
+
     public GoalContribution(
         Guid savingsGoalId,
         Guid transactionId,
@@ -37,13 +42,13 @@ public sealed class GoalContribution : Entity
         Amount = amount;
     }
 
-    public Guid SavingsGoalId { get; }
+    public Guid SavingsGoalId { get; private set; }
 
-    public Guid TransactionId { get; }
+    public Guid TransactionId { get; private set; }
 
-    public GoalContributionType Type { get; }
+    public GoalContributionType Type { get; private set; }
 
-    public Money Amount { get; }
+    public Money Amount { get; private set; }
 
     private static void EnsureNotEmpty(Guid value, string parameterName)
     {

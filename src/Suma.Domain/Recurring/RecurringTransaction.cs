@@ -6,6 +6,11 @@ namespace Suma.Domain.Recurring;
 
 public sealed class RecurringTransaction : Entity
 {
+    private RecurringTransaction()
+    {
+        Amount = null!;
+    }
+
     private RecurringTransaction(
         TransactionType type,
         Guid? sourceAccountId,
@@ -39,13 +44,13 @@ public sealed class RecurringTransaction : Entity
         IsActive = true;
     }
 
-    public TransactionType Type { get; }
+    public TransactionType Type { get; private set; }
 
-    public Guid? SourceAccountId { get; }
+    public Guid? SourceAccountId { get; private set; }
 
-    public Guid? DestinationAccountId { get; }
+    public Guid? DestinationAccountId { get; private set; }
 
-    public Guid? CategoryId { get; }
+    public Guid? CategoryId { get; private set; }
 
     public Money Amount { get; private set; }
 

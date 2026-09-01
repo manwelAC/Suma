@@ -5,6 +5,11 @@ namespace Suma.Domain.Transactions;
 
 public sealed class Transaction : Entity
 {
+    private Transaction()
+    {
+        Amount = null!;
+    }
+
     private Transaction(
         TransactionType type,
         Guid? sourceAccountId,
@@ -27,23 +32,23 @@ public sealed class Transaction : Entity
         Notes = NormalizeOptionalText(notes);
     }
 
-    public TransactionType Type { get; }
+    public TransactionType Type { get; private set; }
 
-    public Guid? SourceAccountId { get; }
+    public Guid? SourceAccountId { get; private set; }
 
-    public Guid? DestinationAccountId { get; }
+    public Guid? DestinationAccountId { get; private set; }
 
-    public Guid? CategoryId { get; }
+    public Guid? CategoryId { get; private set; }
 
-    public Guid? OriginalTransactionId { get; }
+    public Guid? OriginalTransactionId { get; private set; }
 
-    public Money Amount { get; }
+    public Money Amount { get; private set; }
 
-    public DateOnly TransactionDate { get; }
+    public DateOnly TransactionDate { get; private set; }
 
-    public string? Description { get; }
+    public string? Description { get; private set; }
 
-    public string? Notes { get; }
+    public string? Notes { get; private set; }
 
     public static Transaction CreateExpense(
         Guid sourceAccountId,

@@ -5,6 +5,12 @@ namespace Suma.Domain.Accounts;
 
 public sealed class Account : Entity
 {
+    private Account()
+    {
+        Name = null!;
+        OpeningBalance = null!;
+    }
+
     public Account(
         string name,
         AccountType type,
@@ -31,17 +37,16 @@ public sealed class Account : Entity
         Name = name.Trim();
         Type = type;
         OpeningBalance = openingBalance;
-        CurrencyCode = normalizedCurrencyCode;
         IncludeInAvailableToSpend = includeInAvailableToSpend;
     }
 
-    public string Name { get; }
+    public string Name { get; private set; }
 
-    public AccountType Type { get; }
+    public AccountType Type { get; private set; }
 
-    public Money OpeningBalance { get; }
+    public Money OpeningBalance { get; private set; }
 
-    public string CurrencyCode { get; }
+    public string CurrencyCode => OpeningBalance.CurrencyCode;
 
     public bool IncludeInAvailableToSpend { get; private set; }
 

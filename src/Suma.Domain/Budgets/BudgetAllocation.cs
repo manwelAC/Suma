@@ -5,6 +5,11 @@ namespace Suma.Domain.Budgets;
 
 public sealed class BudgetAllocation : Entity
 {
+    private BudgetAllocation()
+    {
+        Amount = null!;
+    }
+
     public BudgetAllocation(
         Guid budgetId,
         Guid categoryId,
@@ -21,9 +26,9 @@ public sealed class BudgetAllocation : Entity
         ReserveFromAvailable = reserveFromAvailable;
     }
 
-    public Guid BudgetId { get; }
+    public Guid BudgetId { get; private set; }
 
-    public Guid CategoryId { get; }
+    public Guid CategoryId { get; private set; }
 
     public Money Amount { get; private set; }
 
