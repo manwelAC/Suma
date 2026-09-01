@@ -1,0 +1,120 @@
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using Suma.Domain.Accounts;
+using Suma.Domain.Budgets;
+using Suma.Domain.Categories;
+using Suma.Domain.Recurring;
+using Suma.Domain.Savings;
+using Suma.Domain.Transactions;
+using Suma.Domain.ValueObjects;
+using Suma.Infrastructure.Persistence;
+using Suma.Infrastructure.Persistence.Stores;
+using Xunit;
+
+namespace Suma.Infrastructure.Tests.Persistence;
+
+public sealed class StoreTests
+{
+    [Fact]
+    public async Task Transaction_queries_return_account_ledger_recent_rows_and_refund_aggregate()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Wallet");
+        var category = new Category("Food", CategoryTransactionKind.Expense);
+        var expense = Transaction.CreateExpense(account.Id, category.Id, new Money(1_000, "PHP"), new(2026, 9, 1));
+        var refund = Transaction.CreateRefund(account.Id, category.Id, expense.Id, new Money(250, "PHP"), new(2026, 9, 2));
+        await database.AddAsync(account, category, expense, refund);
+        await using var context = database.Context();
+        var store = new TransactionStore(context);
+        Assert.Equal(2, (await store.GetForAccountAsync(account.Id, Token)).Count);
+        Assert.Single(await store.GetRecentAsync(1, Token));
+        Assert.Equal(250, await store.GetRefundedAmountMinorAsync(expense.Id, Token));
+    }
+
+    [Fact]
+    public async Task Budget_queries_detect_only_active_overlap_and_duplicate_allocation()
+    {
+        await using var database = await Database.CreateAsync();
+        var category = new Category("Food", CategoryTransactionKind.Expense);
+        var active = new Budget("September", new(2026, 9, 1), new(2026, 9, 30), Money.Zero("PHP"));
+        var archived = new Budget("October", new(2026, 10, 1), new(2026, 10, 31), Money.Zero("PHP"));
+        archived.Archive();
+        var allocation = new BudgetAllocation(active.Id, category.Id, new Money(100, "PHP"), false);
+        await database.AddAsync(category, active, archived, allocation);
+        await using var context = database.Context();
+        Assert.True(await new BudgetStore(context).HasActiveOverlapAsync(new(2026, 9, 30), new(2026, 10, 2), cancellationToken: Token));
+        Assert.False(await new BudgetStore(context).HasActiveOverlapAsync(new(2026, 10, 1), new(2026, 10, 31), cancellationToken: Token));
+        Assert.True(await new BudgetAllocationStore(context).ExistsAsync(active.Id, category.Id, Token));
+    }
+
+    [Fact]
+    public async Task Goal_query_sums_existing_attribution_and_unit_of_work_saves()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Savings");
+        var category = new Category("Salary", CategoryTransactionKind.Income);
+        var transaction = Transaction.CreateIncome(account.Id, category.Id, new Money(1_000, "PHP"), new(2026, 9, 1));
+        var goal = new SavingsGoal("Goal", new Money(10_000, "PHP"));
+        var first = new GoalContribution(goal.Id, transaction.Id, GoalContributionType.Deposit, new Money(300, "PHP"));
+        var second = new GoalContribution(goal.Id, transaction.Id, GoalContributionType.Withdrawal, new Money(200, "PHP"));
+        await database.AddAsync(account, category, transaction, goal, first, second);
+        await using var context = database.Context();
+        Assert.Equal(500, await new GoalContributionStore(context).GetAttributedAmountMinorAsync(transaction.Id, Token));
+        context.Accounts.Add(NewAccount("Second"));
+        await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        Assert.Equal(2, await context.Accounts.CountAsync(Token));
+    }
+
+    [Fact]
+    public async Task Mutable_occurrence_lookup_is_tracked()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Wallet");
+        var category = new Category("Food", CategoryTransactionKind.Expense);
+        var recurring = RecurringTransaction.CreateExpense(account.Id, category.Id, new Money(100, "PHP"), RecurrenceFrequencyUnit.Day, 1, new(2026, 9, 1));
+        var occurrence = new RecurringOccurrence(recurring.Id, new(2026, 9, 2));
+        await database.AddAsync(account, category, recurring, occurrence);
+        await using var context = database.Context();
+        var loaded = await new RecurringOccurrenceStore(context).GetByIdAsync(occurrence.Id, Token);
+        Assert.NotNull(loaded);
+        Assert.Equal(EntityState.Unchanged, context.Entry(loaded).State);
+    }
+
+    [Fact]
+    public async Task Active_account_read_query_is_no_tracking()
+    {
+        await using var database = await Database.CreateAsync();
+        var active = NewAccount("Active");
+        var archived = NewAccount("Archived");
+        archived.Archive();
+        await database.AddAsync(active, archived);
+        await using var context = database.Context();
+        var results = await new AccountStore(context).GetActiveAsync(Token);
+        Assert.Single(results);
+        Assert.Empty(context.ChangeTracker.Entries());
+    }
+
+    private static Account NewAccount(string name) => new(name, AccountType.Bank, Money.Zero("PHP"), "PHP", true);
+    private static CancellationToken Token => TestContext.Current.CancellationToken;
+
+    private sealed class Database : IAsyncDisposable
+    {
+        private readonly SqliteConnection connection = new("Data Source=:memory:");
+        private Database() => connection.Open();
+        public static async Task<Database> CreateAsync()
+        {
+            var database = new Database();
+            await using var context = database.Context();
+            await context.Database.MigrateAsync(Token);
+            return database;
+        }
+        public SumaDbContext Context() => new(new DbContextOptionsBuilder<SumaDbContext>().UseSqlite(connection).Options);
+        public async Task AddAsync(params object[] entities)
+        {
+            await using var context = Context();
+            context.AddRange(entities);
+            await context.SaveChangesAsync(Token);
+        }
+        public ValueTask DisposeAsync() => connection.DisposeAsync();
+    }
+}
