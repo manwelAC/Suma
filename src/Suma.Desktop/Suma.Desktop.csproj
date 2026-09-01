@@ -21,5 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Suma.Application\Suma.Application.csproj" />
     <ProjectReference Include="..\Suma.Domain\Suma.Domain.csproj" />
+    <ProjectReference Include="..\Suma.Infrastructure\Suma.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
