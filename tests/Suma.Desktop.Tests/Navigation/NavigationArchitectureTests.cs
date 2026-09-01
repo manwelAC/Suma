@@ -3,7 +3,11 @@ using Microsoft.UI.Xaml.Controls;
 using Suma.Desktop;
 using Suma.Desktop.Composition;
 using Suma.Desktop.Navigation;
+using Suma.Desktop.Operations.Accounts;
+using Suma.Desktop.Operations.Categories;
+using Suma.Desktop.Pages.Accounts;
 using Suma.Desktop.Shell;
+using Suma.Desktop.ViewModels;
 using Xunit;
 
 namespace Suma.Desktop.Tests.Navigation;
@@ -31,6 +35,12 @@ public sealed class NavigationArchitectureTests
     }
 
     [Fact]
+    public void Accounts_route_maps_explicitly_to_accounts_page()
+    {
+        Assert.Equal(typeof(AccountsPage), NavigationRouteMap.GetPageType(NavigationRoute.Accounts));
+    }
+
+    [Fact]
     public void Desktop_registration_graph_is_root_safe_and_validated()
     {
         var services = new ServiceCollection();
@@ -41,6 +51,12 @@ public sealed class NavigationArchitectureTests
 
         Assert.NotNull(provider.GetRequiredService<INavigationService>());
         Assert.NotNull(provider.GetRequiredService<ShellViewModel>());
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(INavigationPageFactory));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAccountOperations));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ICategoryOperations));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CategoriesViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsPage));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ShellPage));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(MainWindow));
     }
@@ -72,5 +88,34 @@ public sealed class NavigationArchitectureTests
         var parameter = Assert.Single(constructor.GetParameters());
 
         Assert.Equal(typeof(INavigationService), parameter.ParameterType);
+    }
+
+    [Theory]
+    [InlineData(typeof(AccountsViewModel), typeof(IAccountOperations))]
+    [InlineData(typeof(CategoriesViewModel), typeof(ICategoryOperations))]
+    public void Finance_view_models_retain_only_focused_root_safe_operations(Type viewModelType, Type operationType)
+    {
+        var constructor = Assert.Single(viewModelType.GetConstructors());
+        var parameter = Assert.Single(constructor.GetParameters());
+
+        Assert.Equal(operationType, parameter.ParameterType);
+        Assert.DoesNotContain(
+            viewModelType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic),
+            field => field.FieldType == typeof(IServiceProvider)
+                || field.FieldType == typeof(IServiceScopeFactory)
+                || field.FieldType.Namespace?.StartsWith("Suma.Application", StringComparison.Ordinal) == true);
+    }
+
+    [Theory]
+    [InlineData(typeof(AccountOperations))]
+    [InlineData(typeof(CategoryOperations))]
+    public void Finance_operation_adapters_hold_scope_factory_not_scoped_finance_services(Type adapterType)
+    {
+        var fields = adapterType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+
+        Assert.Contains(fields, field => field.FieldType == typeof(IServiceScopeFactory));
+        Assert.DoesNotContain(
+            fields,
+            field => field.FieldType.Namespace?.StartsWith("Suma.Application", StringComparison.Ordinal) == true);
     }
 }

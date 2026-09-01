@@ -52,6 +52,22 @@ public sealed class Account : Entity
 
     public bool IsArchived { get; private set; }
 
+    public void Rename(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        Name = name.Trim();
+    }
+
+    public void ChangeType(AccountType type)
+    {
+        if (!Enum.IsDefined(type))
+        {
+            throw new ArgumentOutOfRangeException(nameof(type), type, "Account type is not supported.");
+        }
+
+        Type = type;
+    }
+
     public void Archive() => IsArchived = true;
 
     public void Restore() => IsArchived = false;

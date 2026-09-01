@@ -27,7 +27,10 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
 
     Task<Account?> IAccountStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Accounts.GetValueOrDefault(id));
     Task<IReadOnlyList<Account>> IAccountStore.GetActiveAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Account>>(Accounts.Values.Where(account => !account.IsArchived).ToArray());
+    Task<IReadOnlyList<Account>> IAccountStore.GetArchivedAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Account>>(Accounts.Values.Where(account => account.IsArchived).ToArray());
     Task<Category?> ICategoryStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Categories.GetValueOrDefault(id));
+    Task<IReadOnlyList<Category>> ICategoryStore.GetAllAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Category>>(Categories.Values.ToArray());
+    Task<bool> ICategoryStore.HasActiveChildrenAsync(Guid parentCategoryId, CancellationToken cancellationToken) => Task.FromResult(Categories.Values.Any(category => category.ParentCategoryId == parentCategoryId && !category.IsArchived));
     Task<Transaction?> ITransactionStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Transactions.GetValueOrDefault(id));
     Task<IReadOnlyList<Transaction>> ITransactionStore.GetRecentAsync(int limit, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Transaction>>(Transactions.Values.Take(limit).ToArray());
     Task<IReadOnlyList<Transaction>> ITransactionStore.GetForAccountAsync(Guid accountId, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Transaction>>(Transactions.Values.Where(transaction => transaction.SourceAccountId == accountId || transaction.DestinationAccountId == accountId).ToArray());
@@ -46,6 +49,9 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
         AddedTransactionCount++;
         return Task.CompletedTask;
     }
+
+    Task IAccountStore.AddAsync(Account account, CancellationToken cancellationToken) { Accounts.Add(account.Id, account); return Task.CompletedTask; }
+    Task ICategoryStore.AddAsync(Category category, CancellationToken cancellationToken) { Categories.Add(category.Id, category); return Task.CompletedTask; }
 
     Task IBudgetStore.AddAsync(Budget budget, CancellationToken cancellationToken) { Budgets.Add(budget.Id, budget); return Task.CompletedTask; }
     Task IBudgetAllocationStore.AddAsync(BudgetAllocation allocation, CancellationToken cancellationToken) { Allocations.Add(allocation); return Task.CompletedTask; }

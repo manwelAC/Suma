@@ -74,6 +74,17 @@ public sealed class CategoryTests
         Assert.False(category.IsArchived);
     }
 
+    [Fact]
+    public void Rename_UsesTrimmedNonEmptyName()
+    {
+        var category = CreateCategory();
+
+        category.Rename("  Dining  ");
+
+        Assert.Equal("Dining", category.Name);
+        Assert.ThrowsAny<ArgumentException>(() => category.Rename(" "));
+    }
+
     private static Category CreateCategory() =>
         new("Groceries", CategoryTransactionKind.Expense);
 }

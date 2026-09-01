@@ -51,6 +51,21 @@
                         </Grid>
                     </ToggleButton>
                     <ToggleButton
+                        x:Name="AccountsNavigationItem"
+                        AutomationProperties.Name="Accounts"
+                        Click="OnNavigationClick"
+                        Style="{StaticResource SumaNavigationItemStyle}"
+                        Tag="Accounts">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="24" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon FontSize="{StaticResource SumaNavigationIconSize}" Glyph="&#xE8C7;" />
+                            <TextBlock Grid.Column="1" VerticalAlignment="Center" Text="Accounts" />
+                        </Grid>
+                    </ToggleButton>
+                    <ToggleButton
                         x:Name="ActivityNavigationItem"
                         AutomationProperties.Name="Activity"
                         Click="OnNavigationClick"

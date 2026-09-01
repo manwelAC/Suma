@@ -94,6 +94,97 @@ public sealed class StoreTests
         Assert.Empty(context.ChangeTracker.Entries());
     }
 
+    [Fact]
+    public async Task Account_store_persists_create_update_archive_and_restore()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Wallet");
+        await using (var context = database.Context())
+        {
+            await new AccountStore(context).AddAsync(account, Token);
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            var tracked = await new AccountStore(context).GetByIdAsync(account.Id, Token);
+            Assert.NotNull(tracked);
+            tracked.Rename("Daily wallet");
+            tracked.ChangeType(AccountType.EWallet);
+            tracked.SetAvailableToSpendInclusion(false);
+            tracked.Archive();
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            var store = new AccountStore(context);
+            Assert.Empty(await store.GetActiveAsync(Token));
+            var archived = Assert.Single(await store.GetArchivedAsync(Token));
+            Assert.Equal("Daily wallet", archived.Name);
+            Assert.Equal(AccountType.EWallet, archived.Type);
+            Assert.False(archived.IncludeInAvailableToSpend);
+        }
+
+        await using (var context = database.Context())
+        {
+            var store = new AccountStore(context);
+            var tracked = await store.GetByIdAsync(account.Id, Token);
+            Assert.NotNull(tracked);
+            tracked.Restore();
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            Assert.Single(await new AccountStore(context).GetActiveAsync(Token));
+        }
+    }
+
+    [Fact]
+    public async Task Category_store_persists_listing_updates_archive_restore_and_child_lookup()
+    {
+        await using var database = await Database.CreateAsync();
+        var parent = new Category("Living", CategoryTransactionKind.Expense);
+        var child = new Category("Food", CategoryTransactionKind.Expense, parent.Id);
+        await using (var context = database.Context())
+        {
+            var store = new CategoryStore(context);
+            await store.AddAsync(parent, Token);
+            await store.AddAsync(child, Token);
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            var store = new CategoryStore(context);
+            Assert.Equal(2, (await store.GetAllAsync(Token)).Count);
+            Assert.True(await store.HasActiveChildrenAsync(parent.Id, Token));
+            var tracked = await store.GetByIdAsync(child.Id, Token);
+            Assert.NotNull(tracked);
+            tracked.Rename("Groceries");
+            tracked.Archive();
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            var store = new CategoryStore(context);
+            Assert.False(await store.HasActiveChildrenAsync(parent.Id, Token));
+            var archived = Assert.Single(await store.GetAllAsync(Token), category => category.IsArchived);
+            Assert.Equal("Groceries", archived.Name);
+            var tracked = await store.GetByIdAsync(child.Id, Token);
+            Assert.NotNull(tracked);
+            tracked.Restore();
+            await new EfUnitOfWork(context).SaveChangesAsync(Token);
+        }
+
+        await using (var context = database.Context())
+        {
+            Assert.True(await new CategoryStore(context).HasActiveChildrenAsync(parent.Id, Token));
+        }
+    }
+
     private static Account NewAccount(string name) => new(name, AccountType.Bank, Money.Zero("PHP"), "PHP", true);
     private static CancellationToken Token => TestContext.Current.CancellationToken;
 

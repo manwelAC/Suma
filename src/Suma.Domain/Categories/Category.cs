@@ -35,7 +35,7 @@ public sealed class Category : Entity
         SetParentCategory(parentCategoryId);
     }
 
-    public string Name { get; }
+    public string Name { get; private set; }
 
     public CategoryTransactionKind TransactionKind { get; }
 
@@ -48,6 +48,12 @@ public sealed class Category : Entity
     public bool IsSystem { get; }
 
     public bool IsArchived { get; private set; }
+
+    public void Rename(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        Name = name.Trim();
+    }
 
     public void SetParentCategory(Guid? parentCategoryId)
     {

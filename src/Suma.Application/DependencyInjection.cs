@@ -1,8 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using Suma.Application.Accounts.GetAccountBalance;
 using Suma.Application.Accounts.GetAccounts;
+using Suma.Application.Accounts.ArchiveAccount;
+using Suma.Application.Accounts.CreateAccount;
+using Suma.Application.Accounts.RestoreAccount;
+using Suma.Application.Accounts.UpdateAccount;
 using Suma.Application.Budgets.AddBudgetAllocation;
 using Suma.Application.Budgets.CreateBudget;
+using Suma.Application.Categories.ArchiveCategory;
+using Suma.Application.Categories.CreateCategory;
+using Suma.Application.Categories.GetCategories;
+using Suma.Application.Categories.RestoreCategory;
+using Suma.Application.Categories.UpdateCategory;
 using Suma.Application.Recurring.MarkOccurrencePaid;
 using Suma.Application.Savings.AddGoalContribution;
 using Suma.Application.Savings.CreateSavingsGoal;
@@ -20,6 +29,15 @@ public static class DependencyInjection
     {
         services.AddScoped<GetAccountBalanceUseCase>();
         services.AddScoped<GetAccountsUseCase>();
+        services.AddScoped<CreateAccountUseCase>();
+        services.AddScoped<UpdateAccountUseCase>();
+        services.AddScoped<ArchiveAccountUseCase>();
+        services.AddScoped<RestoreAccountUseCase>();
+        services.AddScoped<GetCategoriesUseCase>();
+        services.AddScoped<CreateCategoryUseCase>();
+        services.AddScoped<UpdateCategoryUseCase>();
+        services.AddScoped<ArchiveCategoryUseCase>();
+        services.AddScoped<RestoreCategoryUseCase>();
         services.AddScoped<CreateExpenseUseCase>();
         services.AddScoped<CreateIncomeUseCase>();
         services.AddScoped<CreateTransferUseCase>();

@@ -9,9 +9,20 @@ public sealed class GetAccountsUseCase(IAccountStore accounts, ITransactionStore
 {
     public async Task<IReadOnlyList<AccountSummary>> ExecuteAsync(CancellationToken cancellationToken = default)
     {
-        var active = await accounts.GetActiveAsync(cancellationToken);
-        var results = new List<AccountSummary>(active.Count);
-        foreach (var account in active)
+        return await BuildSummariesAsync(await accounts.GetActiveAsync(cancellationToken), cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<AccountSummary>> ExecuteArchivedAsync(CancellationToken cancellationToken = default)
+    {
+        return await BuildSummariesAsync(await accounts.GetArchivedAsync(cancellationToken), cancellationToken);
+    }
+
+    private async Task<IReadOnlyList<AccountSummary>> BuildSummariesAsync(
+        IReadOnlyList<Account> selectedAccounts,
+        CancellationToken cancellationToken)
+    {
+        var results = new List<AccountSummary>(selectedAccounts.Count);
+        foreach (var account in selectedAccounts)
         {
             var ledger = await transactions.GetForAccountAsync(account.Id, cancellationToken);
             var balance = AccountBalanceCalculator.Calculate(account, ledger);

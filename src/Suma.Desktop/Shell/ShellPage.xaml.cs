@@ -47,6 +47,7 @@ public sealed partial class ShellPage : Page
     private void SelectRoute(NavigationRoute route)
     {
         SetNavigationState(OverviewNavigationItem, route == NavigationRoute.Overview);
+        SetNavigationState(AccountsNavigationItem, route == NavigationRoute.Accounts);
         SetNavigationState(ActivityNavigationItem, route == NavigationRoute.Activity);
         SetNavigationState(PlanningNavigationItem, route == NavigationRoute.Planning);
         SetNavigationState(SettingsNavigationItem, route == NavigationRoute.Settings);

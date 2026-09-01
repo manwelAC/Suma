@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml.Controls;
 using Suma.Desktop.Pages.Activity;
+using Suma.Desktop.Pages.Accounts;
 using Suma.Desktop.Pages.Overview;
 using Suma.Desktop.Pages.Planning;
 using Suma.Desktop.Pages.Settings;
@@ -12,6 +13,7 @@ public static class NavigationRouteMap
         new Dictionary<NavigationRoute, Type>
         {
             [NavigationRoute.Overview] = typeof(OverviewPage),
+            [NavigationRoute.Accounts] = typeof(AccountsPage),
             [NavigationRoute.Activity] = typeof(ActivityPage),
             [NavigationRoute.Planning] = typeof(PlanningPage),
             [NavigationRoute.Settings] = typeof(SettingsPage)

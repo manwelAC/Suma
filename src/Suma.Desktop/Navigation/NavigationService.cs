@@ -2,7 +2,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Suma.Desktop.Navigation;
 
-public sealed class NavigationService : INavigationService
+public sealed class NavigationService(INavigationPageFactory pageFactory) : INavigationService
 {
     private Frame? frame;
 
@@ -31,10 +31,8 @@ public sealed class NavigationService : INavigationService
             return false;
         }
 
-        if (!targetFrame.Navigate(pageType))
-        {
-            return false;
-        }
+        var page = pageFactory.GetPage(route);
+        targetFrame.Content = page;
 
         CurrentRoute = route;
         Navigated?.Invoke(this, route);

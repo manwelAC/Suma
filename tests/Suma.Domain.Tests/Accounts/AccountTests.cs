@@ -88,6 +88,28 @@ public sealed class AccountTests
         Assert.Equal(include, account.IncludeInAvailableToSpend);
     }
 
+    [Fact]
+    public void Rename_UsesTrimmedNonEmptyName()
+    {
+        var account = CreateAccount();
+
+        account.Rename("  Daily wallet  ");
+
+        Assert.Equal("Daily wallet", account.Name);
+        Assert.ThrowsAny<ArgumentException>(() => account.Rename("  "));
+    }
+
+    [Fact]
+    public void ChangeType_UsesSupportedDomainType()
+    {
+        var account = CreateAccount();
+
+        account.ChangeType(AccountType.EWallet);
+
+        Assert.Equal(AccountType.EWallet, account.Type);
+        Assert.Throws<ArgumentOutOfRangeException>(() => account.ChangeType((AccountType)999));
+    }
+
     private static Account CreateAccount() =>
         new("Cash", AccountType.Cash, Money.Zero("PHP"), "PHP", true);
 }

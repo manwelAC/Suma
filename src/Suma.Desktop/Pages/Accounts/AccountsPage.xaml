@@ -1,0 +1,372 @@
+<Page
+    x:Class="Suma.Desktop.Pages.Accounts.AccountsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="using:Suma.Desktop.ViewModels"
+    Background="{StaticResource SumaBackgroundBrush}">
+
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto"
+        VerticalScrollMode="Auto">
+    <Grid Padding="{StaticResource SumaPagePadding}" RowSpacing="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Spacing="8">
+            <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Money setup" />
+            <TextBlock
+                Style="{StaticResource SumaLeadTextStyle}"
+                Text="Keep your accounts and categories clear, local, and ready for everyday use." />
+        </StackPanel>
+
+        <Border
+            Grid.Row="1"
+            HorizontalAlignment="Left"
+            Background="{StaticResource SumaSurfaceSecondaryBrush}"
+            CornerRadius="{StaticResource SumaCornerMedium}"
+            Padding="4">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <ToggleButton
+                    x:Name="AccountsSectionButton"
+                    AutomationProperties.Name="Show accounts section"
+                    Click="OnAccountsSectionClick"
+                    Content="Accounts"
+                    Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                <ToggleButton
+                    x:Name="CategoriesSectionButton"
+                    AutomationProperties.Name="Show categories section"
+                    Click="OnCategoriesSectionClick"
+                    Content="Categories"
+                    Style="{StaticResource SumaNavigationItemStyle}" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="2">
+            <Grid x:Name="AccountsSection" RowSpacing="16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Spacing="4">
+                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Accounts" />
+                        <TextBlock
+                            Style="{StaticResource SumaBodySecondaryTextStyle}"
+                            Text="Real balances, derived from each opening balance and the shared ledger." />
+                    </StackPanel>
+                    <Button
+                        Grid.Column="1"
+                        AutomationProperties.Name="Add account"
+                        Click="OnAddAccountClick"
+                        Content="Add account" />
+                </Grid>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        x:Name="ActiveAccountsButton"
+                        AutomationProperties.Name="View active accounts"
+                        Click="OnActiveAccountsClick"
+                        Content="Active"
+                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                    <ToggleButton
+                        x:Name="ArchivedAccountsButton"
+                        AutomationProperties.Name="View archived accounts"
+                        Click="OnArchivedAccountsClick"
+                        Content="Archived"
+                        Style="{StaticResource SumaNavigationItemStyle}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource SumaCaptionTextStyle}"
+                        Text="{x:Bind AccountsViewModel.ActiveFilterLabel, Mode=OneWay}" />
+                </StackPanel>
+
+                <Grid Grid.Row="2" MinHeight="240">
+                    <ListView
+                        AutomationProperties.Name="Account list"
+                        ItemsSource="{x:Bind AccountsViewModel.Items, Mode=OneWay}"
+                        SelectionMode="None">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Margin" Value="0,0,0,8" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:AccountRowViewModel">
+                                <Border
+                                    Background="{StaticResource SumaSurfaceSecondaryBrush}"
+                                    CornerRadius="{StaticResource SumaCornerLarge}"
+                                    Padding="20">
+                                    <Grid RowSpacing="12">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid ColumnSpacing="16">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
+                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
+                                                <TextBlock
+                                                    HorizontalAlignment="Right"
+                                                    Style="{StaticResource SumaSectionTitleTextStyle}"
+                                                    Text="{x:Bind BalanceDisplay}" />
+                                                <TextBlock
+                                                    HorizontalAlignment="Right"
+                                                    Style="{StaticResource SumaCaptionTextStyle}"
+                                                    Text="{x:Bind CurrencyCode}" />
+                                            </StackPanel>
+                                        </Grid>
+                                        <Grid Grid.Row="1" ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource SumaBodySecondaryTextStyle}"
+                                                Text="{x:Bind AvailableToSpendDisplay}" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                                <Button
+                                                    AutomationProperties.Name="Edit account"
+                                                    Click="OnEditAccountClick"
+                                                    Content="Edit"
+                                                    Tag="{x:Bind Id}"
+                                                    Visibility="{x:Bind ActiveActionsVisibility}" />
+                                                <Button
+                                                    AutomationProperties.Name="Archive account"
+                                                    Click="OnArchiveAccountClick"
+                                                    Content="Archive"
+                                                    Tag="{x:Bind Id}"
+                                                    Visibility="{x:Bind ActiveActionsVisibility}" />
+                                                <Button
+                                                    AutomationProperties.Name="Restore account"
+                                                    Click="OnRestoreAccountClick"
+                                                    Content="Restore"
+                                                    Tag="{x:Bind Id}"
+                                                    Visibility="{x:Bind RestoreActionVisibility}" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Visibility="{x:Bind AccountsViewModel.EmptyVisibility, Mode=OneWay}">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource SumaSectionTitleTextStyle}"
+                            Text="No accounts yet" />
+                        <TextBlock
+                            MaxWidth="360"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            Style="{StaticResource SumaBodySecondaryTextStyle}"
+                            Text="Add your cash, bank, e-wallet, or savings account to start organizing your money." />
+                        <Button
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="Add first account"
+                            Click="OnAddAccountClick"
+                            Content="Add account" />
+                    </StackPanel>
+
+                    <ProgressRing
+                        Width="32"
+                        Height="32"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsActive="{x:Bind AccountsViewModel.IsLoading, Mode=OneWay}"
+                        Visibility="{x:Bind AccountsViewModel.LoadingVisibility, Mode=OneWay}" />
+                </Grid>
+
+                <InfoBar
+                    Grid.Row="2"
+                    Margin="0,0,0,8"
+                    VerticalAlignment="Top"
+                    IsClosable="False"
+                    IsOpen="True"
+                    Message="{x:Bind AccountsViewModel.ErrorMessage, Mode=OneWay}"
+                    Severity="Error"
+                    Visibility="{x:Bind AccountsViewModel.ErrorVisibility, Mode=OneWay}" />
+            </Grid>
+
+            <Grid x:Name="CategoriesSection" RowSpacing="16" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Spacing="4">
+                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Categories" />
+                        <TextBlock
+                            Style="{StaticResource SumaBodySecondaryTextStyle}"
+                            Text="Organize future income and spending without changing transaction semantics." />
+                    </StackPanel>
+                    <Button
+                        Grid.Column="1"
+                        AutomationProperties.Name="Add category"
+                        Click="OnAddCategoryClick"
+                        Content="Add category" />
+                </Grid>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        x:Name="ExpenseCategoriesButton"
+                        AutomationProperties.Name="Show expense categories"
+                        Click="OnExpenseCategoriesClick"
+                        Content="Expense"
+                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                    <ToggleButton
+                        x:Name="IncomeCategoriesButton"
+                        AutomationProperties.Name="Show income categories"
+                        Click="OnIncomeCategoriesClick"
+                        Content="Income"
+                        Style="{StaticResource SumaNavigationItemStyle}" />
+                </StackPanel>
+
+                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+                    <ToggleButton
+                        x:Name="ActiveCategoriesButton"
+                        AutomationProperties.Name="View active categories"
+                        Click="OnActiveCategoriesClick"
+                        Content="Active"
+                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                    <ToggleButton
+                        x:Name="ArchivedCategoriesButton"
+                        AutomationProperties.Name="View archived categories"
+                        Click="OnArchivedCategoriesClick"
+                        Content="Archived"
+                        Style="{StaticResource SumaNavigationItemStyle}" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        Style="{StaticResource SumaCaptionTextStyle}"
+                        Text="{x:Bind CategoriesViewModel.FilterLabel, Mode=OneWay}" />
+                </StackPanel>
+
+                <Grid Grid.Row="3" MinHeight="240">
+                    <ListView
+                        AutomationProperties.Name="Category list"
+                        ItemsSource="{x:Bind CategoriesViewModel.Items, Mode=OneWay}"
+                        SelectionMode="None">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                <Setter Property="Padding" Value="0" />
+                                <Setter Property="Margin" Value="0,0,0,8" />
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="models:CategoryRowViewModel">
+                                <Border
+                                    Background="{StaticResource SumaSurfaceSecondaryBrush}"
+                                    CornerRadius="{StaticResource SumaCornerLarge}"
+                                    Padding="20">
+                                    <Grid ColumnSpacing="16">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ParentDisplay}" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind SystemDisplay}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                                            <Button
+                                                AutomationProperties.Name="Edit category"
+                                                Click="OnEditCategoryClick"
+                                                Content="Edit"
+                                                Tag="{x:Bind Id}"
+                                                Visibility="{x:Bind EditVisibility}" />
+                                            <Button
+                                                AutomationProperties.Name="Archive category"
+                                                Click="OnArchiveCategoryClick"
+                                                Content="Archive"
+                                                Tag="{x:Bind Id}"
+                                                Visibility="{x:Bind ArchiveVisibility}" />
+                                            <Button
+                                                AutomationProperties.Name="Restore category"
+                                                Click="OnRestoreCategoryClick"
+                                                Content="Restore"
+                                                Tag="{x:Bind Id}"
+                                                Visibility="{x:Bind RestoreVisibility}" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Visibility="{x:Bind CategoriesViewModel.EmptyVisibility, Mode=OneWay}">
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            Style="{StaticResource SumaSectionTitleTextStyle}"
+                            Text="{x:Bind CategoriesViewModel.EmptyTitle, Mode=OneWay}" />
+                        <TextBlock
+                            MaxWidth="360"
+                            HorizontalAlignment="Center"
+                            TextAlignment="Center"
+                            Style="{StaticResource SumaBodySecondaryTextStyle}"
+                            Text="Create a category when you are ready to organize real money activity." />
+                        <Button
+                            HorizontalAlignment="Center"
+                            AutomationProperties.Name="Add first category"
+                            Click="OnAddCategoryClick"
+                            Content="Add category" />
+                    </StackPanel>
+
+                    <ProgressRing
+                        Width="32"
+                        Height="32"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        IsActive="{x:Bind CategoriesViewModel.IsLoading, Mode=OneWay}"
+                        Visibility="{x:Bind CategoriesViewModel.LoadingVisibility, Mode=OneWay}" />
+                </Grid>
+
+                <InfoBar
+                    Grid.Row="3"
+                    Margin="0,0,0,8"
+                    VerticalAlignment="Top"
+                    IsClosable="False"
+                    IsOpen="True"
+                    Message="{x:Bind CategoriesViewModel.ErrorMessage, Mode=OneWay}"
+                    Severity="Error"
+                    Visibility="{x:Bind CategoriesViewModel.ErrorVisibility, Mode=OneWay}" />
+            </Grid>
+        </Grid>
+    </Grid>
+    </ScrollViewer>
+</Page>

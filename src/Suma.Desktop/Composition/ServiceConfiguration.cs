@@ -18,7 +18,7 @@ internal static class ServiceConfiguration
         try
         {
             logger.Information("Starting Suma application.");
-            var databasePath = LocalDataPaths.GetRuntimeDatabasePath();
+            var databasePath = GetDatabasePath();
             logger.Information("Resolved Suma database path: {DatabasePath}", databasePath);
 
             var services = new ServiceCollection();
@@ -40,5 +40,18 @@ internal static class ServiceConfiguration
             logger.Dispose();
             throw;
         }
+    }
+
+    private static string GetDatabasePath()
+    {
+        var testDatabasePath = Environment.GetEnvironmentVariable("SUMA_TEST_DATABASE_PATH");
+        if (string.IsNullOrWhiteSpace(testDatabasePath))
+        {
+            return LocalDataPaths.GetRuntimeDatabasePath();
+        }
+
+        var fullPath = Path.GetFullPath(testDatabasePath);
+        Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+        return fullPath;
     }
 }
