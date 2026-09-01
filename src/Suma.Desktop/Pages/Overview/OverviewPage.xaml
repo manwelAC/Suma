@@ -5,13 +5,13 @@
     Background="{StaticResource SumaBackgroundBrush}">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <Grid Padding="{StaticResource SumaPagePadding}">
-            <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="24">
-                <StackPanel Spacing="8">
+            <StackPanel MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" Spacing="{StaticResource SumaSpace20}">
+                <StackPanel Spacing="{StaticResource SumaSpace8}">
                     <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Overview" />
-                    <TextBlock Style="{StaticResource SumaDisplayTextStyle}" Text="Money, made clear." />
+                    <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Money, made clear." />
                 </StackPanel>
                 <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}">
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="{StaticResource SumaSpace8}">
                         <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="A calm place to begin" />
                         <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Financial content will be introduced in the next feature milestones. This space is ready for Suma’s clearest daily view." />
                     </StackPanel>

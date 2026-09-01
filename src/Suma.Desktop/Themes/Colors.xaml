@@ -2,14 +2,17 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Color x:Key="SumaBackgroundColor">#FFF7F5F0</Color>
+    <Color x:Key="SumaBackgroundColor">#FFF8F7F3</Color>
     <Color x:Key="SumaSurfaceColor">#FFFFFFFF</Color>
-    <Color x:Key="SumaSurfaceSecondaryColor">#FFF0EEE8</Color>
-    <Color x:Key="SumaTextPrimaryColor">#FF20221F</Color>
-    <Color x:Key="SumaTextSecondaryColor">#FF696D66</Color>
-    <Color x:Key="SumaBorderColor">#FFDCDDD7</Color>
-    <Color x:Key="SumaAccentColor">#FF687B68</Color>
-    <Color x:Key="SumaAccentMutedColor">#FFDDE5DA</Color>
+    <Color x:Key="SumaSurfaceSecondaryColor">#FFF3F2EE</Color>
+    <Color x:Key="SumaTextPrimaryColor">#FF1C1C1E</Color>
+    <Color x:Key="SumaTextSecondaryColor">#FF6E6E73</Color>
+    <Color x:Key="SumaBorderColor">#FFE4E2DC</Color>
+    <Color x:Key="SumaAccentColor">#FF6F806D</Color>
+    <Color x:Key="SumaAccentMutedColor">#FFE7EDE4</Color>
+    <Color x:Key="SumaSelectedSurfaceColor">#FFE7EDE4</Color>
+    <Color x:Key="SumaHoverSurfaceColor">#FFEDECE7</Color>
+    <Color x:Key="SumaPressedSurfaceColor">#FFE0E4DE</Color>
 
     <SolidColorBrush x:Key="SumaBackgroundBrush" Color="{StaticResource SumaBackgroundColor}" />
     <SolidColorBrush x:Key="SumaSurfaceBrush" Color="{StaticResource SumaSurfaceColor}" />
@@ -19,4 +22,8 @@
     <SolidColorBrush x:Key="SumaBorderBrush" Color="{StaticResource SumaBorderColor}" />
     <SolidColorBrush x:Key="SumaAccentBrush" Color="{StaticResource SumaAccentColor}" />
     <SolidColorBrush x:Key="SumaAccentMutedBrush" Color="{StaticResource SumaAccentMutedColor}" />
+    <SolidColorBrush x:Key="SumaSelectedSurfaceBrush" Color="{StaticResource SumaSelectedSurfaceColor}" />
+    <SolidColorBrush x:Key="SumaHoverSurfaceBrush" Color="{StaticResource SumaHoverSurfaceColor}" />
+    <SolidColorBrush x:Key="SumaPressedSurfaceBrush" Color="{StaticResource SumaPressedSurfaceColor}" />
+    <SolidColorBrush x:Key="SumaTransparentBrush" Color="Transparent" />
 </ResourceDictionary>

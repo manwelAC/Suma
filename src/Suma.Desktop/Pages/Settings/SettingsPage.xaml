@@ -5,13 +5,13 @@
     Background="{StaticResource SumaBackgroundBrush}">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <Grid Padding="{StaticResource SumaPagePadding}">
-            <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="24">
-                <StackPanel Spacing="8">
+            <StackPanel MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" Spacing="{StaticResource SumaSpace20}">
+                <StackPanel Spacing="{StaticResource SumaSpace8}">
                     <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Settings" />
-                    <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Preferences and local data controls will appear here." />
+                    <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Preferences and local data controls will appear here." />
                 </StackPanel>
                 <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}">
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="{StaticResource SumaSpace8}">
                         <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Designed for your device" />
                         <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Appearance, data, and security settings are intentionally deferred until their dedicated milestones." />
                     </StackPanel>

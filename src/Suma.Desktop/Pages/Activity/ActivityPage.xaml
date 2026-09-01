@@ -5,13 +5,13 @@
     Background="{StaticResource SumaBackgroundBrush}">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <Grid Padding="{StaticResource SumaPagePadding}">
-            <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="24">
-                <StackPanel Spacing="8">
+            <StackPanel MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" Spacing="{StaticResource SumaSpace20}">
+                <StackPanel Spacing="{StaticResource SumaSpace8}">
                     <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Activity" />
-                    <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="A focused history of money movement will live here." />
+                    <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="A focused history of money movement will live here." />
                 </StackPanel>
                 <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}">
-                    <StackPanel Spacing="8">
+                    <StackPanel Spacing="{StaticResource SumaSpace8}">
                         <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Nothing to review yet" />
                         <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Detailed activity content belongs to a later feature milestone." />
                     </StackPanel>

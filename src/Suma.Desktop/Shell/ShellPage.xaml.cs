@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Suma.Desktop.Navigation;
 
 namespace Suma.Desktop.Shell;
@@ -26,11 +27,9 @@ public sealed partial class ShellPage : Page
         ViewModel.NavigateCommand.Execute(NavigationRoute.Overview);
     }
 
-    private void OnNavigationItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
+    private void OnNavigationClick(object sender, RoutedEventArgs e)
     {
-        var route = args.IsSettingsInvoked
-            ? NavigationRoute.Settings
-            : ParseRoute(args.InvokedItemContainer?.Tag);
+        var route = ParseRoute(((FrameworkElement)sender).Tag);
         SelectRoute(route);
         ViewModel.NavigateCommand.Execute(route);
     }
@@ -47,14 +46,16 @@ public sealed partial class ShellPage : Page
 
     private void SelectRoute(NavigationRoute route)
     {
-        if (route == NavigationRoute.Settings)
-        {
-            ShellNavigation.SelectedItem = ShellNavigation.SettingsItem;
-            return;
-        }
+        SetNavigationState(OverviewNavigationItem, route == NavigationRoute.Overview);
+        SetNavigationState(ActivityNavigationItem, route == NavigationRoute.Activity);
+        SetNavigationState(PlanningNavigationItem, route == NavigationRoute.Planning);
+        SetNavigationState(SettingsNavigationItem, route == NavigationRoute.Settings);
+    }
 
-        ShellNavigation.SelectedItem = ShellNavigation.MenuItems
-            .OfType<NavigationViewItem>()
-            .Single(item => string.Equals(item.Tag?.ToString(), route.ToString(), StringComparison.Ordinal));
+    private static void SetNavigationState(ToggleButton item, bool isSelected)
+    {
+        item.IsChecked = isSelected;
+        item.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[
+            isSelected ? "SumaNavigationItemSelectedStyle" : "SumaNavigationItemStyle"];
     }
 }
