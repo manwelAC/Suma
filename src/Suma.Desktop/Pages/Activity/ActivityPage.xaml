@@ -1,0 +1,22 @@
+<Page
+    x:Class="Suma.Desktop.Pages.Activity.ActivityPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="{StaticResource SumaBackgroundBrush}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid Padding="{StaticResource SumaPagePadding}">
+            <StackPanel MaxWidth="820" HorizontalAlignment="Left" Spacing="24">
+                <StackPanel Spacing="8">
+                    <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Activity" />
+                    <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="A focused history of money movement will live here." />
+                </StackPanel>
+                <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Nothing to review yet" />
+                        <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Detailed activity content belongs to a later feature milestone." />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
+</Page>

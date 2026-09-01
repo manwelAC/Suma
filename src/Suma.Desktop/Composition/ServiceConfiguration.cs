@@ -25,7 +25,7 @@ internal static class ServiceConfiguration
             services.AddLogging(builder => builder.AddSerilog(logger, dispose: true));
             services.AddApplication();
             services.AddInfrastructure(databasePath);
-            services.AddTransient<MainWindow>();
+            services.AddDesktop();
 
             return services.BuildServiceProvider(
                 new ServiceProviderOptions
