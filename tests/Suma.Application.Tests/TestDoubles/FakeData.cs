@@ -24,6 +24,7 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
     public long AttributedAmountMinor { get; set; }
     public int SaveCount { get; private set; }
     public int AddedTransactionCount { get; private set; }
+    public int AddedRecurringTransactionCount { get; private set; }
 
     Task<Account?> IAccountStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Accounts.GetValueOrDefault(id));
     Task<IReadOnlyList<Account>> IAccountStore.GetActiveAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Account>>(Accounts.Values.Where(account => !account.IsArchived).ToArray());
@@ -105,7 +106,11 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
                 allocation.ReserveFromAvailable))
             .ToArray());
     Task<RecurringTransaction?> IRecurringTransactionStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(RecurringTransactions.GetValueOrDefault(id));
+    Task<IReadOnlyList<RecurringTransaction>> IRecurringTransactionStore.GetActiveAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<RecurringTransaction>>(RecurringTransactions.Values.Where(item => item.IsActive).ToArray());
+    Task<IReadOnlyList<RecurringScheduleRecord>> IRecurringTransactionStore.GetSchedulesAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<RecurringScheduleRecord>>(RecurringTransactions.Values.Select(item => new RecurringScheduleRecord(item.Id, item.Type, item.SourceAccountId, item.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(item.SourceAccountId.Value)?.Name : null, item.DestinationAccountId, item.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(item.DestinationAccountId.Value)?.Name : null, item.CategoryId, item.CategoryId.HasValue ? Categories.GetValueOrDefault(item.CategoryId.Value)?.Name : null, item.Amount.AmountMinor, item.Amount.CurrencyCode, item.FrequencyUnit, item.IntervalCount, item.DayOfWeek, item.DayOfMonth, item.MonthOfYear, item.StartDate, item.EndDate, item.Description, item.IsActive)).ToArray());
     Task<RecurringOccurrence?> IRecurringOccurrenceStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Occurrences.GetValueOrDefault(id));
+    Task<IReadOnlySet<(Guid RecurringTransactionId, DateOnly DueDate)>> IRecurringOccurrenceStore.GetExistingKeysAsync(IReadOnlyCollection<Guid> recurringTransactionIds, DateOnly from, DateOnly through, CancellationToken cancellationToken) => Task.FromResult<IReadOnlySet<(Guid, DateOnly)>>(Occurrences.Values.Where(item => recurringTransactionIds.Contains(item.RecurringTransactionId) && item.DueDate >= from && item.DueDate <= through).Select(item => (item.RecurringTransactionId, item.DueDate)).ToHashSet());
+    Task<IReadOnlyList<RecurringOccurrenceRecord>> IRecurringOccurrenceStore.GetRecordsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<RecurringOccurrenceRecord>>(Occurrences.Values.Select(item => { var recurring = RecurringTransactions[item.RecurringTransactionId]; return new RecurringOccurrenceRecord(item.Id, item.RecurringTransactionId, item.DueDate, item.Status, item.TransactionId, recurring.Type, recurring.Amount.AmountMinor, recurring.Amount.CurrencyCode, recurring.Description, recurring.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(recurring.SourceAccountId.Value)?.Name : null, recurring.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(recurring.DestinationAccountId.Value)?.Name : null, recurring.CategoryId.HasValue ? Categories.GetValueOrDefault(recurring.CategoryId.Value)?.Name : null); }).OrderByDescending(item => item.DueDate).ToArray());
     Task<SavingsGoal?> ISavingsGoalStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Goals.GetValueOrDefault(id));
     Task<long> IGoalContributionStore.GetAttributedAmountMinorAsync(Guid transactionId, CancellationToken cancellationToken) => Task.FromResult(AttributedAmountMinor);
 
@@ -121,6 +126,8 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
 
     Task IBudgetStore.AddAsync(Budget budget, CancellationToken cancellationToken) { Budgets.Add(budget.Id, budget); return Task.CompletedTask; }
     Task IBudgetAllocationStore.AddAsync(BudgetAllocation allocation, CancellationToken cancellationToken) { Allocations.Add(allocation); return Task.CompletedTask; }
+    Task IRecurringTransactionStore.AddAsync(RecurringTransaction recurringTransaction, CancellationToken cancellationToken) { RecurringTransactions.Add(recurringTransaction.Id, recurringTransaction); AddedRecurringTransactionCount++; return Task.CompletedTask; }
+    Task IRecurringOccurrenceStore.AddRangeAsync(IReadOnlyCollection<RecurringOccurrence> occurrences, CancellationToken cancellationToken) { foreach (var occurrence in occurrences) Occurrences.Add(occurrence.Id, occurrence); return Task.CompletedTask; }
     Task ISavingsGoalStore.AddAsync(SavingsGoal goal, CancellationToken cancellationToken) { Goals.Add(goal.Id, goal); return Task.CompletedTask; }
     Task IGoalContributionStore.AddAsync(GoalContribution contribution, CancellationToken cancellationToken) { Contributions.Add(contribution); return Task.CompletedTask; }
     public Task SaveChangesAsync(CancellationToken cancellationToken = default) { SaveCount++; return Task.CompletedTask; }

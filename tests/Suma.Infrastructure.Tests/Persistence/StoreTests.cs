@@ -134,6 +134,33 @@ public sealed class StoreTests
     }
 
     [Fact]
+    public async Task Recurring_reads_preserve_historical_names_states_keys_and_paid_transaction()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Archived wallet");
+        var category = new Category("Bills", CategoryTransactionKind.Expense);
+        var recurring = RecurringTransaction.CreateExpense(account.Id, category.Id, new Money(500, "PHP"), RecurrenceFrequencyUnit.Month, 1, new(2026, 9, 5), dayOfMonth: 5, description: "Internet");
+        var pending = new RecurringOccurrence(recurring.Id, new(2026, 9, 5));
+        var skipped = new RecurringOccurrence(recurring.Id, new(2026, 10, 5)); skipped.Skip();
+        var paid = new RecurringOccurrence(recurring.Id, new(2026, 8, 5));
+        var transaction = Transaction.CreateExpense(account.Id, category.Id, new Money(500, "PHP"), paid.DueDate, "Internet");
+        paid.MarkPaid(transaction.Id);
+        account.Archive(); category.Archive();
+        await database.AddAsync(account, category, recurring, pending, skipped, paid, transaction);
+        await using var context = database.Context();
+        var schedules = await new RecurringTransactionStore(context).GetSchedulesAsync(Token);
+        var store = new RecurringOccurrenceStore(context);
+        var records = await store.GetRecordsAsync(Token);
+        var keys = await store.GetExistingKeysAsync([recurring.Id], new(2026, 8, 1), new(2026, 10, 31), Token);
+        Assert.Equal("Archived wallet", Assert.Single(schedules).SourceAccountName);
+        Assert.Equal("Bills", schedules[0].CategoryName);
+        Assert.Contains(records, item => item.Status == RecurringOccurrenceStatus.Pending);
+        Assert.Contains(records, item => item.Status == RecurringOccurrenceStatus.Skipped);
+        Assert.Contains(records, item => item.Status == RecurringOccurrenceStatus.Paid && item.TransactionId == transaction.Id);
+        Assert.Equal(3, keys.Count);
+    }
+
+    [Fact]
     public async Task Mutable_occurrence_lookup_is_tracked()
     {
         await using var database = await Database.CreateAsync();

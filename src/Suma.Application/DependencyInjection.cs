@@ -17,6 +17,10 @@ using Suma.Application.Categories.GetCategories;
 using Suma.Application.Categories.RestoreCategory;
 using Suma.Application.Categories.UpdateCategory;
 using Suma.Application.Recurring.MarkOccurrencePaid;
+using Suma.Application.Recurring.CreateRecurringTransaction;
+using Suma.Application.Recurring.EnsureRecurringOccurrences;
+using Suma.Application.Recurring.GetRecurringOverview;
+using Suma.Application.Recurring.SkipOccurrence;
 using Suma.Application.Savings.AddGoalContribution;
 using Suma.Application.Savings.CreateSavingsGoal;
 using Suma.Application.Transactions.CreateExpense;
@@ -56,6 +60,10 @@ public static class DependencyInjection
         services.AddScoped<ArchiveBudgetUseCase>();
         services.AddScoped<RestoreBudgetUseCase>();
         services.AddScoped<MarkOccurrencePaidUseCase>();
+        services.AddScoped<CreateRecurringTransactionUseCase>();
+        services.AddScoped<EnsureRecurringOccurrencesUseCase>();
+        services.AddScoped<GetRecurringOverviewUseCase>();
+        services.AddScoped<SkipOccurrenceUseCase>();
         services.AddScoped<CreateSavingsGoalUseCase>();
         services.AddScoped<AddGoalContributionUseCase>();
 

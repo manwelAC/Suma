@@ -16,9 +16,15 @@
                         <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Planning" />
                         <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Plan where your money should go." />
                     </StackPanel>
-                    <Button Grid.Column="1" AutomationProperties.Name="Create new budget" Click="OnNewBudgetClick" Content="New budget" Visibility="{x:Bind ViewModel.NewBudgetVisibility, Mode=OneWay}" />
+                    <Button x:Name="NewBudgetButton" Grid.Column="1" AutomationProperties.Name="Create new budget" Click="OnNewBudgetClick" Content="New budget" Visibility="{x:Bind ViewModel.NewBudgetVisibility, Mode=OneWay}" />
                 </Grid>
 
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <ToggleButton x:Name="BudgetsSectionButton" AutomationProperties.Name="Show budgets planning section" Click="OnBudgetsSectionClick" Content="Budgets" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                    <ToggleButton x:Name="RecurringSectionButton" AutomationProperties.Name="Show recurring planning section" Click="OnRecurringSectionClick" Content="Recurring" Style="{StaticResource SumaNavigationItemStyle}" />
+                </StackPanel>
+
+                <StackPanel x:Name="BudgetSection" Spacing="20">
                 <StackPanel Spacing="12">
                     <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Budgets" />
                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -158,6 +164,67 @@
                     </Grid>
                 </Border>
                 <InfoBar IsClosable="False" IsOpen="True" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}" />
+                </StackPanel>
+
+                <StackPanel x:Name="RecurringSection" Spacing="20" Visibility="Collapsed">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Recurring" />
+                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Scheduled money movements become real only when marked paid." TextWrapping="Wrap" />
+                        </StackPanel>
+                        <Button Grid.Column="1" AutomationProperties.Name="Create new recurring transaction" Click="OnNewRecurringClick" Content="New recurring" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ToggleButton x:Name="UpcomingOccurrencesButton" AutomationProperties.Name="Show pending recurring occurrences" Click="OnUpcomingOccurrencesClick" Content="Upcoming" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
+                        <ToggleButton x:Name="HistoryOccurrencesButton" AutomationProperties.Name="Show paid and skipped recurring occurrences" Click="OnHistoryOccurrencesClick" Content="History" Style="{StaticResource SumaNavigationItemStyle}" />
+                    </StackPanel>
+                    <Grid MinHeight="120">
+                        <ListView AutomationProperties.Name="Recurring occurrences" ItemsSource="{x:Bind RecurringViewModel.Occurrences, Mode=OneWay}" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:RecurringOccurrenceRowViewModel">
+                                    <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20" Margin="0,0,0,8">
+                                        <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Title}" />
+                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ContextDisplay}" TextWrapping="Wrap" />
+                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind DueDisplay}" />
+                                                <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind StatusDisplay}" />
+                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TransactionDisplay}" Visibility="{x:Bind TransactionVisibility}" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="8">
+                                                <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind AmountDisplay}" />
+                                                <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind PendingVisibility}">
+                                                    <Button AutomationProperties.Name="Mark recurring occurrence paid" Click="OnMarkPaidClick" Content="Mark paid" IsEnabled="{x:Bind CanMarkPaid}" />
+                                                    <Button AutomationProperties.Name="Skip recurring occurrence" Click="OnSkipOccurrenceClick" Content="Skip" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="No occurrences in this view." Visibility="{x:Bind RecurringViewModel.EmptyOccurrencesVisibility, Mode=OneWay}" />
+                        <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind RecurringViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind RecurringViewModel.LoadingVisibility, Mode=OneWay}" />
+                    </Grid>
+                    <StackPanel Spacing="10">
+                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Schedules" />
+                        <ListView AutomationProperties.Name="Recurring schedules" ItemsSource="{x:Bind RecurringViewModel.Schedules, Mode=OneWay}" SelectionMode="None">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="models:RecurringScheduleRowViewModel">
+                                    <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,1,0,0" Padding="0,14,0,8">
+                                        <Grid ColumnSpacing="16"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel Spacing="3"><TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind Title}" /><TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ContextDisplay}" TextWrapping="Wrap" /><TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind PatternDisplay}" /></StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="3"><TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind AmountDisplay}" /><TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" /></StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="No recurring schedules yet." Visibility="{x:Bind RecurringViewModel.EmptySchedulesVisibility, Mode=OneWay}" />
+                    </StackPanel>
+                    <InfoBar IsClosable="False" IsOpen="True" Message="{x:Bind RecurringViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind RecurringViewModel.ErrorVisibility, Mode=OneWay}" />
+                </StackPanel>
             </StackPanel>
         </Grid>
     </ScrollViewer>
