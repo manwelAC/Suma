@@ -9,6 +9,13 @@ public sealed class BudgetStore(SumaDbContext context) : IBudgetStore
     public Task<Budget?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.Budgets.SingleOrDefaultAsync(budget => budget.Id == id, cancellationToken);
 
+    public async Task<IReadOnlyList<Budget>> GetAsync(bool archived, CancellationToken cancellationToken = default) =>
+        await context.Budgets.AsNoTracking()
+            .Where(budget => budget.IsArchived == archived)
+            .OrderByDescending(budget => budget.PeriodStart)
+            .ThenBy(budget => budget.Name)
+            .ToListAsync(cancellationToken);
+
     public Task<bool> HasActiveOverlapAsync(DateOnly periodStart, DateOnly periodEnd, Guid? excludingBudgetId = null, CancellationToken cancellationToken = default) =>
         context.Budgets.AsNoTracking().AnyAsync(
             budget => !budget.IsArchived

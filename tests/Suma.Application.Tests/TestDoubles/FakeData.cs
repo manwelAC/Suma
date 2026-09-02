@@ -69,9 +69,41 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
                 item.Item.Amount.AmountMinor, item.Refunded, item.Item.Amount.CurrencyCode,
                 item.Item.TransactionDate, item.Item.Description))
             .ToArray());
+    Task<IReadOnlyList<CategoryNetExpenseRecord>> ITransactionStore.GetNetExpenseAmountsByCategoryAsync(DateOnly periodStart, DateOnly periodEnd, string currencyCode, IReadOnlyCollection<Guid> categoryIds, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<CategoryNetExpenseRecord>>(Transactions.Values
+            .Where(expense => expense.Type == TransactionType.Expense
+                && expense.TransactionDate >= periodStart
+                && expense.TransactionDate <= periodEnd
+                && string.Equals(expense.Amount.CurrencyCode, currencyCode, StringComparison.Ordinal)
+                && expense.CategoryId.HasValue
+                && categoryIds.Contains(expense.CategoryId.Value))
+            .GroupBy(expense => expense.CategoryId!.Value)
+            .Select(group => new CategoryNetExpenseRecord(
+                group.Key,
+                group.Sum(expense => expense.Amount.AmountMinor)
+                    - Transactions.Values.Where(refund => refund.Type == TransactionType.Refund
+                        && refund.OriginalTransactionId.HasValue
+                        && group.Any(expense => expense.Id == refund.OriginalTransactionId.Value))
+                        .Sum(refund => refund.Amount.AmountMinor)))
+            .ToArray());
     Task<Budget?> IBudgetStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Budgets.GetValueOrDefault(id));
+    Task<IReadOnlyList<Budget>> IBudgetStore.GetAsync(bool archived, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<Budget>>(Budgets.Values.Where(budget => budget.IsArchived == archived).OrderByDescending(budget => budget.PeriodStart).ToArray());
     Task<bool> IBudgetStore.HasActiveOverlapAsync(DateOnly periodStart, DateOnly periodEnd, Guid? excludingBudgetId, CancellationToken cancellationToken) => Task.FromResult(HasOverlap);
     Task<bool> IBudgetAllocationStore.ExistsAsync(Guid budgetId, Guid categoryId, CancellationToken cancellationToken) => Task.FromResult(Allocations.Any(allocation => allocation.BudgetId == budgetId && allocation.CategoryId == categoryId));
+    Task<IReadOnlyList<BudgetAllocationRecord>> IBudgetAllocationStore.GetForBudgetAsync(Guid budgetId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<BudgetAllocationRecord>>(Allocations
+            .Where(allocation => allocation.BudgetId == budgetId)
+            .Select(allocation => new BudgetAllocationRecord(
+                allocation.Id,
+                allocation.BudgetId,
+                allocation.CategoryId,
+                Categories[allocation.CategoryId].Name,
+                Categories[allocation.CategoryId].IsArchived,
+                allocation.Amount.AmountMinor,
+                allocation.CurrencyCode,
+                allocation.ReserveFromAvailable))
+            .ToArray());
     Task<RecurringTransaction?> IRecurringTransactionStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(RecurringTransactions.GetValueOrDefault(id));
     Task<RecurringOccurrence?> IRecurringOccurrenceStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Occurrences.GetValueOrDefault(id));
     Task<SavingsGoal?> ISavingsGoalStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Goals.GetValueOrDefault(id));

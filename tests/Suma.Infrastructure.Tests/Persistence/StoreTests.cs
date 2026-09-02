@@ -78,6 +78,44 @@ public sealed class StoreTests
     }
 
     [Fact]
+    public async Task Budget_reads_and_net_spending_preserve_history_and_refund_original_expenses()
+    {
+        await using var database = await Database.CreateAsync();
+        var food = new Category("Food", CategoryTransactionKind.Expense);
+        var child = new Category("Dining", CategoryTransactionKind.Expense, food.Id);
+        var account = NewAccount("PHP Wallet");
+        var usdAccount = new Account("USD Wallet", AccountType.Bank, Money.Zero("USD"), "USD", true);
+        var active = new Budget("September", new(2026, 9, 1), new(2026, 9, 30), new Money(2_000, "PHP"));
+        var archived = new Budget("August", new(2026, 8, 1), new(2026, 8, 31), Money.Zero("PHP"));
+        archived.Archive();
+        var allocation = new BudgetAllocation(active.Id, food.Id, new Money(500, "PHP"), true);
+        var inPeriod = Transaction.CreateExpense(account.Id, food.Id, new Money(600, "PHP"), new(2026, 9, 2));
+        var outOfPeriod = Transaction.CreateExpense(account.Id, food.Id, new Money(100, "PHP"), new(2026, 8, 31));
+        var childExpense = Transaction.CreateExpense(account.Id, child.Id, new Money(200, "PHP"), new(2026, 9, 3));
+        var foreignCurrencyExpense = Transaction.CreateExpense(usdAccount.Id, food.Id, new Money(20_000, "USD"), new(2026, 9, 4));
+        var refundAfterPeriod = Transaction.CreateRefund(account.Id, food.Id, inPeriod.Id, new Money(25, "PHP"), new(2026, 10, 3));
+        food.Archive();
+        await database.AddAsync(account, usdAccount, food, child, active, archived, allocation, inPeriod, outOfPeriod, childExpense, foreignCurrencyExpense, refundAfterPeriod);
+
+        await using var context = database.Context();
+        var activeBudgets = await new BudgetStore(context).GetAsync(false, Token);
+        var archivedBudgets = await new BudgetStore(context).GetAsync(true, Token);
+        var allocations = await new BudgetAllocationStore(context).GetForBudgetAsync(active.Id, Token);
+        var spending = await new TransactionStore(context).GetNetExpenseAmountsByCategoryAsync(
+            active.PeriodStart,
+            active.PeriodEnd,
+            active.CurrencyCode,
+            [food.Id],
+            Token);
+
+        Assert.Equal(active.Id, Assert.Single(activeBudgets).Id);
+        Assert.Equal(archived.Id, Assert.Single(archivedBudgets).Id);
+        Assert.True(Assert.Single(allocations).CategoryArchived);
+        Assert.Equal("Food", allocations[0].CategoryName);
+        Assert.Equal(575, Assert.Single(spending).AmountMinor);
+    }
+
+    [Fact]
     public async Task Goal_query_sums_existing_attribution_and_unit_of_work_saves()
     {
         await using var database = await Database.CreateAsync();

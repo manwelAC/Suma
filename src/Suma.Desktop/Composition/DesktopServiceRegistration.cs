@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Suma.Desktop.Navigation;
 using Suma.Desktop.Operations.Accounts;
+using Suma.Desktop.Operations.Budgets;
 using Suma.Desktop.Operations.Categories;
 using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Pages.Accounts;
@@ -22,10 +23,13 @@ public static class DesktopServiceRegistration
         services.AddSingleton<IAccountOperations, AccountOperations>();
         services.AddSingleton<ICategoryOperations, CategoryOperations>();
         services.AddSingleton<ITransactionOperations, TransactionOperations>();
+        services.AddSingleton<IBudgetOperations, BudgetOperations>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<CategoriesViewModel>();
         services.AddSingleton<ActivityViewModel>();
         services.AddSingleton<TransactionEditorViewModel>();
+        services.AddSingleton<PlanningViewModel>();
+        services.AddSingleton<BudgetEditorViewModel>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<ShellPage>();
         services.AddSingleton<MainWindow>();

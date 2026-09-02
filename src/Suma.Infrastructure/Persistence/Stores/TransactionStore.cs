@@ -90,4 +90,45 @@ public sealed class TransactionStore(SumaDbContext context) : ITransactionStore
             .Take(limit)
             .ToArray();
     }
+
+    public async Task<IReadOnlyList<CategoryNetExpenseRecord>> GetNetExpenseAmountsByCategoryAsync(
+        DateOnly periodStart,
+        DateOnly periodEnd,
+        string currencyCode,
+        IReadOnlyCollection<Guid> categoryIds,
+        CancellationToken cancellationToken = default)
+    {
+        if (categoryIds.Count == 0)
+        {
+            return [];
+        }
+
+        var ids = categoryIds.Distinct().ToArray();
+        var expenses = context.Transactions.AsNoTracking().Where(transaction =>
+            transaction.Type == TransactionType.Expense
+            && transaction.TransactionDate >= periodStart
+            && transaction.TransactionDate <= periodEnd
+            && transaction.Amount.CurrencyCode == currencyCode
+            && transaction.CategoryId.HasValue
+            && ids.Contains(transaction.CategoryId.Value));
+
+        var expenseTotals = await expenses
+            .GroupBy(expense => expense.CategoryId!.Value)
+            .Select(group => new { CategoryId = group.Key, Amount = group.Sum(expense => expense.Amount.AmountMinor) })
+            .ToDictionaryAsync(item => item.CategoryId, item => item.Amount, cancellationToken);
+
+        var refundTotals = await (
+            from refund in context.Transactions.AsNoTracking()
+            join expense in expenses on refund.OriginalTransactionId equals (Guid?)expense.Id
+            where refund.Type == TransactionType.Refund
+            group refund by expense.CategoryId!.Value into grouped
+            select new { CategoryId = grouped.Key, Amount = grouped.Sum(refund => refund.Amount.AmountMinor) })
+            .ToDictionaryAsync(item => item.CategoryId, item => item.Amount, cancellationToken);
+
+        return expenseTotals
+            .Select(item => new CategoryNetExpenseRecord(
+                item.Key,
+                checked(item.Value - refundTotals.GetValueOrDefault(item.Key))))
+            .ToArray();
+    }
 }

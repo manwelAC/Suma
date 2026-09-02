@@ -17,7 +17,16 @@ public interface ITransactionStore
     Task<IReadOnlyList<TransactionHistoryRecord>> GetHistoryAsync(TransactionType? type, int limit, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<RefundableExpenseRecord>> GetRefundableExpensesAsync(int limit, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<CategoryNetExpenseRecord>> GetNetExpenseAmountsByCategoryAsync(
+        DateOnly periodStart,
+        DateOnly periodEnd,
+        string currencyCode,
+        IReadOnlyCollection<Guid> categoryIds,
+        CancellationToken cancellationToken = default);
 }
+
+public sealed record CategoryNetExpenseRecord(Guid CategoryId, long AmountMinor);
 
 public sealed record TransactionHistoryRecord(
     Guid Id,

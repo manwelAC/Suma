@@ -4,6 +4,7 @@ using Suma.Desktop;
 using Suma.Desktop.Composition;
 using Suma.Desktop.Navigation;
 using Suma.Desktop.Operations.Accounts;
+using Suma.Desktop.Operations.Budgets;
 using Suma.Desktop.Operations.Categories;
 using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Pages.Accounts;
@@ -56,9 +57,11 @@ public sealed class NavigationArchitectureTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IAccountOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ICategoryOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ITransactionOperations));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IBudgetOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CategoriesViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ActivityViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(PlanningViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsPage));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ShellPage));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(MainWindow));
@@ -97,6 +100,7 @@ public sealed class NavigationArchitectureTests
     [InlineData(typeof(AccountsViewModel), typeof(IAccountOperations))]
     [InlineData(typeof(CategoriesViewModel), typeof(ICategoryOperations))]
     [InlineData(typeof(ActivityViewModel), typeof(ITransactionOperations))]
+    [InlineData(typeof(PlanningViewModel), typeof(IBudgetOperations))]
     public void Finance_view_models_retain_only_focused_root_safe_operations(Type viewModelType, Type operationType)
     {
         var constructor = Assert.Single(viewModelType.GetConstructors());
@@ -114,6 +118,7 @@ public sealed class NavigationArchitectureTests
     [InlineData(typeof(AccountOperations))]
     [InlineData(typeof(CategoryOperations))]
     [InlineData(typeof(TransactionOperations))]
+    [InlineData(typeof(BudgetOperations))]
     public void Finance_operation_adapters_hold_scope_factory_not_scoped_finance_services(Type adapterType)
     {
         var fields = adapterType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
