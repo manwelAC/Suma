@@ -32,6 +32,36 @@ public sealed class StoreTests
     }
 
     [Fact]
+    public async Task Transaction_history_and_refundable_queries_preserve_archived_names()
+    {
+        await using var database = await Database.CreateAsync();
+        var source = NewAccount("Archived wallet");
+        var destination = NewAccount("Savings");
+        var category = new Category("Food", CategoryTransactionKind.Expense);
+        var activeCategory = new Category("Travel", CategoryTransactionKind.Expense);
+        var expense = Transaction.CreateExpense(source.Id, category.Id, new Money(1_000, "PHP"), new(2026, 9, 1), "Groceries");
+        var refund = Transaction.CreateRefund(destination.Id, category.Id, expense.Id, new Money(250, "PHP"), new(2026, 9, 2));
+        var activeExpense = Transaction.CreateExpense(source.Id, activeCategory.Id, new Money(500, "PHP"), new(2026, 8, 31), "Bus");
+        var activeRefund = Transaction.CreateRefund(destination.Id, activeCategory.Id, activeExpense.Id, new Money(100, "PHP"), new(2026, 9, 1));
+        var transfer = Transaction.CreateTransfer(source.Id, destination.Id, new Money(100, "PHP"), new(2026, 9, 3));
+        source.Archive();
+        category.Archive();
+        await database.AddAsync(source, destination, category, activeCategory, expense, refund, activeExpense, activeRefund, transfer);
+
+        await using var context = database.Context();
+        var store = new TransactionStore(context);
+        var history = Assert.Single(await store.GetHistoryAsync(TransactionType.Expense, 1, Token));
+        Assert.Equal("Archived wallet", history.SourceAccountName);
+        Assert.Equal("Food", history.CategoryName);
+        var all = await store.GetHistoryAsync(null, 2, Token);
+        Assert.Equal(TransactionType.Transfer, all[0].Type);
+        Assert.Equal("Savings", all[0].DestinationAccountName);
+        var refundable = Assert.Single(await store.GetRefundableExpensesAsync(10, Token));
+        Assert.Equal(activeExpense.Id, refundable.Id);
+        Assert.Equal(100, refundable.RefundedAmountMinor);
+    }
+
+    [Fact]
     public async Task Budget_queries_detect_only_active_overlap_and_duplicate_allocation()
     {
         await using var database = await Database.CreateAsync();

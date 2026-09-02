@@ -13,4 +13,36 @@ public interface ITransactionStore
     Task<IReadOnlyList<Transaction>> GetForAccountAsync(Guid accountId, CancellationToken cancellationToken = default);
 
     Task<long> GetRefundedAmountMinorAsync(Guid originalTransactionId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<TransactionHistoryRecord>> GetHistoryAsync(TransactionType? type, int limit, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<RefundableExpenseRecord>> GetRefundableExpensesAsync(int limit, CancellationToken cancellationToken = default);
 }
+
+public sealed record TransactionHistoryRecord(
+    Guid Id,
+    TransactionType Type,
+    Guid? SourceAccountId,
+    string? SourceAccountName,
+    Guid? DestinationAccountId,
+    string? DestinationAccountName,
+    Guid? CategoryId,
+    string? CategoryName,
+    Guid? OriginalTransactionId,
+    long AmountMinor,
+    string CurrencyCode,
+    DateOnly TransactionDate,
+    string? Description,
+    string? Notes);
+
+public sealed record RefundableExpenseRecord(
+    Guid Id,
+    Guid SourceAccountId,
+    string SourceAccountName,
+    Guid CategoryId,
+    string CategoryName,
+    long AmountMinor,
+    long RefundedAmountMinor,
+    string CurrencyCode,
+    DateOnly TransactionDate,
+    string? Description);

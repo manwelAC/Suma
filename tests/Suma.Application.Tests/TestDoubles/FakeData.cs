@@ -35,6 +35,40 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
     Task<IReadOnlyList<Transaction>> ITransactionStore.GetRecentAsync(int limit, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Transaction>>(Transactions.Values.Take(limit).ToArray());
     Task<IReadOnlyList<Transaction>> ITransactionStore.GetForAccountAsync(Guid accountId, CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Transaction>>(Transactions.Values.Where(transaction => transaction.SourceAccountId == accountId || transaction.DestinationAccountId == accountId).ToArray());
     Task<long> ITransactionStore.GetRefundedAmountMinorAsync(Guid originalTransactionId, CancellationToken cancellationToken) => Task.FromResult(RefundedAmountMinor);
+    Task<IReadOnlyList<TransactionHistoryRecord>> ITransactionStore.GetHistoryAsync(TransactionType? type, int limit, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<TransactionHistoryRecord>>(Transactions.Values
+            .Where(item => !type.HasValue || item.Type == type.Value)
+            .OrderByDescending(item => item.TransactionDate)
+            .ThenByDescending(item => item.Id)
+            .Take(limit)
+            .Select(item => new TransactionHistoryRecord(
+                item.Id, item.Type, item.SourceAccountId,
+                item.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(item.SourceAccountId.Value)?.Name : null,
+                item.DestinationAccountId,
+                item.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(item.DestinationAccountId.Value)?.Name : null,
+                item.CategoryId,
+                item.CategoryId.HasValue ? Categories.GetValueOrDefault(item.CategoryId.Value)?.Name : null,
+                item.OriginalTransactionId, item.Amount.AmountMinor, item.Amount.CurrencyCode,
+                item.TransactionDate, item.Description, item.Notes))
+            .ToArray());
+    Task<IReadOnlyList<RefundableExpenseRecord>> ITransactionStore.GetRefundableExpensesAsync(int limit, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<RefundableExpenseRecord>>(Transactions.Values
+            .Where(item => item.Type == TransactionType.Expense)
+            .Select(item => new
+            {
+                Item = item,
+                Refunded = Transactions.Values.Where(refund => refund.Type == TransactionType.Refund && refund.OriginalTransactionId == item.Id).Sum(refund => refund.Amount.AmountMinor)
+            })
+            .Where(item => !Categories[item.Item.CategoryId!.Value].IsArchived)
+            .Where(item => item.Refunded < item.Item.Amount.AmountMinor)
+            .OrderByDescending(item => item.Item.TransactionDate)
+            .Take(limit)
+            .Select(item => new RefundableExpenseRecord(
+                item.Item.Id, item.Item.SourceAccountId!.Value, Accounts[item.Item.SourceAccountId.Value].Name,
+                item.Item.CategoryId!.Value, Categories[item.Item.CategoryId.Value].Name,
+                item.Item.Amount.AmountMinor, item.Refunded, item.Item.Amount.CurrencyCode,
+                item.Item.TransactionDate, item.Item.Description))
+            .ToArray());
     Task<Budget?> IBudgetStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Budgets.GetValueOrDefault(id));
     Task<bool> IBudgetStore.HasActiveOverlapAsync(DateOnly periodStart, DateOnly periodEnd, Guid? excludingBudgetId, CancellationToken cancellationToken) => Task.FromResult(HasOverlap);
     Task<bool> IBudgetAllocationStore.ExistsAsync(Guid budgetId, Guid categoryId, CancellationToken cancellationToken) => Task.FromResult(Allocations.Any(allocation => allocation.BudgetId == budgetId && allocation.CategoryId == categoryId));
