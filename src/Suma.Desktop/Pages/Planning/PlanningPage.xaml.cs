@@ -6,17 +6,21 @@ using Suma.Desktop.ViewModels;
 using Suma.Application.Recurring.CreateRecurringTransaction;
 using Suma.Domain.Recurring;
 using Suma.Domain.Transactions;
+using Suma.Application.Savings.CreateSavingsGoal;
+using Suma.Domain.Savings;
 
 namespace Suma.Desktop.Pages.Planning;
 
 public sealed partial class PlanningPage : Page
 {
-    public PlanningPage(PlanningViewModel viewModel, BudgetEditorViewModel editorViewModel, RecurringViewModel recurringViewModel, RecurringEditorViewModel recurringEditorViewModel)
+    public PlanningPage(PlanningViewModel viewModel, BudgetEditorViewModel editorViewModel, RecurringViewModel recurringViewModel, RecurringEditorViewModel recurringEditorViewModel, SavingsViewModel savingsViewModel, SavingsGoalEditorViewModel savingsGoalEditorViewModel)
     {
         ViewModel = viewModel;
         EditorViewModel = editorViewModel;
         RecurringViewModel = recurringViewModel;
         RecurringEditorViewModel = recurringEditorViewModel;
+        SavingsViewModel = savingsViewModel;
+        SavingsGoalEditorViewModel = savingsGoalEditorViewModel;
         InitializeComponent();
         Loaded += OnLoaded;
     }
@@ -28,6 +32,10 @@ public sealed partial class PlanningPage : Page
     public RecurringViewModel RecurringViewModel { get; }
 
     public RecurringEditorViewModel RecurringEditorViewModel { get; }
+
+    public SavingsViewModel SavingsViewModel { get; }
+
+    public SavingsGoalEditorViewModel SavingsGoalEditorViewModel { get; }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
@@ -66,8 +74,10 @@ public sealed partial class PlanningPage : Page
     {
         SetToggleState(BudgetsSectionButton, true);
         SetToggleState(RecurringSectionButton, false);
+        SetToggleState(SavingsSectionButton, false);
         BudgetSection.Visibility = Visibility.Visible;
         RecurringSection.Visibility = Visibility.Collapsed;
+        SavingsSection.Visibility = Visibility.Collapsed;
         NewBudgetButton.Visibility = ViewModel.NewBudgetVisibility;
     }
 
@@ -75,8 +85,10 @@ public sealed partial class PlanningPage : Page
     {
         SetToggleState(BudgetsSectionButton, false);
         SetToggleState(RecurringSectionButton, true);
+        SetToggleState(SavingsSectionButton, false);
         BudgetSection.Visibility = Visibility.Collapsed;
         RecurringSection.Visibility = Visibility.Visible;
+        SavingsSection.Visibility = Visibility.Collapsed;
         NewBudgetButton.Visibility = Visibility.Collapsed;
         await RecurringViewModel.LoadAsync();
     }
@@ -106,6 +118,90 @@ public sealed partial class PlanningPage : Page
     }
 
     private async void OnNewRecurringClick(object sender, RoutedEventArgs e) => await ShowRecurringEditorAsync();
+
+    private async void OnSavingsSectionClick(object sender, RoutedEventArgs e)
+    {
+        SetToggleState(BudgetsSectionButton, false); SetToggleState(RecurringSectionButton, false); SetToggleState(SavingsSectionButton, true);
+        BudgetSection.Visibility = Visibility.Collapsed; RecurringSection.Visibility = Visibility.Collapsed; SavingsSection.Visibility = Visibility.Visible;
+        NewBudgetButton.Visibility = Visibility.Collapsed; await SavingsViewModel.LoadAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+    }
+
+    private async void OnActiveSavingsClick(object sender, RoutedEventArgs e)
+    {
+        SetToggleState(ActiveSavingsButton, true); SetToggleState(ArchivedSavingsButton, false);
+        await SavingsViewModel.SetArchivedAsync(false); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+    }
+
+    private async void OnArchivedSavingsClick(object sender, RoutedEventArgs e)
+    {
+        SetToggleState(ActiveSavingsButton, false); SetToggleState(ArchivedSavingsButton, true);
+        await SavingsViewModel.SetArchivedAsync(true); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+    }
+
+    private async void OnSavingsGoalClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is SavingsGoalRowViewModel goal) { SavingsGoalList.SelectedItem = goal; await SavingsViewModel.SelectGoalAsync(goal.Id); }
+    }
+
+    private async void OnNewSavingsGoalClick(object sender, RoutedEventArgs e) => await ShowSavingsGoalEditorAsync();
+    private async void OnAddSavingsContributionClick(object sender, RoutedEventArgs e) => await ShowSavingsContributionEditorAsync();
+    private async void OnArchiveSavingsClick(object sender, RoutedEventArgs e) { await SavingsViewModel.ArchiveAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal; }
+    private async void OnRestoreSavingsClick(object sender, RoutedEventArgs e)
+    {
+        await SavingsViewModel.RestoreAsync();
+        SetToggleState(ActiveSavingsButton, !SavingsViewModel.ShowArchived);
+        SetToggleState(ArchivedSavingsButton, SavingsViewModel.ShowArchived);
+        SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+    }
+
+    private async Task ShowSavingsGoalEditorAsync()
+    {
+        if (!await SavingsGoalEditorViewModel.LoadAsync()) { SavingsViewModel.SetError(SavingsGoalEditorViewModel.ErrorMessage!); return; }
+        var nameBox = new TextBox { Header = "Name", PlaceholderText = "Emergency Fund" };
+        var targetBox = new TextBox { Header = "Target amount", PlaceholderText = "0.00", InputScope = new InputScope { Names = { new InputScopeName(InputScopeNameValue.CurrencyAmount) } } };
+        var currencyBox = new TextBox { Header = "Currency", Text = "PHP", MaxLength = 3, CharacterCasing = CharacterCasing.Upper };
+        var accountBox = new ComboBox { Header = "Destination account", ItemsSource = SavingsGoalEditorViewModel.Accounts, DisplayMemberPath = nameof(SavingsAccountOption.Display), SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+        accountBox.SelectionChanged += (_, _) => { if (accountBox.SelectedItem is SavingsAccountOption { Id: not null } option) { currencyBox.Text = option.CurrencyCode; currencyBox.IsEnabled = false; } else currencyBox.IsEnabled = true; };
+        var targetDateCheck = new CheckBox { Content = "Set a target date" };
+        var targetDateBox = new DatePicker { Header = "Target date", Date = DateTimeOffset.Now.AddMonths(6), Visibility = Visibility.Collapsed };
+        targetDateCheck.Checked += (_, _) => targetDateBox.Visibility = Visibility.Visible; targetDateCheck.Unchecked += (_, _) => targetDateBox.Visibility = Visibility.Collapsed;
+        var error = ErrorText(); var dialog = Dialog("New savings goal", DialogContent(nameBox, targetBox, currencyBox, accountBox, targetDateCheck, targetDateBox, error));
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            var deferral = args.GetDeferral(); dialog.IsPrimaryButtonEnabled = false;
+            try
+            {
+                if (!MoneyText.TryParseMinor(targetBox.Text, out var target) || target <= 0) { Reject(args, error, "Enter a valid target amount."); return; }
+                var account = accountBox.SelectedItem as SavingsAccountOption;
+                var request = new CreateSavingsGoalRequest(nameBox.Text, target, currencyBox.Text,
+                    targetDateCheck.IsChecked == true ? DateOnly.FromDateTime(targetDateBox.Date.DateTime) : null, account?.Id);
+                if (!await SavingsViewModel.CreateAsync(request)) Reject(args, error, SavingsViewModel.ErrorMessage!);
+            }
+            finally { dialog.IsPrimaryButtonEnabled = true; deferral.Complete(); }
+        };
+        _ = await dialog.ShowAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+    }
+
+    private async Task ShowSavingsContributionEditorAsync()
+    {
+        if (!await SavingsViewModel.LoadCandidatesAsync()) return;
+        if (SavingsViewModel.Candidates.Count == 0) { SavingsViewModel.SetError("No transactions have remaining capacity for this goal."); return; }
+        var candidateBox = new ComboBox { Header = "Existing transaction", ItemsSource = SavingsViewModel.Candidates, DisplayMemberPath = nameof(GoalCandidateRowViewModel.Display), SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var typeBox = new ComboBox { Header = "Contribution type", ItemsSource = Enum.GetValues<GoalContributionType>(), SelectedIndex = 0, HorizontalAlignment = HorizontalAlignment.Stretch };
+        var amountBox = new TextBox { Header = "Amount", PlaceholderText = "0.00", InputScope = new InputScope { Names = { new InputScopeName(InputScopeNameValue.CurrencyAmount) } } };
+        var error = ErrorText(); var dialog = Dialog("Add contribution", DialogContent(candidateBox, typeBox, amountBox, error));
+        dialog.PrimaryButtonClick += async (_, args) =>
+        {
+            var deferral = args.GetDeferral(); dialog.IsPrimaryButtonEnabled = false;
+            try
+            {
+                if (candidateBox.SelectedItem is not GoalCandidateRowViewModel candidate || !MoneyText.TryParseMinor(amountBox.Text, out var amount) || amount <= 0) { Reject(args, error, "Choose a transaction and enter a valid amount."); return; }
+                if (!await SavingsViewModel.AddContributionAsync(candidate.Value.TransactionId, (GoalContributionType)typeBox.SelectedItem, amount)) Reject(args, error, SavingsViewModel.ErrorMessage!);
+            }
+            finally { dialog.IsPrimaryButtonEnabled = true; deferral.Complete(); }
+        };
+        _ = await dialog.ShowAsync();
+    }
 
     private async Task ShowRecurringEditorAsync()
     {

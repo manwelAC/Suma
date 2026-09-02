@@ -112,7 +112,31 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
     Task<IReadOnlySet<(Guid RecurringTransactionId, DateOnly DueDate)>> IRecurringOccurrenceStore.GetExistingKeysAsync(IReadOnlyCollection<Guid> recurringTransactionIds, DateOnly from, DateOnly through, CancellationToken cancellationToken) => Task.FromResult<IReadOnlySet<(Guid, DateOnly)>>(Occurrences.Values.Where(item => recurringTransactionIds.Contains(item.RecurringTransactionId) && item.DueDate >= from && item.DueDate <= through).Select(item => (item.RecurringTransactionId, item.DueDate)).ToHashSet());
     Task<IReadOnlyList<RecurringOccurrenceRecord>> IRecurringOccurrenceStore.GetRecordsAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<RecurringOccurrenceRecord>>(Occurrences.Values.Select(item => { var recurring = RecurringTransactions[item.RecurringTransactionId]; return new RecurringOccurrenceRecord(item.Id, item.RecurringTransactionId, item.DueDate, item.Status, item.TransactionId, recurring.Type, recurring.Amount.AmountMinor, recurring.Amount.CurrencyCode, recurring.Description, recurring.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(recurring.SourceAccountId.Value)?.Name : null, recurring.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(recurring.DestinationAccountId.Value)?.Name : null, recurring.CategoryId.HasValue ? Categories.GetValueOrDefault(recurring.CategoryId.Value)?.Name : null); }).OrderByDescending(item => item.DueDate).ToArray());
     Task<SavingsGoal?> ISavingsGoalStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Goals.GetValueOrDefault(id));
+    Task<IReadOnlyList<SavingsGoalFactRecord>> ISavingsGoalStore.GetRecordsAsync(bool archived, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<SavingsGoalFactRecord>>(Goals.Values.Where(goal => goal.IsArchived == archived).Select(goal => new SavingsGoalFactRecord(
+            goal.Id, goal.Name, goal.TargetAmount.AmountMinor, goal.CurrencyCode, goal.TargetDate, goal.DestinationAccountId,
+            goal.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(goal.DestinationAccountId.Value)?.Name : null, goal.IsArchived,
+            Contributions.Where(item => item.SavingsGoalId == goal.Id && item.Type == GoalContributionType.Deposit).Sum(item => item.Amount.AmountMinor),
+            Contributions.Where(item => item.SavingsGoalId == goal.Id && item.Type == GoalContributionType.Withdrawal).Sum(item => item.Amount.AmountMinor))).ToArray());
     Task<long> IGoalContributionStore.GetAttributedAmountMinorAsync(Guid transactionId, CancellationToken cancellationToken) => Task.FromResult(AttributedAmountMinor);
+    Task<IReadOnlyList<GoalContributionHistoryRecord>> IGoalContributionStore.GetForGoalAsync(Guid savingsGoalId, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<GoalContributionHistoryRecord>>(Contributions.Where(item => item.SavingsGoalId == savingsGoalId).Select(item =>
+        {
+            var transaction = Transactions[item.TransactionId];
+            return new GoalContributionHistoryRecord(item.Id, item.TransactionId, item.Type, item.Amount.AmountMinor, item.Amount.CurrencyCode,
+                transaction.TransactionDate, transaction.Type, transaction.Description,
+                transaction.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(transaction.SourceAccountId.Value)?.Name : null,
+                transaction.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(transaction.DestinationAccountId.Value)?.Name : null,
+                transaction.CategoryId.HasValue ? Categories.GetValueOrDefault(transaction.CategoryId.Value)?.Name : null);
+        }).ToArray());
+    Task<IReadOnlyList<GoalContributionCandidateFact>> IGoalContributionStore.GetCandidateFactsAsync(string currencyCode, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<GoalContributionCandidateFact>>(Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode).Select(item => new GoalContributionCandidateFact(
+            item.Id, item.TransactionDate, item.Type, item.Description,
+            item.SourceAccountId.HasValue ? Accounts.GetValueOrDefault(item.SourceAccountId.Value)?.Name : null,
+            item.DestinationAccountId.HasValue ? Accounts.GetValueOrDefault(item.DestinationAccountId.Value)?.Name : null,
+            item.CategoryId.HasValue ? Categories.GetValueOrDefault(item.CategoryId.Value)?.Name : null,
+            item.Amount.AmountMinor, item.Amount.CurrencyCode,
+            Contributions.Where(contribution => contribution.TransactionId == item.Id).Sum(contribution => contribution.Amount.AmountMinor))).ToArray());
 
     Task ITransactionStore.AddAsync(Transaction transaction, CancellationToken cancellationToken)
     {

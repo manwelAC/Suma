@@ -161,6 +161,30 @@ public sealed class StoreTests
     }
 
     [Fact]
+    public async Task Savings_reads_separate_archive_resolve_history_and_return_candidate_capacity()
+    {
+        await using var database = await Database.CreateAsync();
+        var account = NewAccount("Savings");
+        var category = new Category("Salary", CategoryTransactionKind.Income);
+        var transaction = Transaction.CreateIncome(account.Id, category.Id, new Money(1_000, "PHP"), new(2026, 9, 1), "Salary");
+        var goal = new SavingsGoal("Emergency", new Money(5_000, "PHP"), new(2027, 1, 1), account.Id);
+        var archived = new SavingsGoal("Archived", new Money(2_000, "PHP")); archived.Archive();
+        var contribution = new GoalContribution(goal.Id, transaction.Id, GoalContributionType.Deposit, new Money(300, "PHP"));
+        account.Archive(); category.Archive();
+        await database.AddAsync(account, category, transaction, goal, archived, contribution);
+        await using var context = database.Context();
+        var goalStore = new SavingsGoalStore(context);
+        var active = Assert.Single(await goalStore.GetRecordsAsync(false, Token));
+        var archivedRows = Assert.Single(await goalStore.GetRecordsAsync(true, Token));
+        var contributionStore = new GoalContributionStore(context);
+        var history = Assert.Single(await contributionStore.GetForGoalAsync(goal.Id, Token));
+        var candidate = Assert.Single(await contributionStore.GetCandidateFactsAsync("PHP", Token));
+        Assert.Equal(goal.Id, active.Id); Assert.Equal("Savings", active.DestinationAccountName); Assert.Equal(300, active.DepositMinor);
+        Assert.Equal(archived.Id, archivedRows.Id); Assert.Equal("Salary", history.CategoryName); Assert.Equal("Savings", history.DestinationAccountName);
+        Assert.Equal(300, candidate.AttributedAmountMinor); Assert.Equal(1_000, candidate.TransactionAmountMinor);
+    }
+
+    [Fact]
     public async Task Mutable_occurrence_lookup_is_tracked()
     {
         await using var database = await Database.CreateAsync();

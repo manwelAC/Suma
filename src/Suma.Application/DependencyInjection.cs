@@ -23,6 +23,11 @@ using Suma.Application.Recurring.GetRecurringOverview;
 using Suma.Application.Recurring.SkipOccurrence;
 using Suma.Application.Savings.AddGoalContribution;
 using Suma.Application.Savings.CreateSavingsGoal;
+using Suma.Application.Savings.GetSavingsGoals;
+using Suma.Application.Savings.GetSavingsGoalDetails;
+using Suma.Application.Savings.GetGoalContributionCandidates;
+using Suma.Application.Savings.ArchiveSavingsGoal;
+using Suma.Application.Savings.RestoreSavingsGoal;
 using Suma.Application.Transactions.CreateExpense;
 using Suma.Application.Transactions.CreateIncome;
 using Suma.Application.Transactions.CreateRefund;
@@ -66,6 +71,11 @@ public static class DependencyInjection
         services.AddScoped<SkipOccurrenceUseCase>();
         services.AddScoped<CreateSavingsGoalUseCase>();
         services.AddScoped<AddGoalContributionUseCase>();
+        services.AddScoped<GetSavingsGoalsUseCase>();
+        services.AddScoped<GetSavingsGoalDetailsUseCase>();
+        services.AddScoped<GetGoalContributionCandidatesUseCase>();
+        services.AddScoped<ArchiveSavingsGoalUseCase>();
+        services.AddScoped<RestoreSavingsGoalUseCase>();
 
         return services;
     }
