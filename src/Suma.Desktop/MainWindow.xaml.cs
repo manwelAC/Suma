@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Suma.Desktop.Shell;
@@ -12,12 +13,34 @@ namespace Suma.Desktop;
 
 public sealed partial class MainWindow : Window
 {
-    private readonly Func<ShellPage> shellFactory; private readonly LockViewModel lockViewModel;
+    private readonly Func<ShellPage> shellFactory;
+    private readonly LockViewModel lockViewModel;
+    private bool isFirstActivation = true;
+
     public MainWindow(Func<ShellPage> shellFactory, LockViewModel lockViewModel)
     {
-        this.shellFactory = shellFactory; this.lockViewModel = lockViewModel; InitializeComponent();
+        this.shellFactory = shellFactory;
+        this.lockViewModel = lockViewModel;
+        InitializeComponent();
         CustomizeTitleBar();
         AppWindow.Resize(new SizeInt32(1200, 760));
+
+        if (AppWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Maximize();
+        }
+
+        Activated += (_, _) =>
+        {
+            if (isFirstActivation)
+            {
+                isFirstActivation = false;
+                if (AppWindow.Presenter is OverlappedPresenter activePresenter)
+                {
+                    activePresenter.Maximize();
+                }
+            }
+        };
     }
 
     public void ShowShell() => RootHost.Content = shellFactory();

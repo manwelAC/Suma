@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Suma.Desktop.ViewModels;
+using Suma.Desktop.Common;
 using Suma.Domain.Accounts;
 using Suma.Domain.Categories;
 
@@ -110,7 +112,20 @@ public sealed partial class AccountsPage : Page
 
     private async void OnArchiveAccountClick(object sender, RoutedEventArgs e)
     {
-        if (GetId(sender) is { } id)
+        if (FindAccount(sender) is { } account)
+        {
+            var dialog = SumaDialog.CreateDestructive(
+                XamlRoot,
+                "Archive account?",
+                $"{account.Name} will be moved to Archived accounts. You can view it anytime or restore it later.",
+                "Archived accounts are excluded from available to spend and reports.",
+                destructiveButtonText: "Archive");
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await AccountsViewModel.ArchiveCommand.ExecuteAsync(account.Id);
+            }
+        }
+        else if (GetId(sender) is { } id)
         {
             await AccountsViewModel.ArchiveCommand.ExecuteAsync(id);
         }
@@ -147,7 +162,20 @@ public sealed partial class AccountsPage : Page
 
     private async void OnArchiveCategoryClick(object sender, RoutedEventArgs e)
     {
-        if (GetId(sender) is { } id)
+        if (FindCategory(sender) is { } category)
+        {
+            var dialog = SumaDialog.CreateDestructive(
+                XamlRoot,
+                "Archive category?",
+                $"{category.Name} will be moved to Archived categories. You can view it anytime or restore it later.",
+                "Archived categories cannot be assigned to new transactions or budgets.",
+                destructiveButtonText: "Archive");
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await CategoriesViewModel.ArchiveCommand.ExecuteAsync(category.Id);
+            }
+        }
+        else if (GetId(sender) is { } id)
         {
             await CategoriesViewModel.ArchiveCommand.ExecuteAsync(id);
         }
@@ -163,82 +191,79 @@ public sealed partial class AccountsPage : Page
 
     private async Task ShowAccountEditorAsync(AccountRowViewModel? account)
     {
-        var nameBox = new TextBox
-        {
-            Header = "Name",
-            PlaceholderText = "Everyday account",
-            Text = account?.Name ?? string.Empty
-        };
-        var typeBox = new ComboBox
-        {
-            Header = "Type",
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            ItemsSource = Enum.GetValues<AccountType>(),
-            SelectedItem = account?.Type ?? AccountType.Bank
-        };
-        var currencyBox = new TextBox
-        {
-            Header = "Currency code",
-            CharacterCasing = CharacterCasing.Upper,
-            MaxLength = 3,
-            PlaceholderText = "PHP",
-            Text = "PHP",
-            Visibility = account is null ? Visibility.Visible : Visibility.Collapsed
-        };
-        var openingBalanceBox = new TextBox
-        {
-            Header = "Opening balance",
-            InputScope = new InputScope { Names = { new InputScopeName(InputScopeNameValue.CurrencyAmount) } },
-            PlaceholderText = "0.00",
-            Text = "0.00",
-            Visibility = account is null ? Visibility.Visible : Visibility.Collapsed
-        };
-        var inclusionBox = new CheckBox
-        {
-            Content = "Include in future Available-to-Spend",
-            IsChecked = account?.IncludeInAvailableToSpend ?? true
-        };
+        var selectedType = account?.Type ?? AccountType.Bank;
+        var typeSelector = SumaDialog.CreateAccountTypeSelector(selectedType, type => selectedType = type);
+        var typeField = SumaDialog.CreateField("Account type", typeSelector);
+
+        var nameBox = SumaDialog.CreateTextBox("e.g., Main Wallet", account?.Name ?? string.Empty);
+        var nameField = SumaDialog.CreateField("Account name", nameBox);
+
+        var currencyBox = SumaDialog.CreateTextBox("PHP", "PHP", maxLength: 3, casing: CharacterCasing.Upper);
+        var currencyField = SumaDialog.CreateField("Currency", currencyBox);
+
+        var openingBalanceBox = SumaDialog.CreateTextBox("0.00", "0.00", inputScope: InputScopeNameValue.CurrencyAmount);
+        var balanceField = SumaDialog.CreateField("Opening balance", openingBalanceBox);
+
+        var balanceGrid = new Grid { ColumnSpacing = 16 };
+        balanceGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        balanceGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        Grid.SetColumn(balanceField, 0);
+        Grid.SetColumn(currencyField, 1);
+        balanceGrid.Children.Add(balanceField);
+        balanceGrid.Children.Add(currencyField);
+        balanceGrid.Visibility = account is null ? Visibility.Visible : Visibility.Collapsed;
+
+        var inclusionSwitch = SumaDialog.CreateToggleSwitch(account?.IncludeInAvailableToSpend ?? true);
+
+        var inclusionRow = new Grid();
+        inclusionRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        inclusionRow.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        var inclusionTextStack = new StackPanel { Spacing = 2 };
+        inclusionTextStack.Children.Add(new TextBlock { Text = "Include in available to spend", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13, Foreground = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"] });
+        inclusionTextStack.Children.Add(new TextBlock { Text = "Included accounts increase the amount you can spend.", FontSize = 12, Foreground = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaTextSecondaryBrush"] });
+        inclusionRow.Children.Add(inclusionTextStack);
+        Grid.SetColumn(inclusionSwitch, 1);
+        inclusionRow.Children.Add(inclusionSwitch);
+
         var immutableNote = new TextBlock
         {
             Text = account is null ? string.Empty : "Currency and opening balance remain unchanged when editing.",
             TextWrapping = TextWrapping.Wrap,
+            FontSize = 12,
+            Foreground = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaTextSecondaryBrush"],
             Visibility = account is null ? Visibility.Collapsed : Visibility.Visible
         };
-        var errorText = EditorErrorText();
-        var content = new StackPanel { Spacing = 12 };
-        content.Children.Add(nameBox);
-        content.Children.Add(typeBox);
-        content.Children.Add(currencyBox);
-        content.Children.Add(openingBalanceBox);
-        content.Children.Add(inclusionBox);
+
+        var errorText = SumaDialog.CreateErrorText();
+
+        var content = new StackPanel { Spacing = 18, Padding = new Thickness(0, 4, 0, 8) };
+        content.Children.Add(typeField);
+        content.Children.Add(nameField);
+        content.Children.Add(balanceGrid);
+        content.Children.Add(inclusionRow);
         content.Children.Add(immutableNote);
         content.Children.Add(errorText);
 
-        var dialog = EditorDialog(account is null ? "Add account" : "Edit account", content);
+        var title = account is null ? "Add account" : "Edit account";
+        var primaryText = account is null ? "Add account" : "Save";
+        var dialog = SumaDialog.Create(XamlRoot, title, content, primaryText, "Cancel", ModalSize.Medium);
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             var deferral = args.GetDeferral();
             try
             {
-                if (typeBox.SelectedItem is not AccountType type)
-                {
-                    SetEditorError(errorText, "Choose an account type.");
-                    args.Cancel = true;
-                    return;
-                }
-
                 long openingMinor = 0;
                 if (account is null && !MoneyText.TryParseMinor(openingBalanceBox.Text, out openingMinor))
                 {
-                    SetEditorError(errorText, "Enter an opening balance with no more than two decimal places.");
+                    SumaDialog.SetError(errorText, "Enter an opening balance with no more than two decimal places.");
                     args.Cancel = true;
                     return;
                 }
 
                 var input = new AccountEditorInput(
                     nameBox.Text,
-                    type,
-                    inclusionBox.IsChecked == true,
+                    selectedType,
+                    inclusionSwitch.IsOn,
                     openingMinor,
                     currencyBox.Text);
                 var succeeded = account is null
@@ -246,7 +271,7 @@ public sealed partial class AccountsPage : Page
                     : await AccountsViewModel.UpdateAsync(account.Id, input);
                 if (!succeeded)
                 {
-                    SetEditorError(errorText, AccountsViewModel.ErrorMessage!);
+                    SumaDialog.SetError(errorText, AccountsViewModel.ErrorMessage!);
                     args.Cancel = true;
                 }
             }
@@ -262,42 +287,44 @@ public sealed partial class AccountsPage : Page
     private async Task ShowCategoryEditorAsync(CategoryRowViewModel? category)
     {
         var kind = category?.Kind ?? CategoriesViewModel.SelectedKind;
-        var nameBox = new TextBox
+        var nameBox = SumaDialog.CreateTextBox(kind == CategoryTransactionKind.Expense ? "e.g., Groceries" : "e.g., Salary", category?.Name ?? string.Empty);
+        var nameField = SumaDialog.CreateField("Category name", nameBox);
+
+        var kindText = new TextBlock
         {
-            Header = "Name",
-            PlaceholderText = kind == CategoryTransactionKind.Expense ? "Groceries" : "Salary",
-            Text = category?.Name ?? string.Empty
+            Text = kind == CategoryTransactionKind.Expense ? "Expense" : "Income",
+            FontSize = 13,
+            FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+            Foreground = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"],
+            VerticalAlignment = VerticalAlignment.Center
         };
-        var kindBox = new ComboBox
+        var kindBorder = new Border
         {
-            Header = "Kind",
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            ItemsSource = Enum.GetValues<CategoryTransactionKind>(),
-            SelectedItem = kind,
-            IsEnabled = false
+            Background = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaSurfaceSecondaryBrush"],
+            BorderBrush = (Brush)Microsoft.UI.Xaml.Application.Current.Resources["SumaBorderBrush"],
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(8),
+            Padding = new Thickness(14, 10, 14, 10),
+            Child = kindText
         };
-        var parentBox = new ComboBox
-        {
-            Header = "Parent category (optional)",
-            HorizontalAlignment = HorizontalAlignment.Stretch,
-            ItemsSource = CategoriesViewModel.GetParentOptions(category?.Id)
-        };
+        var kindField = SumaDialog.CreateField("Category kind", kindBorder, "Category kind cannot be changed after creation.");
+
+        var parentBox = SumaDialog.CreateComboBox(CategoriesViewModel.GetParentOptions(category?.Id));
         parentBox.SelectedItem = ((IEnumerable<CategoryParentOption>)parentBox.ItemsSource)
             .First(option => option.Id == category?.ParentCategoryId);
-        var kindNote = new TextBlock
-        {
-            Text = "Choose Expense or Income from the section selector before adding. Kind cannot be changed later.",
-            TextWrapping = TextWrapping.Wrap
-        };
-        var errorText = EditorErrorText();
-        var content = new StackPanel { Spacing = 12 };
-        content.Children.Add(nameBox);
-        content.Children.Add(kindBox);
-        content.Children.Add(parentBox);
-        content.Children.Add(kindNote);
+        var parentField = SumaDialog.CreateField("Parent category (optional)", parentBox);
+
+        var errorText = SumaDialog.CreateErrorText();
+
+        var content = new StackPanel { Spacing = 18, Padding = new Thickness(0, 4, 0, 8) };
+        content.Children.Add(kindField);
+        content.Children.Add(nameField);
+        content.Children.Add(parentField);
         content.Children.Add(errorText);
 
-        var dialog = EditorDialog(category is null ? "Add category" : "Edit category", content);
+        var title = category is null ? "Add category" : "Edit category";
+        var primaryText = category is null ? "Add category" : "Save";
+        var dialog = SumaDialog.Create(XamlRoot, title, content, primaryText, "Cancel", ModalSize.Medium);
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             var deferral = args.GetDeferral();
@@ -310,7 +337,7 @@ public sealed partial class AccountsPage : Page
                     : await CategoriesViewModel.UpdateAsync(category.Id, input);
                 if (!succeeded)
                 {
-                    SetEditorError(errorText, CategoriesViewModel.ErrorMessage!);
+                    SumaDialog.SetError(errorText, CategoriesViewModel.ErrorMessage!);
                     args.Cancel = true;
                 }
             }
@@ -321,28 +348,6 @@ public sealed partial class AccountsPage : Page
         };
 
         _ = await dialog.ShowAsync();
-    }
-
-    private ContentDialog EditorDialog(string title, UIElement content) => new()
-    {
-        Title = title,
-        Content = content,
-        PrimaryButtonText = "Save",
-        CloseButtonText = "Cancel",
-        DefaultButton = ContentDialogButton.Primary,
-        XamlRoot = XamlRoot
-    };
-
-    private static TextBlock EditorErrorText() => new()
-    {
-        TextWrapping = TextWrapping.Wrap,
-        Visibility = Visibility.Collapsed
-    };
-
-    private static void SetEditorError(TextBlock textBlock, string message)
-    {
-        textBlock.Text = message;
-        textBlock.Visibility = Visibility.Visible;
     }
 
     private AccountRowViewModel? FindAccount(object sender) =>

@@ -23,4 +23,7 @@
     <ProjectReference Include="..\Suma.Domain\Suma.Domain.csproj" />
     <ProjectReference Include="..\Suma.Infrastructure\Suma.Infrastructure.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

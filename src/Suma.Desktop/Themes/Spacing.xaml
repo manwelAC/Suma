@@ -21,4 +21,9 @@
     <CornerRadius x:Key="SumaCornerSmall">4</CornerRadius>
     <CornerRadius x:Key="SumaCornerMedium">8</CornerRadius>
     <CornerRadius x:Key="SumaCornerLarge">12</CornerRadius>
+    <CornerRadius x:Key="SumaCornerModal">16</CornerRadius>
+
+    <x:Double x:Key="SumaModalWidthCompact">360</x:Double>
+    <x:Double x:Key="SumaModalWidthMedium">520</x:Double>
+    <x:Double x:Key="SumaModalWidthLarge">720</x:Double>
 </ResourceDictionary>

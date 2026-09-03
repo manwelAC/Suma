@@ -26,4 +26,27 @@
     <SolidColorBrush x:Key="SumaHoverSurfaceBrush" Color="{StaticResource SumaHoverSurfaceColor}" />
     <SolidColorBrush x:Key="SumaPressedSurfaceBrush" Color="{StaticResource SumaPressedSurfaceColor}" />
     <SolidColorBrush x:Key="SumaTransparentBrush" Color="Transparent" />
+
+    <!-- Status Colors & Brushes for Modals and Confirmations -->
+    <Color x:Key="SumaWarningColor">#FFC47D2B</Color>
+    <Color x:Key="SumaWarningMutedColor">#FFFFF9F2</Color>
+    <Color x:Key="SumaWarningBorderColor">#FFFDE8CE</Color>
+    <Color x:Key="SumaDestructiveColor">#FFC74B3E</Color>
+    <Color x:Key="SumaDestructiveHoverColor">#FFB53F33</Color>
+    <Color x:Key="SumaDestructivePressedColor">#FFA13429</Color>
+    <Color x:Key="SumaDestructiveMutedColor">#FFFDEEEC</Color>
+    <Color x:Key="SumaSuccessColor">#FF4A7C59</Color>
+    <Color x:Key="SumaSuccessMutedColor">#FFEDF5EE</Color>
+    <Color x:Key="SumaSuccessBorderColor">#FFD1E6D4</Color>
+
+    <SolidColorBrush x:Key="SumaWarningBrush" Color="{StaticResource SumaWarningColor}" />
+    <SolidColorBrush x:Key="SumaWarningMutedBrush" Color="{StaticResource SumaWarningMutedColor}" />
+    <SolidColorBrush x:Key="SumaWarningBorderBrush" Color="{StaticResource SumaWarningBorderColor}" />
+    <SolidColorBrush x:Key="SumaDestructiveBrush" Color="{StaticResource SumaDestructiveColor}" />
+    <SolidColorBrush x:Key="SumaDestructiveHoverBrush" Color="{StaticResource SumaDestructiveHoverColor}" />
+    <SolidColorBrush x:Key="SumaDestructivePressedBrush" Color="{StaticResource SumaDestructivePressedColor}" />
+    <SolidColorBrush x:Key="SumaDestructiveMutedBrush" Color="{StaticResource SumaDestructiveMutedColor}" />
+    <SolidColorBrush x:Key="SumaSuccessBrush" Color="{StaticResource SumaSuccessColor}" />
+    <SolidColorBrush x:Key="SumaSuccessMutedBrush" Color="{StaticResource SumaSuccessMutedColor}" />
+    <SolidColorBrush x:Key="SumaSuccessBorderBrush" Color="{StaticResource SumaSuccessBorderColor}" />
 </ResourceDictionary>

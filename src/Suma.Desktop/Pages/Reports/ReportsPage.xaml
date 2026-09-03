@@ -1,16 +1,211 @@
-<Page x:Class="Suma.Desktop.Pages.Reports.ReportsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:viewModels="using:Suma.Desktop.ViewModels">
-    <ScrollViewer HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled"><StackPanel MaxWidth="980" Padding="32" Spacing="18">
-        <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Reports" /><TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Understand actual cash flow, categories, accounts, and Budget performance." />
-        <Grid ColumnSpacing="12"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-            <ComboBox x:Name="CurrencyBox" Header="Currency" ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Currency, Mode=OneWay}" SelectionChanged="OnReportSelectionChanged" />
-            <DatePicker x:Name="StartBox" Grid.Column="1" Header="Start date" DateChanged="OnReportDateChanged"/><DatePicker x:Name="EndBox" Grid.Column="2" Header="End date" DateChanged="OnReportDateChanged"/>
+<Page
+    x:Class="Suma.Desktop.Pages.Reports.ReportsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:viewModels="using:Suma.Desktop.ViewModels"
+    Background="{StaticResource SumaBackgroundBrush}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <Grid Padding="{StaticResource SumaPagePadding}" MaxWidth="1440" HorizontalAlignment="Stretch" RowSpacing="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <StackPanel Grid.Row="0" Spacing="4">
+                <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Reports" />
+                <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Understand actual cash flow, categories, accounts, and Budget performance." />
+            </StackPanel>
+
+            <!-- Filter & Parameters Workspace Card -->
+            <Border Grid.Row="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                <StackPanel Spacing="16">
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*" />
+                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="CurrencyBox" Header="Currency" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Currency, Mode=OneWay}" SelectionChanged="OnReportSelectionChanged" />
+                        <DatePicker x:Name="StartBox" Grid.Column="1" Header="Start date" HorizontalAlignment="Stretch" DateChanged="OnReportDateChanged" />
+                        <DatePicker x:Name="EndBox" Grid.Column="2" Header="End date" HorizontalAlignment="Stretch" DateChanged="OnReportDateChanged" />
+                        <Button Grid.Column="3" VerticalAlignment="Bottom" MinWidth="100" Click="OnApplyClick" Content="Apply" />
+                    </Grid>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock VerticalAlignment="Center" Style="{StaticResource SumaCaptionTextStyle}" Text="PRESETS:" Margin="0,0,4,0" />
+                        <Button Click="OnPresetClick" Tag="MonthToDate" Content="Month to date" />
+                        <Button Click="OnPresetClick" Tag="LastMonth" Content="Last month" />
+                        <Button Click="OnPresetClick" Tag="Last30Days" Content="Last 30 days" />
+                        <Button Click="OnPresetClick" Tag="YearToDate" Content="Year to date" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Section Navigation Bar & Export Action -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Click="OnSectionClick" Tag="CashFlow" Content="Cash Flow" />
+                    <Button Click="OnSectionClick" Tag="Categories" Content="Categories" />
+                    <Button Click="OnSectionClick" Tag="Accounts" Content="Accounts" />
+                    <Button Click="OnSectionClick" Tag="Budget" Content="Budget" />
+                </StackPanel>
+                <Button Grid.Column="1" Click="OnExportClick" IsEnabled="{Binding CanExport}" Content="Export CSV" />
+            </Grid>
+
+            <!-- Loading & Error Indicators -->
+            <StackPanel Grid.Row="3" Spacing="8">
+                <ProgressRing IsActive="{Binding IsLoading}" />
+                <InfoBar IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}" />
+            </StackPanel>
+
+            <!-- Report Workspace Content Panels -->
+            <Grid Grid.Row="4">
+                <!-- 1. Cash Flow Panel -->
+                <StackPanel x:Name="CashFlowPanel" Spacing="24">
+                    <!-- Hero KPI Card -->
+                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="32,28">
+                        <StackPanel Spacing="10">
+                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET CASH FLOW" />
+                            <TextBlock FontFamily="Segoe UI Variable Display" FontSize="44" FontWeight="SemiBold" Text="{x:Bind NetCashFlowText, Mode=OneTime}" />
+                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Net financial movement across all accounts and categories during the selected period." />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Breakdown KPI Grid -->
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="GROSS INCOME" />
+                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind GrossIncomeText, Mode=OneTime}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="1" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="GROSS EXPENSE" />
+                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind GrossExpenseText, Mode=OneTime}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="2" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="REFUNDS" />
+                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind RefundsText, Mode=OneTime}" />
+                            </StackPanel>
+                        </Border>
+                        <Border Grid.Column="3" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
+                            <StackPanel Spacing="6">
+                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET EXPENSE" />
+                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind NetExpenseText, Mode=OneTime}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <!-- 2. Categories Panel -->
+                <StackPanel x:Name="CategoriesPanel" Visibility="Collapsed" Spacing="16">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Click="OnCategoryModeClick" Tag="Expense" Content="Expense" />
+                        <Button Click="OnCategoryModeClick" Tag="Income" Content="Income" />
+                    </StackPanel>
+                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                        <ItemsControl ItemsSource="{x:Bind CategoryRows, Mode=OneTime}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                                        <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{Binding}" />
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </StackPanel>
+
+                <!-- 3. Accounts Panel -->
+                <Grid x:Name="AccountsPanel" Visibility="Collapsed" ColumnSpacing="28">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                        <StackPanel Spacing="12">
+                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Account Movements" />
+                            <ItemsControl ItemsSource="{x:Bind AccountRows, Mode=OneTime}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{Binding}" TextWrapping="Wrap" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                        <StackPanel Spacing="12">
+                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Movement detail" />
+                            <ItemsControl ItemsSource="{x:Bind DetailRows, Mode=OneTime}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,10">
+                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{Binding}" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- 4. Budget Panel -->
+                <Grid x:Name="BudgetPanel" Visibility="Collapsed" ColumnSpacing="28">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="380" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Spacing="16">
+                        <ComboBox x:Name="BudgetBox" Header="Budget" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.Budgets, Mode=OneTime}" DisplayMemberPath="Name" SelectionChanged="OnBudgetChanged" />
+                        <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                            <StackPanel Spacing="12">
+                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind BudgetTitleText, Mode=OneTime}" />
+                                <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind BudgetPeriodText, Mode=OneTime}" />
+                                <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12" Margin="0,4">
+                                    <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind BudgetExpectedIncomeText, Mode=OneTime}" />
+                                </Border>
+                                <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
+                                    <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind BudgetTotalsText, Mode=OneTime}" />
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <Border Grid.Column="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                        <StackPanel Spacing="12">
+                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Budget Allocations" />
+                            <ItemsControl ItemsSource="{x:Bind BudgetRows, Mode=OneTime}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{Binding}" TextWrapping="Wrap" />
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
         </Grid>
-        <Grid ColumnSpacing="8" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Button HorizontalAlignment="Stretch" Click="OnPresetClick" Tag="MonthToDate" Content="Month to date"/><Button Grid.Column="1" HorizontalAlignment="Stretch" Click="OnPresetClick" Tag="LastMonth" Content="Last month"/><Button Grid.Column="2" HorizontalAlignment="Stretch" Click="OnPresetClick" Tag="Last30Days" Content="Last 30 days"/><Button Grid.Row="1" HorizontalAlignment="Stretch" Click="OnPresetClick" Tag="YearToDate" Content="Year to date"/><Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Click="OnApplyClick" Content="Apply"/></Grid>
-        <Grid ColumnSpacing="8" RowSpacing="8"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions><Button HorizontalAlignment="Stretch" Click="OnSectionClick" Tag="CashFlow" Content="Cash Flow"/><Button Grid.Column="1" HorizontalAlignment="Stretch" Click="OnSectionClick" Tag="Categories" Content="Categories"/><Button Grid.Column="2" HorizontalAlignment="Stretch" Click="OnSectionClick" Tag="Accounts" Content="Accounts"/><Button Grid.Row="1" HorizontalAlignment="Stretch" Click="OnSectionClick" Tag="Budget" Content="Budget"/><Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" Click="OnExportClick" IsEnabled="{Binding CanExport}" Content="Export CSV"/></Grid>
-        <ProgressRing IsActive="{Binding IsLoading}"/><InfoBar IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}"/>
-        <StackPanel x:Name="CashFlowPanel" Spacing="12"><TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET CASH FLOW"/><TextBlock FontSize="38" FontWeight="SemiBold" Text="{x:Bind NetCashFlowText, Mode=OneTime}"/><Grid ColumnSpacing="18"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><TextBlock Text="{x:Bind GrossIncomeText, Mode=OneTime}"/><TextBlock Grid.Column="1" Text="{x:Bind GrossExpenseText, Mode=OneTime}"/><TextBlock Grid.Column="2" Text="{x:Bind RefundsText, Mode=OneTime}"/><TextBlock Grid.Column="3" Text="{x:Bind NetExpenseText, Mode=OneTime}"/></Grid></StackPanel>
-        <StackPanel x:Name="CategoriesPanel" Visibility="Collapsed" Spacing="10"><StackPanel Orientation="Horizontal" Spacing="8"><Button Click="OnCategoryModeClick" Tag="Expense" Content="Expense"/><Button Click="OnCategoryModeClick" Tag="Income" Content="Income"/></StackPanel><ItemsControl ItemsSource="{x:Bind CategoryRows, Mode=OneTime}"/></StackPanel>
-        <StackPanel x:Name="AccountsPanel" Visibility="Collapsed" Spacing="10"><ItemsControl ItemsSource="{x:Bind AccountRows, Mode=OneTime}"/><TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Movement detail"/><ItemsControl ItemsSource="{x:Bind DetailRows, Mode=OneTime}"/></StackPanel>
-        <StackPanel x:Name="BudgetPanel" Visibility="Collapsed" Spacing="10"><ComboBox x:Name="BudgetBox" Header="Budget" ItemsSource="{x:Bind ViewModel.Budgets, Mode=OneTime}" DisplayMemberPath="Name" SelectionChanged="OnBudgetChanged"/><TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind BudgetTitleText, Mode=OneTime}"/><TextBlock TextWrapping="Wrap" Text="{x:Bind BudgetPeriodText, Mode=OneTime}"/><TextBlock TextWrapping="Wrap" Text="{x:Bind BudgetExpectedIncomeText, Mode=OneTime}"/><TextBlock TextWrapping="Wrap" Text="{x:Bind BudgetTotalsText, Mode=OneTime}"/><ItemsControl ItemsSource="{x:Bind BudgetRows, Mode=OneTime}"/></StackPanel>
-    </StackPanel></ScrollViewer>
+    </ScrollViewer>
 </Page>

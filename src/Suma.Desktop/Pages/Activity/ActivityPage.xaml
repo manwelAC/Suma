@@ -4,25 +4,29 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:models="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
-    <Grid Padding="{StaticResource SumaPagePadding}" RowSpacing="20">
+    <Grid Padding="{StaticResource SumaPagePadding}" MaxWidth="1440" HorizontalAlignment="Stretch" RowSpacing="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" ColumnSpacing="20">
+
+        <!-- Header -->
+        <Grid Grid.Row="0" ColumnSpacing="20">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <StackPanel Spacing="8">
+            <StackPanel Spacing="4">
                 <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Activity" />
                 <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Your money movements, clearly recorded." />
             </StackPanel>
-            <Button Grid.Column="1" AutomationProperties.Name="Add transaction" Click="OnAddTransactionClick" Content="Add transaction" />
+            <Button Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Add transaction" Click="OnAddTransactionClick" Content="Add transaction" />
         </Grid>
-        <ScrollViewer Grid.Row="1" MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-            <StackPanel Orientation="Horizontal" Spacing="6">
+
+        <!-- Filter Bar -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Horizontal" Spacing="8">
                 <ToggleButton x:Name="AllFilter" AutomationProperties.Name="Show all transactions" Click="OnAllFilterClick" Content="All" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
                 <ToggleButton x:Name="ExpenseFilter" AutomationProperties.Name="Show expenses" Click="OnExpenseFilterClick" Content="Expenses" Style="{StaticResource SumaNavigationItemStyle}" />
                 <ToggleButton x:Name="IncomeFilter" AutomationProperties.Name="Show income" Click="OnIncomeFilterClick" Content="Income" Style="{StaticResource SumaNavigationItemStyle}" />
@@ -30,44 +34,74 @@
                 <ToggleButton x:Name="RefundFilter" AutomationProperties.Name="Show refunds" Click="OnRefundFilterClick" Content="Refunds" Style="{StaticResource SumaNavigationItemStyle}" />
             </StackPanel>
         </ScrollViewer>
-        <Grid Grid.Row="2" MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left">
-            <ListView AutomationProperties.Name="Transaction history" ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}" SelectionMode="None">
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="Margin" Value="0,0,0,8" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="models:ActivityRowViewModel">
-                        <StackPanel Spacing="8">
-                            <TextBlock Margin="4,14,0,2" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind DateGroupLabel}" Visibility="{x:Bind DateGroupVisibility}" />
-                            <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20">
-                                <Grid ColumnSpacing="20">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" />
-                                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="{x:Bind Context}" TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind AmountDisplay}" />
-                                </Grid>
-                            </Border>
+
+        <!-- Main Workspace -->
+        <Grid Grid.Row="2" ColumnSpacing="28">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="ActivitySidebarColDef" Width="360" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Transactions Ledger List -->
+            <Grid Grid.Column="0">
+                <ListView AutomationProperties.Name="Transaction history" ItemsSource="{x:Bind ViewModel.Items, Mode=OneWay}" SelectionMode="None">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="0,0,0,8" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:ActivityRowViewModel">
+                            <StackPanel Spacing="8">
+                                <TextBlock Margin="4,14,0,2" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind DateGroupLabel}" Visibility="{x:Bind DateGroupVisibility}" />
+                                <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20">
+                                    <Grid ColumnSpacing="20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4">
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" />
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Title}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="{x:Bind Context}" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" VerticalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind AmountDisplay}" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="{x:Bind ViewModel.EmptyVisibility, Mode=OneWay}">
+                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.EmptyTitle, Mode=OneWay}" />
+                    <TextBlock MaxWidth="380" HorizontalAlignment="Center" TextAlignment="Center" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Record an expense, income, transfer, or refund to start building your money history." TextWrapping="Wrap" />
+                    <Button HorizontalAlignment="Center" AutomationProperties.Name="Add first transaction" Click="OnAddTransactionClick" Content="Add transaction" />
+                </StackPanel>
+                <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind ViewModel.LoadingVisibility, Mode=OneWay}" />
+                <InfoBar Margin="0,0,0,8" VerticalAlignment="Top" IsClosable="False" IsOpen="True" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}" />
+            </Grid>
+
+            <!-- Supporting Sidebar Panel (Wide screens) -->
+            <Border x:Name="ActivitySidebar" Grid.Column="1" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="24" VerticalAlignment="Top">
+                <StackPanel Spacing="16">
+                    <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Activity Summary" />
+                    <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="18,14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="TRANSACTIONS IN VIEW" />
+                            <TextBlock FontSize="28" FontWeight="SemiBold" FontFamily="Segoe UI Variable Display" Text="{x:Bind ViewModel.Items.Count, Mode=OneWay}" />
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="{x:Bind ViewModel.EmptyVisibility, Mode=OneWay}">
-                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.EmptyTitle, Mode=OneWay}" />
-                <TextBlock MaxWidth="380" HorizontalAlignment="Center" TextAlignment="Center" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Record an expense, income, transfer, or refund to start building your money history." TextWrapping="Wrap" />
-                <Button HorizontalAlignment="Center" AutomationProperties.Name="Add first transaction" Click="OnAddTransactionClick" Content="Add transaction" />
-            </StackPanel>
-            <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind ViewModel.LoadingVisibility, Mode=OneWay}" />
-            <InfoBar Margin="0,0,0,8" VerticalAlignment="Top" IsClosable="False" IsOpen="True" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}" />
+                    </Border>
+                    <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="18,14">
+                        <StackPanel Spacing="4">
+                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="LEDGER INTEGRITY" />
+                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Every transaction recorded here directly updates your account balances and Available to Spend calculation." TextWrapping="Wrap" />
+                        </StackPanel>
+                    </Border>
+                    <Button HorizontalAlignment="Stretch" AutomationProperties.Name="Add transaction from sidebar" Click="OnAddTransactionClick" Content="Add transaction" />
+                </StackPanel>
+            </Border>
         </Grid>
     </Grid>
 </Page>
