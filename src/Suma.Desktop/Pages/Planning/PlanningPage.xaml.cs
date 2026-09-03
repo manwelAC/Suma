@@ -2,7 +2,9 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using Suma.Desktop.ViewModels;
+using Suma.Desktop.Common;
 using Suma.Application.Recurring.CreateRecurringTransaction;
 using Suma.Domain.Recurring;
 using Suma.Domain.Transactions;
@@ -23,6 +25,21 @@ public sealed partial class PlanningPage : Page
         SavingsGoalEditorViewModel = savingsGoalEditorViewModel;
         InitializeComponent();
         Loaded += OnLoaded;
+        SizeChanged += OnPageSizeChanged;
+        ViewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(ViewModel.SelectedBudget) or nameof(ViewModel.SelectedBudgetVisibility))
+            {
+                UpdateResponsiveLayout(ActualWidth);
+            }
+        };
+        SavingsViewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName is nameof(SavingsViewModel.SelectedGoal) or nameof(SavingsViewModel.DetailsVisibility))
+            {
+                UpdateResponsiveLayout(ActualWidth);
+            }
+        };
     }
 
     public PlanningViewModel ViewModel { get; }
@@ -37,10 +54,69 @@ public sealed partial class PlanningPage : Page
 
     public SavingsGoalEditorViewModel SavingsGoalEditorViewModel { get; }
 
+    private void OnPageSizeChanged(object sender, SizeChangedEventArgs e) => UpdateResponsiveLayout(e.NewSize.Width);
+
+    private void UpdateResponsiveLayout(double availableWidth)
+    {
+        if (availableWidth <= 0) availableWidth = ActualWidth;
+        if (availableWidth <= 0) return;
+
+        var isWide = availableWidth >= 960;
+
+        // 1. Budgets Section
+        if (isWide && ViewModel.SelectedBudget != null)
+        {
+            BudgetListColDef.Width = new GridLength(380);
+            BudgetDetailColDef.Width = new GridLength(1, GridUnitType.Star);
+            Grid.SetColumn(BudgetDetailPanel, 1);
+            Grid.SetRow(BudgetDetailPanel, 0);
+        }
+        else
+        {
+            BudgetListColDef.Width = new GridLength(1, GridUnitType.Star);
+            BudgetDetailColDef.Width = new GridLength(0);
+            Grid.SetColumn(BudgetDetailPanel, 0);
+            Grid.SetRow(BudgetDetailPanel, 1);
+        }
+
+        // 2. Recurring Section
+        if (isWide)
+        {
+            RecurringOccurrencesColDef.Width = new GridLength(1.1, GridUnitType.Star);
+            RecurringSchedulesColDef.Width = new GridLength(1, GridUnitType.Star);
+            Grid.SetColumn(RecurringSchedulesPanel, 1);
+            Grid.SetRow(RecurringSchedulesPanel, 0);
+        }
+        else
+        {
+            RecurringOccurrencesColDef.Width = new GridLength(1, GridUnitType.Star);
+            RecurringSchedulesColDef.Width = new GridLength(0);
+            Grid.SetColumn(RecurringSchedulesPanel, 0);
+            Grid.SetRow(RecurringSchedulesPanel, 1);
+        }
+
+        // 3. Savings Section
+        if (isWide && SavingsViewModel.SelectedGoal != null)
+        {
+            SavingsListColDef.Width = new GridLength(380);
+            SavingsDetailColDef.Width = new GridLength(1, GridUnitType.Star);
+            Grid.SetColumn(SavingsDetailPanel, 1);
+            Grid.SetRow(SavingsDetailPanel, 0);
+        }
+        else
+        {
+            SavingsListColDef.Width = new GridLength(1, GridUnitType.Star);
+            SavingsDetailColDef.Width = new GridLength(0);
+            Grid.SetColumn(SavingsDetailPanel, 0);
+            Grid.SetRow(SavingsDetailPanel, 1);
+        }
+    }
+
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
         await ViewModel.LoadAsync();
         BudgetList.SelectedItem = ViewModel.SelectedBudget;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnActiveBudgetsClick(object sender, RoutedEventArgs e)
@@ -49,6 +125,7 @@ public sealed partial class PlanningPage : Page
         SetToggleState(ArchivedBudgetsButton, false);
         await ViewModel.SetArchivedViewAsync(false);
         BudgetList.SelectedItem = ViewModel.SelectedBudget;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnArchivedBudgetsClick(object sender, RoutedEventArgs e)
@@ -57,6 +134,7 @@ public sealed partial class PlanningPage : Page
         SetToggleState(ArchivedBudgetsButton, true);
         await ViewModel.SetArchivedViewAsync(true);
         BudgetList.SelectedItem = ViewModel.SelectedBudget;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnBudgetItemClick(object sender, ItemClickEventArgs e)
@@ -65,6 +143,7 @@ public sealed partial class PlanningPage : Page
         {
             BudgetList.SelectedItem = budget;
             await ViewModel.SelectBudgetAsync(budget.Id);
+            UpdateResponsiveLayout(ActualWidth);
         }
     }
 
@@ -79,6 +158,7 @@ public sealed partial class PlanningPage : Page
         RecurringSection.Visibility = Visibility.Collapsed;
         SavingsSection.Visibility = Visibility.Collapsed;
         NewBudgetButton.Visibility = ViewModel.NewBudgetVisibility;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnRecurringSectionClick(object sender, RoutedEventArgs e)
@@ -91,6 +171,7 @@ public sealed partial class PlanningPage : Page
         SavingsSection.Visibility = Visibility.Collapsed;
         NewBudgetButton.Visibility = Visibility.Collapsed;
         await RecurringViewModel.LoadAsync();
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnUpcomingOccurrencesClick(object sender, RoutedEventArgs e)
@@ -124,34 +205,55 @@ public sealed partial class PlanningPage : Page
         SetToggleState(BudgetsSectionButton, false); SetToggleState(RecurringSectionButton, false); SetToggleState(SavingsSectionButton, true);
         BudgetSection.Visibility = Visibility.Collapsed; RecurringSection.Visibility = Visibility.Collapsed; SavingsSection.Visibility = Visibility.Visible;
         NewBudgetButton.Visibility = Visibility.Collapsed; await SavingsViewModel.LoadAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnActiveSavingsClick(object sender, RoutedEventArgs e)
     {
         SetToggleState(ActiveSavingsButton, true); SetToggleState(ArchivedSavingsButton, false);
         await SavingsViewModel.SetArchivedAsync(false); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnArchivedSavingsClick(object sender, RoutedEventArgs e)
     {
         SetToggleState(ActiveSavingsButton, false); SetToggleState(ArchivedSavingsButton, true);
         await SavingsViewModel.SetArchivedAsync(true); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async void OnSavingsGoalClick(object sender, ItemClickEventArgs e)
     {
-        if (e.ClickedItem is SavingsGoalRowViewModel goal) { SavingsGoalList.SelectedItem = goal; await SavingsViewModel.SelectGoalAsync(goal.Id); }
+        if (e.ClickedItem is SavingsGoalRowViewModel goal) { SavingsGoalList.SelectedItem = goal; await SavingsViewModel.SelectGoalAsync(goal.Id); UpdateResponsiveLayout(ActualWidth); }
     }
 
     private async void OnNewSavingsGoalClick(object sender, RoutedEventArgs e) => await ShowSavingsGoalEditorAsync();
     private async void OnAddSavingsContributionClick(object sender, RoutedEventArgs e) => await ShowSavingsContributionEditorAsync();
-    private async void OnArchiveSavingsClick(object sender, RoutedEventArgs e) { await SavingsViewModel.ArchiveAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal; }
+    private async void OnArchiveSavingsClick(object sender, RoutedEventArgs e)
+    {
+        if (SavingsViewModel.SelectedGoal is { } goal)
+        {
+            var dialog = SumaDialog.CreateDestructive(
+                XamlRoot,
+                "Archive savings goal?",
+                $"{goal.Name} will be moved to Archived goals. You can view it anytime or restore it later.",
+                "Archived goals do not accept new contributions until restored.",
+                destructiveButtonText: "Archive");
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await SavingsViewModel.ArchiveAsync();
+                SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+                UpdateResponsiveLayout(ActualWidth);
+            }
+        }
+    }
     private async void OnRestoreSavingsClick(object sender, RoutedEventArgs e)
     {
         await SavingsViewModel.RestoreAsync();
         SetToggleState(ActiveSavingsButton, !SavingsViewModel.ShowArchived);
         SetToggleState(ArchivedSavingsButton, SavingsViewModel.ShowArchived);
         SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+        UpdateResponsiveLayout(ActualWidth);
     }
 
     private async Task ShowSavingsGoalEditorAsync()
@@ -306,8 +408,21 @@ public sealed partial class PlanningPage : Page
 
     private async void OnArchiveBudgetClick(object sender, RoutedEventArgs e)
     {
-        await ViewModel.ArchiveAsync();
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
+        if (ViewModel.SelectedBudget is { } budget)
+        {
+            var dialog = SumaDialog.CreateDestructive(
+                XamlRoot,
+                "Archive budget?",
+                $"{budget.Name} will be moved to Archived budgets. Active allocations will no longer be tracked in Overview.",
+                "Archived budgets can be viewed and restored anytime from the Archived view.",
+                destructiveButtonText: "Archive");
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                await ViewModel.ArchiveAsync();
+                BudgetList.SelectedItem = ViewModel.SelectedBudget;
+                UpdateResponsiveLayout(ActualWidth);
+            }
+        }
     }
 
     private async void OnRestoreBudgetClick(object sender, RoutedEventArgs e)
@@ -490,40 +605,69 @@ public sealed partial class PlanningPage : Page
         _ = await dialog.ShowAsync();
     }
 
-    private ContentDialog Dialog(string title, UIElement content) => new()
-    {
-        Title = title,
-        Content = content,
-        PrimaryButtonText = "Save",
-        CloseButtonText = "Cancel",
-        DefaultButton = ContentDialogButton.Primary,
-        XamlRoot = XamlRoot
-    };
+    private ContentDialog Dialog(string title, UIElement content, string primaryText = "Save", ModalSize size = ModalSize.Medium) =>
+        SumaDialog.Create(XamlRoot, title, content, primaryText, "Cancel", size);
 
-    private static ScrollViewer DialogContent(params UIElement[] children)
+    private static StackPanel DialogContent(params UIElement[] children)
     {
-        var panel = new StackPanel { Spacing = 12 };
-        foreach (var child in children) panel.Children.Add(child);
-        return new ScrollViewer
+        var panel = new StackPanel { Spacing = 16, Padding = new Thickness(0, 4, 0, 8) };
+        foreach (var child in children)
         {
-            MaxHeight = 420,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            Content = panel
-        };
+            if (child is Control c)
+            {
+                c.RequestedTheme = ElementTheme.Light;
+            }
+
+            if (child is TextBox tb)
+            {
+                tb.MinHeight = tb.AcceptsReturn ? 80 : 44;
+                tb.CornerRadius = new CornerRadius(10);
+                tb.BorderThickness = new Thickness(1);
+                tb.Padding = new Thickness(14, 10, 14, 10);
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaSurfaceBrush"] is Brush s) tb.Background = s;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaBorderBrush"] is Brush b) tb.BorderBrush = b;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"] is Brush p) tb.Foreground = p;
+            }
+            else if (child is ComboBox cb)
+            {
+                cb.MinHeight = 44;
+                cb.CornerRadius = new CornerRadius(10);
+                cb.BorderThickness = new Thickness(1);
+                cb.Padding = new Thickness(14, 0, 14, 0);
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaSurfaceBrush"] is Brush s) cb.Background = s;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaBorderBrush"] is Brush b) cb.BorderBrush = b;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"] is Brush p) cb.Foreground = p;
+            }
+            else if (child is DatePicker dp)
+            {
+                dp.MinHeight = 44;
+                dp.CornerRadius = new CornerRadius(10);
+                dp.BorderThickness = new Thickness(1);
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaSurfaceBrush"] is Brush s) dp.Background = s;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaBorderBrush"] is Brush b) dp.BorderBrush = b;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"] is Brush p) dp.Foreground = p;
+            }
+            else if (child is NumberBox nb)
+            {
+                nb.MinHeight = 44;
+                nb.CornerRadius = new CornerRadius(10);
+                nb.BorderThickness = new Thickness(1);
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaSurfaceBrush"] is Brush s) nb.Background = s;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaBorderBrush"] is Brush b) nb.BorderBrush = b;
+                if (Microsoft.UI.Xaml.Application.Current.Resources["SumaTextPrimaryBrush"] is Brush p) nb.Foreground = p;
+            }
+
+            panel.Children.Add(child);
+        }
+        return panel;
     }
 
-    private static TextBlock ErrorText() => new()
-    {
-        TextWrapping = TextWrapping.Wrap,
-        Visibility = Visibility.Collapsed
-    };
+    private static TextBlock ErrorText() => SumaDialog.CreateErrorText();
 
     private static void Reject(ContentDialogButtonClickEventArgs args, TextBlock error, string message)
     {
         args.Cancel = true;
-        error.Text = message;
-        error.Visibility = Visibility.Visible;
+        SumaDialog.SetError(error, message);
     }
 
     private static void SetToggleState(ToggleButton button, bool selected)

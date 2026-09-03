@@ -23,6 +23,7 @@ public sealed partial class ShellPage : Page
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         navigationService.Attach(ContentFrame);
+        navigationService.Navigated += (_, route) => SelectRoute(route);
         SelectRoute(NavigationRoute.Overview);
         ViewModel.NavigateCommand.Execute(NavigationRoute.Overview);
     }

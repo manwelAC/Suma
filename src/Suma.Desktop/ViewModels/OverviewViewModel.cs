@@ -30,12 +30,20 @@ public sealed class OverviewViewModel(IOverviewOperations operations) : Observab
     public string AccountTotalDisplay { get; private set; } = "Unavailable";
     public string BudgetTitle { get; private set; } = "No account currencies";
     public string BudgetDetail { get; private set; } = "Create an account to begin.";
+    private bool hasCurrentBudget;
+    public bool HasCurrentBudget { get => hasCurrentBudget; private set => SetProperty(ref hasCurrentBudget, value); }
     public Visibility LoadingVisibility => IsLoading ? Visibility.Visible : Visibility.Collapsed;
     public Visibility ErrorVisibility => string.IsNullOrWhiteSpace(ErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
     public Visibility AccountsEmptyVisibility => !IsLoading && Accounts.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility AccountsContentVisibility => !IsLoading && Accounts.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility SavingsEmptyVisibility => !IsLoading && Savings.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility SavingsContentVisibility => !IsLoading && Savings.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility UpcomingEmptyVisibility => !IsLoading && Upcoming.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility UpcomingContentVisibility => !IsLoading && Upcoming.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility ActivityEmptyVisibility => !IsLoading && RecentActivity.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility ActivityContentVisibility => !IsLoading && RecentActivity.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility CurrentBudgetEmptyVisibility => !IsLoading && !HasCurrentBudget ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility CurrentBudgetContentVisibility => !IsLoading && HasCurrentBudget ? Visibility.Visible : Visibility.Collapsed;
 
     public Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -101,6 +109,7 @@ public sealed class OverviewViewModel(IOverviewOperations operations) : Observab
             return;
         }
 
+        HasCurrentBudget = result.CurrentBudget is not null;
         AvailableToSpendDisplay = MoneyText.Format(result.AvailableToSpendMinor, result.CurrencyCode);
         IncludedBalanceDisplay = MoneyText.Format(result.IncludedAccountBalanceMinor, result.CurrencyCode);
         ProtectedReserveDisplay = MoneyText.Format(result.ProtectedBudgetRemainingMinor, result.CurrencyCode);
@@ -120,6 +129,7 @@ public sealed class OverviewViewModel(IOverviewOperations operations) : Observab
 
     private void ClearFinancialSnapshot()
     {
+        HasCurrentBudget = false;
         AvailableToSpendDisplay = "Unavailable";
         IncludedBalanceDisplay = "Unavailable";
         ProtectedReserveDisplay = "Unavailable";
@@ -136,7 +146,10 @@ public sealed class OverviewViewModel(IOverviewOperations operations) : Observab
     private void Notify()
     {
         OnPropertyChanged(nameof(LoadingVisibility)); OnPropertyChanged(nameof(ErrorVisibility));
-        OnPropertyChanged(nameof(AccountsEmptyVisibility)); OnPropertyChanged(nameof(SavingsEmptyVisibility));
-        OnPropertyChanged(nameof(UpcomingEmptyVisibility)); OnPropertyChanged(nameof(ActivityEmptyVisibility));
+        OnPropertyChanged(nameof(AccountsEmptyVisibility)); OnPropertyChanged(nameof(AccountsContentVisibility));
+        OnPropertyChanged(nameof(SavingsEmptyVisibility)); OnPropertyChanged(nameof(SavingsContentVisibility));
+        OnPropertyChanged(nameof(UpcomingEmptyVisibility)); OnPropertyChanged(nameof(UpcomingContentVisibility));
+        OnPropertyChanged(nameof(ActivityEmptyVisibility)); OnPropertyChanged(nameof(ActivityContentVisibility));
+        OnPropertyChanged(nameof(CurrentBudgetEmptyVisibility)); OnPropertyChanged(nameof(CurrentBudgetContentVisibility));
     }
 }

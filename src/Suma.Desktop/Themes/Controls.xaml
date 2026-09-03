@@ -16,6 +16,107 @@
             <StaticResource x:Key="SumaNavigationItemBackgroundSelected" ResourceKey="SumaSelectedSurfaceBrush" />
             <StaticResource x:Key="SumaNavigationFocusPrimaryBrush" ResourceKey="SumaAccentBrush" />
             <StaticResource x:Key="SumaNavigationFocusSecondaryBrush" ResourceKey="SumaSurfaceBrush" />
+            <!-- System Accent Color Overrides to Suma Sage Green -->
+            <Color x:Key="SystemAccentColor">#FF6F806D</Color>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="SystemControlHighlightAltAccentBrush" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#FF61705F" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#FF536051" />
+
+            <!-- Accent Button Theming -->
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#FF61705F" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#FF536051" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#FFFFFFFF" />
+
+            <!-- Text Control (TextBox / PasswordBox) Theming -->
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#FFE4E2DC" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#FFD0CECB" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FF6F806D" />
+            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1.5</Thickness>
+            <CornerRadius x:Key="ControlCornerRadius">10</CornerRadius>
+
+            <!-- ComboBox Theming -->
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#FFF3F2EE" />
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#FFE4E2DC" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#FFD0CECB" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="#FF6F806D" />
+
+            <x:Double x:Key="ContentDialogMaxWidth">800</x:Double>
+            <x:Double x:Key="ContentDialogMinWidth">320</x:Double>
+        </ResourceDictionary>
+
+        <ResourceDictionary x:Key="Light">
+            <StaticResource x:Key="SumaShellBackgroundBrush" ResourceKey="SumaBackgroundBrush" />
+            <StaticResource x:Key="SumaShellSidebarBackgroundBrush" ResourceKey="SumaSurfaceSecondaryBrush" />
+            <StaticResource x:Key="SumaShellTextPrimaryBrush" ResourceKey="SumaTextPrimaryBrush" />
+            <StaticResource x:Key="SumaShellTextSecondaryBrush" ResourceKey="SumaTextSecondaryBrush" />
+            <StaticResource x:Key="SumaNavigationItemForeground" ResourceKey="SumaTextSecondaryBrush" />
+            <StaticResource x:Key="SumaNavigationItemForegroundSelected" ResourceKey="SumaTextPrimaryBrush" />
+            <StaticResource x:Key="SumaNavigationItemBackground" ResourceKey="SumaTransparentBrush" />
+            <StaticResource x:Key="SumaNavigationItemBackgroundPointerOver" ResourceKey="SumaHoverSurfaceBrush" />
+            <StaticResource x:Key="SumaNavigationItemBackgroundPressed" ResourceKey="SumaPressedSurfaceBrush" />
+            <StaticResource x:Key="SumaNavigationItemBackgroundSelected" ResourceKey="SumaSelectedSurfaceBrush" />
+            <StaticResource x:Key="SumaNavigationFocusPrimaryBrush" ResourceKey="SumaAccentBrush" />
+            <StaticResource x:Key="SumaNavigationFocusSecondaryBrush" ResourceKey="SumaSurfaceBrush" />
+
+            <Color x:Key="SystemAccentColor">#FF6F806D</Color>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="SystemControlHighlightAltAccentBrush" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#FF61705F" />
+            <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#FF536051" />
+
+            <!-- Accent Button Theming -->
+            <SolidColorBrush x:Key="AccentButtonBackground" Color="#FF6F806D" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#FF61705F" />
+            <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#FF536051" />
+            <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#FFFFFFFF" />
+
+            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#FF8E8E93" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#FFE4E2DC" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#FFD0CECB" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FF6F806D" />
+            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1.5</Thickness>
+            <CornerRadius x:Key="ControlCornerRadius">10</CornerRadius>
+
+            <SolidColorBrush x:Key="ComboBoxBackground" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FFFFFFFF" />
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#FFF3F2EE" />
+            <SolidColorBrush x:Key="ComboBoxForeground" Color="#FF1C1C1E" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#FFE4E2DC" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#FFD0CECB" />
+            <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="#FF6F806D" />
+
+            <x:Double x:Key="ContentDialogMaxWidth">800</x:Double>
+            <x:Double x:Key="ContentDialogMinWidth">320</x:Double>
         </ResourceDictionary>
 
         <ResourceDictionary x:Key="HighContrast">
@@ -39,6 +140,25 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="CornerRadius" Value="{StaticResource SumaCornerLarge}" />
         <Setter Property="Padding" Value="{StaticResource SumaContentPadding}" />
+    </Style>
+
+    <Style x:Key="SumaDashboardCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{StaticResource SumaCornerLarge}" />
+        <Setter Property="Padding" Value="22" />
+    </Style>
+
+    <Style x:Key="SumaTextSubtleButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="8,4,8,4" />
+        <Setter Property="Foreground" Value="{StaticResource SumaTextSecondaryBrush}" />
+        <Setter Property="FontFamily" Value="Segoe UI Variable Text" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="CornerRadius" Value="6" />
     </Style>
 
     <Style x:Key="SumaNavigationItemStyle" TargetType="ToggleButton">

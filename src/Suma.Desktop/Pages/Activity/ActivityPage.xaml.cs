@@ -3,6 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Suma.Desktop.ViewModels;
+using Suma.Desktop.Common;
 using Suma.Domain.Transactions;
 
 namespace Suma.Desktop.Pages.Activity;
@@ -15,13 +16,30 @@ public sealed partial class ActivityPage : Page
         EditorViewModel = editorViewModel;
         InitializeComponent();
         Loaded += OnLoaded;
+        SizeChanged += OnSizeChanged;
     }
 
     public ActivityViewModel ViewModel { get; }
 
     public TransactionEditorViewModel EditorViewModel { get; }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e) => await ViewModel.LoadAsync();
+    private async void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.LoadAsync();
+        UpdateResponsiveLayout(ActualWidth);
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e) => UpdateResponsiveLayout(e.NewSize.Width);
+
+    private void UpdateResponsiveLayout(double availableWidth)
+    {
+        if (availableWidth <= 0) availableWidth = ActualWidth;
+        if (availableWidth <= 0) return;
+
+        var isWide = availableWidth >= 960;
+        ActivitySidebar.Visibility = isWide ? Visibility.Visible : Visibility.Collapsed;
+        ActivitySidebarColDef.Width = isWide ? new GridLength(360) : new GridLength(0);
+    }
 
     private async void OnAllFilterClick(object sender, RoutedEventArgs e) => await ApplyFilterAsync(null, AllFilter);
 
@@ -53,7 +71,7 @@ public sealed partial class ActivityPage : Page
 
         var typeBox = Combo("Transaction type", Enum.GetValues<TransactionType>());
         typeBox.SelectedItem = TransactionType.Expense;
-        var chooser = Dialog("Add transaction", typeBox, "Continue");
+        var chooser = Dialog("Add transaction", Stack(typeBox), "Continue", ModalSize.Medium);
         if (await chooser.ShowAsync() != ContentDialogResult.Primary || typeBox.SelectedItem is not TransactionType type)
         {
             return;
@@ -242,36 +260,50 @@ public sealed partial class ActivityPage : Page
         _ = await dialog.ShowAsync();
     }
 
-    private ContentDialog Dialog(string title, UIElement content, string primaryText = "Save") => new()
+    private ContentDialog Dialog(string title, UIElement content, string primaryText = "Save", ModalSize size = ModalSize.Medium) =>
+        SumaDialog.Create(XamlRoot, title, content, primaryText, "Cancel", size);
+
+    private static ComboBox Combo(string header, object items)
     {
-        Title = title,
-        Content = new ScrollViewer
-        {
-            Content = content,
-            MaxHeight = 400,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-        },
-        PrimaryButtonText = primaryText,
-        CloseButtonText = "Cancel",
-        DefaultButton = ContentDialogButton.Primary,
-        XamlRoot = XamlRoot
-    };
+        var cb = SumaDialog.CreateComboBox(items);
+        cb.Header = header;
+        return cb;
+    }
 
-    private static ComboBox Combo(string header, object items) => new() { Header = header, HorizontalAlignment = HorizontalAlignment.Stretch, ItemsSource = items };
+    private static TextBox AmountBox()
+    {
+        var tb = SumaDialog.CreateTextBox("0.00", inputScope: InputScopeNameValue.CurrencyAmount);
+        tb.Header = "Amount";
+        return tb;
+    }
 
-    private static TextBox AmountBox() => new() { Header = "Amount", PlaceholderText = "0.00", InputScope = new InputScope { Names = { new InputScopeName(InputScopeNameValue.CurrencyAmount) } } };
+    private static DatePicker DatePicker()
+    {
+        var dp = SumaDialog.CreateDatePicker();
+        dp.Header = "Date";
+        return dp;
+    }
 
-    private static DatePicker DatePicker() => new() { Header = "Date", HorizontalAlignment = HorizontalAlignment.Stretch, Date = DateTimeOffset.Now };
+    private static TextBox TextBox(string header, string placeholder, bool acceptsReturn = false)
+    {
+        var tb = SumaDialog.CreateTextBox(placeholder, acceptsReturn: acceptsReturn);
+        tb.Header = header;
+        return tb;
+    }
 
-    private static TextBox TextBox(string header, string placeholder, bool acceptsReturn = false) => new() { Header = header, PlaceholderText = placeholder, AcceptsReturn = acceptsReturn, TextWrapping = TextWrapping.Wrap };
-
-    private static TextBlock ErrorText() => new() { TextWrapping = TextWrapping.Wrap, Visibility = Visibility.Collapsed };
+    private static TextBlock ErrorText() => SumaDialog.CreateErrorText();
 
     private static StackPanel Stack(params UIElement[] children)
     {
-        var panel = new StackPanel { Spacing = 12 };
-        foreach (var child in children) panel.Children.Add(child);
+        var panel = new StackPanel { Spacing = 16, Padding = new Thickness(0, 4, 0, 8) };
+        foreach (var child in children)
+        {
+            if (child is Control c)
+            {
+                c.RequestedTheme = ElementTheme.Light;
+            }
+            panel.Children.Add(child);
+        }
         return panel;
     }
 
@@ -280,8 +312,7 @@ public sealed partial class ActivityPage : Page
     private static void Reject(ContentDialogButtonClickEventArgs args, TextBlock error, string message)
     {
         args.Cancel = true;
-        error.Text = message;
-        error.Visibility = Visibility.Visible;
+        SumaDialog.SetError(error, message);
     }
 
     private static void SetToggleState(ToggleButton button, bool selected)
