@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IRecurringTransactionStore, RecurringTransactionStore>();
         services.AddScoped<IRecurringOccurrenceStore, RecurringOccurrenceStore>();
         services.AddScoped<ISavingsGoalStore, SavingsGoalStore>();
+        services.AddScoped<IOverviewStore, OverviewStore>();
         services.AddScoped<IGoalContributionStore, GoalContributionStore>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 

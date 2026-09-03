@@ -304,6 +304,39 @@ public sealed class StoreTests
         }
     }
 
+    [Fact]
+    public async Task Overview_account_facts_are_currency_isolated_set_based_and_preserve_inclusion_archive_and_ledger_sides()
+    {
+        await using var database = await Database.CreateAsync();
+        var included = new Account("Wallet", AccountType.Cash, new Money(1_000, "PHP"), "PHP", true);
+        var excluded = new Account("Savings", AccountType.Bank, new Money(-100, "PHP"), "PHP", false);
+        excluded.Archive();
+        var usd = new Account("Dollar", AccountType.Cash, new Money(99_999, "USD"), "USD", true);
+        var incomeCategory = new Category("Salary", CategoryTransactionKind.Income);
+        var expenseCategory = new Category("Food", CategoryTransactionKind.Expense);
+        var income = Transaction.CreateIncome(included.Id, incomeCategory.Id, new Money(500, "PHP"), new(2026, 9, 1));
+        var expense = Transaction.CreateExpense(excluded.Id, expenseCategory.Id, new Money(200, "PHP"), new(2026, 9, 2));
+        var refund = Transaction.CreateRefund(included.Id, expenseCategory.Id, expense.Id, new Money(50, "PHP"), new(2026, 10, 1));
+        var transfer = Transaction.CreateTransfer(included.Id, excluded.Id, new Money(300, "PHP"), new(2026, 9, 3));
+        await database.AddAsync(included, excluded, usd, incomeCategory, expenseCategory, income, expense, refund, transfer);
+
+        await using var context = database.Context();
+        var store = new OverviewStore(context);
+        var facts = await store.GetAccountBalanceFactsAsync("PHP", Token);
+
+        Assert.Equal(2, facts.Count);
+        var includedFact = Assert.Single(facts, item => item.AccountId == included.Id);
+        Assert.Equal((500, 50, 0, 0, 300), (includedFact.IncomeMinor, includedFact.RefundMinor, includedFact.TransferInMinor, includedFact.ExpenseMinor, includedFact.TransferOutMinor));
+        var excludedFact = Assert.Single(facts, item => item.AccountId == excluded.Id);
+        Assert.True(excludedFact.IsArchived);
+        Assert.False(excludedFact.IncludeInAvailableToSpend);
+        Assert.Equal((-100, 300, 200), (excludedFact.OpeningBalanceMinor, excludedFact.TransferInMinor, excludedFact.ExpenseMinor));
+        var currencies = await store.GetAccountCurrencyFactsAsync(Token);
+        Assert.Equal(["PHP", "USD"], currencies.Select(item => item.CurrencyCode));
+        Assert.True(currencies.Single(item => item.CurrencyCode == "PHP").HasActiveIncludedAccount);
+        Assert.True(currencies.Single(item => item.CurrencyCode == "USD").HasActiveIncludedAccount);
+    }
+
     private static Account NewAccount(string name) => new(name, AccountType.Bank, Money.Zero("PHP"), "PHP", true);
     private static CancellationToken Token => TestContext.Current.CancellationToken;
 

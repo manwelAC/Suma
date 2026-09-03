@@ -3,6 +3,7 @@ using Suma.Desktop.Navigation;
 using Suma.Desktop.Operations.Accounts;
 using Suma.Desktop.Operations.Budgets;
 using Suma.Desktop.Operations.Categories;
+using Suma.Desktop.Operations.Overview;
 using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Operations.Recurring;
 using Suma.Desktop.Operations.Savings;
@@ -28,6 +29,8 @@ public static class DesktopServiceRegistration
         services.AddSingleton<IBudgetOperations, BudgetOperations>();
         services.AddSingleton<IRecurringOperations, RecurringOperations>();
         services.AddSingleton<ISavingsOperations, SavingsOperations>();
+        services.AddSingleton<IOverviewOperations, OverviewOperations>();
+        services.AddSingleton<OverviewViewModel>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<CategoriesViewModel>();
         services.AddSingleton<ActivityViewModel>();

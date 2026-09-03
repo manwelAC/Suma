@@ -8,7 +8,7 @@ using Suma.Domain.Transactions;
 
 namespace Suma.Application.Tests.TestDoubles;
 
-internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStore, IBudgetStore, IBudgetAllocationStore, IRecurringTransactionStore, IRecurringOccurrenceStore, ISavingsGoalStore, IGoalContributionStore, IUnitOfWork
+internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStore, IBudgetStore, IBudgetAllocationStore, IRecurringTransactionStore, IRecurringOccurrenceStore, ISavingsGoalStore, IGoalContributionStore, IOverviewStore, IUnitOfWork
 {
     public Dictionary<Guid, Account> Accounts { get; } = [];
     public Dictionary<Guid, Category> Categories { get; } = [];
@@ -137,6 +137,34 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
             item.CategoryId.HasValue ? Categories.GetValueOrDefault(item.CategoryId.Value)?.Name : null,
             item.Amount.AmountMinor, item.Amount.CurrencyCode,
             Contributions.Where(contribution => contribution.TransactionId == item.Id).Sum(contribution => contribution.Amount.AmountMinor))).ToArray());
+
+    Task<IReadOnlyList<OverviewCurrencyFact>> IOverviewStore.GetAccountCurrencyFactsAsync(CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OverviewCurrencyFact>>(Accounts.Values
+            .GroupBy(item => item.CurrencyCode)
+            .Select(group => new OverviewCurrencyFact(group.Key, group.Any(item => !item.IsArchived && item.IncludeInAvailableToSpend)))
+            .OrderBy(item => item.CurrencyCode)
+            .ToArray());
+
+    Task<IReadOnlyList<OverviewAccountBalanceFact>> IOverviewStore.GetAccountBalanceFactsAsync(string currencyCode, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OverviewAccountBalanceFact>>(Accounts.Values.Where(account => account.CurrencyCode == currencyCode).Select(account =>
+            new OverviewAccountBalanceFact(account.Id, account.Name, account.IsArchived, account.IncludeInAvailableToSpend, account.OpeningBalance.AmountMinor,
+                Transactions.Values.Where(item => item.Type == TransactionType.Income && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor),
+                Transactions.Values.Where(item => item.Type == TransactionType.Refund && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor),
+                Transactions.Values.Where(item => item.Type == TransactionType.Transfer && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor),
+                Transactions.Values.Where(item => item.Type == TransactionType.Expense && item.SourceAccountId == account.Id).Sum(item => item.Amount.AmountMinor),
+                Transactions.Values.Where(item => item.Type == TransactionType.Transfer && item.SourceAccountId == account.Id).Sum(item => item.Amount.AmountMinor),
+                account.CurrencyCode)).ToArray());
+
+    Task<IReadOnlyList<OverviewRecurringFact>> IOverviewStore.GetUpcomingRecurringAsync(string currencyCode, DateOnly today, int limit, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OverviewRecurringFact>>(Occurrences.Values.Where(item => item.Status == RecurringOccurrenceStatus.Pending && item.DueDate >= today)
+            .Select(item => (Occurrence: item, Recurring: RecurringTransactions[item.RecurringTransactionId]))
+            .Where(item => item.Recurring.Amount.CurrencyCode == currencyCode).OrderBy(item => item.Occurrence.DueDate).Take(limit)
+            .Select(item => new OverviewRecurringFact(item.Occurrence.Id, item.Occurrence.DueDate, item.Recurring.Type, item.Recurring.Amount.AmountMinor, item.Recurring.Amount.CurrencyCode, item.Recurring.Description)).ToArray());
+
+    Task<IReadOnlyList<OverviewActivityFact>> IOverviewStore.GetRecentActivityAsync(string currencyCode, int limit, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyList<OverviewActivityFact>>(Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode)
+            .OrderByDescending(item => item.TransactionDate).Take(limit)
+            .Select(item => new OverviewActivityFact(item.Id, item.TransactionDate, item.Type, item.Amount.AmountMinor, item.Amount.CurrencyCode, item.Description)).ToArray());
 
     Task ITransactionStore.AddAsync(Transaction transaction, CancellationToken cancellationToken)
     {

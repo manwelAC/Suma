@@ -34,6 +34,7 @@ using Suma.Application.Transactions.CreateRefund;
 using Suma.Application.Transactions.CreateTransfer;
 using Suma.Application.Transactions.GetTransactions;
 using Suma.Application.Transactions.GetRefundableExpenses;
+using Suma.Application.Overview.GetOverview;
 
 namespace Suma.Application;
 
@@ -76,6 +77,7 @@ public static class DependencyInjection
         services.AddScoped<GetGoalContributionCandidatesUseCase>();
         services.AddScoped<ArchiveSavingsGoalUseCase>();
         services.AddScoped<RestoreSavingsGoalUseCase>();
+        services.AddScoped<GetOverviewUseCase>();
 
         return services;
     }
