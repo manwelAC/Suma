@@ -35,6 +35,10 @@ using Suma.Application.Transactions.CreateTransfer;
 using Suma.Application.Transactions.GetTransactions;
 using Suma.Application.Transactions.GetRefundableExpenses;
 using Suma.Application.Overview.GetOverview;
+using Suma.Application.Reports.GetAccountMovementDetail;
+using Suma.Application.Reports.GetFinancialReport;
+using Suma.Application.Reports.GetReportOptions;
+using Suma.Application.Reports.Csv;
 
 namespace Suma.Application;
 
@@ -78,6 +82,10 @@ public static class DependencyInjection
         services.AddScoped<ArchiveSavingsGoalUseCase>();
         services.AddScoped<RestoreSavingsGoalUseCase>();
         services.AddScoped<GetOverviewUseCase>();
+        services.AddScoped<GetFinancialReportUseCase>();
+        services.AddScoped<GetReportOptionsUseCase>();
+        services.AddScoped<GetAccountMovementDetailUseCase>();
+        services.AddScoped<ReportCsvSerializer>();
 
         return services;
     }

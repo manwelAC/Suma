@@ -8,7 +8,7 @@ using Suma.Domain.Transactions;
 
 namespace Suma.Application.Tests.TestDoubles;
 
-internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStore, IBudgetStore, IBudgetAllocationStore, IRecurringTransactionStore, IRecurringOccurrenceStore, ISavingsGoalStore, IGoalContributionStore, IOverviewStore, IUnitOfWork
+internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStore, IBudgetStore, IBudgetAllocationStore, IRecurringTransactionStore, IRecurringOccurrenceStore, ISavingsGoalStore, IGoalContributionStore, IOverviewStore, IReportStore, IUnitOfWork
 {
     public Dictionary<Guid, Account> Accounts { get; } = [];
     public Dictionary<Guid, Category> Categories { get; } = [];
@@ -25,6 +25,8 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
     public int SaveCount { get; private set; }
     public int AddedTransactionCount { get; private set; }
     public int AddedRecurringTransactionCount { get; private set; }
+    public IReadOnlyList<ReportCategoryFact>? ReportCategoryFactsOverride { get; set; }
+    public IReadOnlyList<ReportAccountMovementFact>? ReportAccountFactsOverride { get; set; }
 
     Task<Account?> IAccountStore.GetByIdAsync(Guid id, CancellationToken cancellationToken) => Task.FromResult(Accounts.GetValueOrDefault(id));
     Task<IReadOnlyList<Account>> IAccountStore.GetActiveAsync(CancellationToken cancellationToken) => Task.FromResult<IReadOnlyList<Account>>(Accounts.Values.Where(account => !account.IsArchived).ToArray());
@@ -165,6 +167,36 @@ internal sealed class FakeData : IAccountStore, ICategoryStore, ITransactionStor
         Task.FromResult<IReadOnlyList<OverviewActivityFact>>(Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode)
             .OrderByDescending(item => item.TransactionDate).Take(limit)
             .Select(item => new OverviewActivityFact(item.Id, item.TransactionDate, item.Type, item.Amount.AmountMinor, item.Amount.CurrencyCode, item.Description)).ToArray());
+
+    Task<IReadOnlyList<ReportCategoryFact>> IReportStore.GetCategoryFactsAsync(string currencyCode, DateOnly startDate, DateOnly endDate, CancellationToken cancellationToken)
+    {
+        if (ReportCategoryFactsOverride is not null) return Task.FromResult(ReportCategoryFactsOverride);
+        var rows = Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode && item.TransactionDate >= startDate && item.TransactionDate <= endDate && item.Type != TransactionType.Transfer)
+            .Select(item => (Item: item, CategoryId: item.Type == TransactionType.Refund ? Transactions[item.OriginalTransactionId!.Value].CategoryId!.Value : item.CategoryId!.Value));
+        return Task.FromResult<IReadOnlyList<ReportCategoryFact>>(rows.GroupBy(item => item.CategoryId).Select(group => new ReportCategoryFact(group.Key, Categories[group.Key].Name, Categories[group.Key].IsArchived,
+            group.Where(item => item.Item.Type == TransactionType.Income).Sum(item => item.Item.Amount.AmountMinor), group.Where(item => item.Item.Type == TransactionType.Expense).Sum(item => item.Item.Amount.AmountMinor), group.Where(item => item.Item.Type == TransactionType.Refund).Sum(item => item.Item.Amount.AmountMinor))).ToArray());
+    }
+
+    Task<IReadOnlyList<ReportAccountMovementFact>> IReportStore.GetAccountMovementFactsAsync(string currencyCode, DateOnly startDate, DateOnly endDate, CancellationToken cancellationToken)
+    {
+        if (ReportAccountFactsOverride is not null) return Task.FromResult(ReportAccountFactsOverride);
+        var rows = Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode && item.TransactionDate >= startDate && item.TransactionDate <= endDate);
+        return Task.FromResult<IReadOnlyList<ReportAccountMovementFact>>(Accounts.Values.Where(account => account.CurrencyCode == currencyCode).Select(account => new ReportAccountMovementFact(account.Id, account.Name, account.IsArchived,
+            rows.Where(item => item.Type == TransactionType.Income && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor), rows.Where(item => item.Type == TransactionType.Refund && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor), rows.Where(item => item.Type == TransactionType.Transfer && item.DestinationAccountId == account.Id).Sum(item => item.Amount.AmountMinor), rows.Where(item => item.Type == TransactionType.Expense && item.SourceAccountId == account.Id).Sum(item => item.Amount.AmountMinor), rows.Where(item => item.Type == TransactionType.Transfer && item.SourceAccountId == account.Id).Sum(item => item.Amount.AmountMinor)))
+            .Where(item => item.IncomeInMinor != 0 || item.RefundInMinor != 0 || item.TransferInMinor != 0 || item.ExpenseOutMinor != 0 || item.TransferOutMinor != 0).ToArray());
+    }
+
+    Task<IReadOnlyList<ReportAccountMovementDetailFact>> IReportStore.GetAccountMovementDetailsAsync(string currencyCode, DateOnly startDate, DateOnly endDate, Guid? accountId, CancellationToken cancellationToken)
+    {
+        var result = new List<ReportAccountMovementDetailFact>();
+        foreach (var item in Transactions.Values.Where(item => item.Amount.CurrencyCode == currencyCode && item.TransactionDate >= startDate && item.TransactionDate <= endDate))
+        {
+            var category = item.Type == TransactionType.Refund ? Categories[Transactions[item.OriginalTransactionId!.Value].CategoryId!.Value].Name : item.CategoryId.HasValue ? Categories[item.CategoryId.Value].Name : null;
+            if (item.SourceAccountId.HasValue && (!accountId.HasValue || accountId == item.SourceAccountId)) { var account = Accounts[item.SourceAccountId.Value]; result.Add(new(item.Id, item.TransactionDate, account.Id, account.Name, account.IsArchived, ReportMovementDirection.Outflow, item.Type, item.DestinationAccountId.HasValue ? Accounts[item.DestinationAccountId.Value].Name : null, category, item.Description, item.Amount.AmountMinor, currencyCode)); }
+            if (item.DestinationAccountId.HasValue && (!accountId.HasValue || accountId == item.DestinationAccountId)) { var account = Accounts[item.DestinationAccountId.Value]; result.Add(new(item.Id, item.TransactionDate, account.Id, account.Name, account.IsArchived, ReportMovementDirection.Inflow, item.Type, item.SourceAccountId.HasValue ? Accounts[item.SourceAccountId.Value].Name : null, category, item.Description, item.Amount.AmountMinor, currencyCode)); }
+        }
+        return Task.FromResult<IReadOnlyList<ReportAccountMovementDetailFact>>(result);
+    }
 
     Task ITransactionStore.AddAsync(Transaction transaction, CancellationToken cancellationToken)
     {

@@ -4,6 +4,7 @@ using Suma.Desktop.Operations.Accounts;
 using Suma.Desktop.Operations.Budgets;
 using Suma.Desktop.Operations.Categories;
 using Suma.Desktop.Operations.Overview;
+using Suma.Desktop.Operations.Reports;
 using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Operations.Recurring;
 using Suma.Desktop.Operations.Savings;
@@ -12,6 +13,7 @@ using Suma.Desktop.Pages.Activity;
 using Suma.Desktop.Pages.Overview;
 using Suma.Desktop.Pages.Planning;
 using Suma.Desktop.Pages.Settings;
+using Suma.Desktop.Pages.Reports;
 using Suma.Desktop.Shell;
 using Suma.Desktop.ViewModels;
 
@@ -31,6 +33,8 @@ public static class DesktopServiceRegistration
         services.AddSingleton<ISavingsOperations, SavingsOperations>();
         services.AddSingleton<IOverviewOperations, OverviewOperations>();
         services.AddSingleton<OverviewViewModel>();
+        services.AddSingleton<IReportOperations, ReportOperations>();
+        services.AddSingleton<ReportsViewModel>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<CategoriesViewModel>();
         services.AddSingleton<ActivityViewModel>();
@@ -50,12 +54,14 @@ public static class DesktopServiceRegistration
         services.AddSingleton<ActivityPage>();
         services.AddSingleton<PlanningPage>();
         services.AddSingleton<SettingsPage>();
+        services.AddSingleton<ReportsPage>();
 
         services.AddSingleton<Func<OverviewPage>>(provider => () => provider.GetRequiredService<OverviewPage>());
         services.AddSingleton<Func<AccountsPage>>(provider => () => provider.GetRequiredService<AccountsPage>());
         services.AddSingleton<Func<ActivityPage>>(provider => () => provider.GetRequiredService<ActivityPage>());
         services.AddSingleton<Func<PlanningPage>>(provider => () => provider.GetRequiredService<PlanningPage>());
         services.AddSingleton<Func<SettingsPage>>(provider => () => provider.GetRequiredService<SettingsPage>());
+        services.AddSingleton<Func<ReportsPage>>(provider => () => provider.GetRequiredService<ReportsPage>());
 
         return services;
     }

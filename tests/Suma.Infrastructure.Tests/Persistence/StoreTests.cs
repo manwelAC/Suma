@@ -1,5 +1,6 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Suma.Application.Abstractions.Persistence;
 using Suma.Domain.Accounts;
 using Suma.Domain.Budgets;
 using Suma.Domain.Categories;
@@ -335,6 +336,27 @@ public sealed class StoreTests
         Assert.Equal(["PHP", "USD"], currencies.Select(item => item.CurrencyCode));
         Assert.True(currencies.Single(item => item.CurrencyCode == "PHP").HasActiveIncludedAccount);
         Assert.True(currencies.Single(item => item.CurrencyCode == "USD").HasActiveIncludedAccount);
+    }
+
+    [Fact]
+    public async Task Report_reads_are_inclusive_currency_isolated_join_refund_category_and_do_not_truncate_detail()
+    {
+        await using var database = await Database.CreateAsync();
+        var source = NewAccount("Archived wallet"); var destination = NewAccount("Savings"); source.Archive();
+        var food = new Category("Food", CategoryTransactionKind.Expense); food.Archive(); var other = new Category("Other", CategoryTransactionKind.Expense);
+        var incomeCategory = new Category("Salary", CategoryTransactionKind.Income);
+        var expense = Transaction.CreateExpense(source.Id, food.Id, new Money(1_000, "PHP"), new(2026, 9, 1));
+        var refund = Transaction.CreateRefund(destination.Id, other.Id, expense.Id, new Money(250, "PHP"), new(2026, 9, 30));
+        var transfer = Transaction.CreateTransfer(source.Id, destination.Id, new Money(100, "PHP"), new(2026, 9, 15));
+        var income = Transaction.CreateIncome(source.Id, incomeCategory.Id, new Money(2_000, "PHP"), new(2026, 9, 2));
+        var extra = Enumerable.Range(0, 501).Select(i => Transaction.CreateIncome(source.Id, incomeCategory.Id, new Money(1, "PHP"), new(2026, 9, 3), $"row {i}")).ToArray();
+        await database.AddAsync([source, destination, food, other, incomeCategory, expense, refund, transfer, income, .. extra]);
+        await using var context = database.Context(); IReportStore store = new ReportStore(context);
+        var categories = await store.GetCategoryFactsAsync("PHP", new(2026, 9, 1), new(2026, 9, 30), Token);
+        var foodFact = Assert.Single(categories, item => item.CategoryId == food.Id); Assert.Equal((1_000, 250), (foodFact.GrossExpenseMinor, foodFact.RefundMinor)); Assert.True(foodFact.CategoryArchived);
+        var movements = await store.GetAccountMovementFactsAsync("PHP", new(2026, 9, 1), new(2026, 9, 30), Token); Assert.Equal(2, movements.Count); Assert.True(movements.Single(item => item.AccountId == source.Id).AccountArchived);
+        var details = await store.GetAccountMovementDetailsAsync("PHP", new(2026, 9, 1), new(2026, 9, 30), null, Token); Assert.True(details.Count > 500); Assert.Contains(details, item => item.Type == TransactionType.Transfer && item.Direction == ReportMovementDirection.Inflow); Assert.Contains(details, item => item.Type == TransactionType.Transfer && item.Direction == ReportMovementDirection.Outflow); Assert.Contains(details, item => item.Type == TransactionType.Refund && item.Category == "Food");
+        Assert.Empty(await store.GetCategoryFactsAsync("USD", new(2026, 9, 1), new(2026, 9, 30), Token));
     }
 
     private static Account NewAccount(string name) => new(name, AccountType.Bank, Money.Zero("PHP"), "PHP", true);

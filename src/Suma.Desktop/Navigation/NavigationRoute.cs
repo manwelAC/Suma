@@ -6,5 +6,6 @@ public enum NavigationRoute
     Accounts,
     Activity,
     Planning,
+    Reports,
     Settings
 }

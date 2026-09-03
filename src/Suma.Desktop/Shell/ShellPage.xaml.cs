@@ -50,6 +50,7 @@ public sealed partial class ShellPage : Page
         SetNavigationState(AccountsNavigationItem, route == NavigationRoute.Accounts);
         SetNavigationState(ActivityNavigationItem, route == NavigationRoute.Activity);
         SetNavigationState(PlanningNavigationItem, route == NavigationRoute.Planning);
+        SetNavigationState(ReportsNavigationItem, route == NavigationRoute.Reports);
         SetNavigationState(SettingsNavigationItem, route == NavigationRoute.Settings);
     }
 

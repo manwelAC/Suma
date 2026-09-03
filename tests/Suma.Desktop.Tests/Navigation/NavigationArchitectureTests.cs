@@ -10,7 +10,9 @@ using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Operations.Recurring;
 using Suma.Desktop.Operations.Savings;
 using Suma.Desktop.Operations.Overview;
+using Suma.Desktop.Operations.Reports;
 using Suma.Desktop.Pages.Accounts;
+using Suma.Desktop.Pages.Reports;
 using Suma.Desktop.Shell;
 using Suma.Desktop.ViewModels;
 using Xunit;
@@ -65,6 +67,9 @@ public sealed class NavigationArchitectureTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ISavingsOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IOverviewOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(OverviewViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IReportOperations));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ReportsViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ReportsPage));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CategoriesViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ActivityViewModel));
@@ -126,6 +131,15 @@ public sealed class NavigationArchitectureTests
                 || field.FieldType.Namespace?.StartsWith("Suma.Application", StringComparison.Ordinal) == true);
     }
 
+    [Fact]
+    public void Reports_view_model_depends_only_on_report_operations_and_retains_no_services()
+    {
+        var constructor = Assert.Single(typeof(ReportsViewModel).GetConstructors());
+        Assert.Equal(typeof(IReportOperations), Assert.Single(constructor.GetParameters()).ParameterType);
+        Assert.DoesNotContain(typeof(ReportsViewModel).GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic),
+            field => field.FieldType == typeof(IServiceProvider) || field.FieldType == typeof(IServiceScopeFactory) || field.FieldType.Name.EndsWith("UseCase", StringComparison.Ordinal) || field.FieldType.Name.EndsWith("Store", StringComparison.Ordinal));
+    }
+
     [Theory]
     [InlineData(typeof(AccountOperations))]
     [InlineData(typeof(CategoryOperations))]
@@ -134,6 +148,7 @@ public sealed class NavigationArchitectureTests
     [InlineData(typeof(RecurringOperations))]
     [InlineData(typeof(SavingsOperations))]
     [InlineData(typeof(OverviewOperations))]
+    [InlineData(typeof(ReportOperations))]
     public void Finance_operation_adapters_hold_scope_factory_not_scoped_finance_services(Type adapterType)
     {
         var fields = adapterType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);

@@ -11,6 +11,8 @@ public partial class App : Microsoft.UI.Xaml.Application
     private Window? _window;
     private readonly ServiceProvider _services;
 
+    internal Window? MainWindow => _window;
+
     public App()
     {
         InitializeComponent();

@@ -3,6 +3,7 @@ using Suma.Desktop.Pages.Activity;
 using Suma.Desktop.Pages.Accounts;
 using Suma.Desktop.Pages.Overview;
 using Suma.Desktop.Pages.Planning;
+using Suma.Desktop.Pages.Reports;
 using Suma.Desktop.Pages.Settings;
 
 namespace Suma.Desktop.Navigation;
@@ -16,6 +17,7 @@ public static class NavigationRouteMap
             [NavigationRoute.Accounts] = typeof(AccountsPage),
             [NavigationRoute.Activity] = typeof(ActivityPage),
             [NavigationRoute.Planning] = typeof(PlanningPage),
+            [NavigationRoute.Reports] = typeof(ReportsPage),
             [NavigationRoute.Settings] = typeof(SettingsPage)
         };
 
