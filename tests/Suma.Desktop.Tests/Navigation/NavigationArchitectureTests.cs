@@ -11,10 +11,12 @@ using Suma.Desktop.Operations.Recurring;
 using Suma.Desktop.Operations.Savings;
 using Suma.Desktop.Operations.Overview;
 using Suma.Desktop.Operations.Reports;
+using Suma.Desktop.Operations.Settings;
 using Suma.Desktop.Pages.Accounts;
 using Suma.Desktop.Pages.Reports;
 using Suma.Desktop.Shell;
 using Suma.Desktop.ViewModels;
+using Suma.Infrastructure.Runtime;
 using Xunit;
 
 namespace Suma.Desktop.Tests.Navigation;
@@ -70,6 +72,9 @@ public sealed class NavigationArchitectureTests
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(IReportOperations));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ReportsViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ReportsPage));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ISettingsOperations));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(SettingsViewModel));
+        Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(LockViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(AccountsViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(CategoriesViewModel));
         Assert.Contains(services, descriptor => descriptor.ServiceType == typeof(ActivityViewModel));
@@ -141,6 +146,63 @@ public sealed class NavigationArchitectureTests
     }
 
     [Theory]
+    [InlineData(typeof(SettingsViewModel))]
+    [InlineData(typeof(LockViewModel))]
+    public void Security_view_models_depend_only_on_settings_operations(Type viewModelType)
+    {
+        Assert.Equal(typeof(ISettingsOperations), Assert.Single(Assert.Single(viewModelType.GetConstructors()).GetParameters()).ParameterType);
+        Assert.DoesNotContain(viewModelType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic), field => field.FieldType == typeof(IServiceProvider) || field.FieldType == typeof(IServiceScopeFactory) || field.FieldType.Name.Contains("DbContext", StringComparison.Ordinal) || field.FieldType.Name.Contains("Sqlite", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Main_window_uses_lazy_shell_factory_so_financial_shell_is_not_required_before_unlock()
+    {
+        var parameters = Assert.Single(typeof(MainWindow).GetConstructors()).GetParameters(); Assert.Contains(parameters, parameter => parameter.ParameterType == typeof(Func<ShellPage>)); Assert.DoesNotContain(parameters, parameter => parameter.ParameterType == typeof(ShellPage));
+    }
+
+    [Fact]
+    public void Recovery_required_blocks_finance_while_safe_startup_selects_lock_or_shell()
+    {
+        var recovery = new PendingRestoreResult(true, false, false, true, true, "recovery"); var safe = PendingRestoreResult.None;
+        Assert.Equal(StartupDestination.Recovery, StartupDestinationSelector.Select(recovery, false)); Assert.Equal(StartupDestination.Recovery, StartupDestinationSelector.Select(recovery, true));
+        Assert.Equal(StartupDestination.Shell, StartupDestinationSelector.Select(safe, false)); Assert.Equal(StartupDestination.Lock, StartupDestinationSelector.Select(safe, true));
+    }
+
+    [Theory]
+    [InlineData("{\"Version\":2,\"Phase\":0}")]
+    [InlineData("{\"Version\":1,\"Phase\":999}")]
+    [InlineData("{invalid-json")]
+    public async Task Invalid_or_unsupported_restore_state_without_rollback_blocks_startup_and_selects_recovery_destination(string restoreStateJson)
+    {
+        var tempDirectory = Path.Combine(Path.GetTempPath(), "Suma-Nav-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDirectory);
+        try
+        {
+            var paths = new SumaRuntimePaths(Path.Combine(tempDirectory, "suma.db"));
+            Directory.CreateDirectory(paths.RestoreDirectory);
+            await File.WriteAllTextAsync(paths.RestoreStatePath, restoreStateJson, TestContext.Current.CancellationToken);
+
+            var applier = new PendingRestoreApplier(paths, Microsoft.Extensions.Logging.Abstractions.NullLogger<PendingRestoreApplier>.Instance);
+            var result = await applier.ApplyAsync(TestContext.Current.CancellationToken);
+
+            Assert.True(result.RecoveryRequired);
+            Assert.False(result.RollbackRetained);
+            Assert.NotNull(result.UserMessage);
+            Assert.DoesNotContain("rollback", result.UserMessage, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal("Suma could not safely open your finance data after an interrupted restore. Do not modify or remove Suma data.", result.UserMessage);
+
+            Assert.Equal(StartupDestination.Recovery, StartupDestinationSelector.Select(result, false));
+            Assert.Equal(StartupDestination.Recovery, StartupDestinationSelector.Select(result, true));
+            Assert.NotEqual(StartupDestination.Shell, StartupDestinationSelector.Select(result, false));
+            Assert.NotEqual(StartupDestination.Lock, StartupDestinationSelector.Select(result, true));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDirectory)) Directory.Delete(tempDirectory, true);
+        }
+    }
+
+    [Theory]
     [InlineData(typeof(AccountOperations))]
     [InlineData(typeof(CategoryOperations))]
     [InlineData(typeof(TransactionOperations))]
@@ -149,6 +211,7 @@ public sealed class NavigationArchitectureTests
     [InlineData(typeof(SavingsOperations))]
     [InlineData(typeof(OverviewOperations))]
     [InlineData(typeof(ReportOperations))]
+    [InlineData(typeof(SettingsOperations))]
     public void Finance_operation_adapters_hold_scope_factory_not_scoped_finance_services(Type adapterType)
     {
         var fields = adapterType.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);

@@ -2,9 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Suma.Application.Abstractions.Persistence;
 using Suma.Application.Abstractions.Time;
+using Suma.Application.Abstractions.Security;
 using Suma.Infrastructure.Persistence;
 using Suma.Infrastructure.Persistence.Stores;
 using Suma.Infrastructure.Runtime;
+using Suma.Infrastructure.Security;
 using Suma.Infrastructure.Time;
 
 namespace Suma.Infrastructure;
@@ -18,6 +20,7 @@ public static class DependencyInjection
         ArgumentException.ThrowIfNullOrWhiteSpace(databasePath);
 
         var connectionString = SqliteRuntimeConnection.Build(databasePath);
+        services.AddSingleton(new SumaRuntimePaths(Path.GetFullPath(databasePath)));
         services.AddDbContext<SumaDbContext>(options => options.UseSqlite(connectionString));
 
         services.AddScoped<IAccountStore, AccountStore>();
@@ -30,11 +33,14 @@ public static class DependencyInjection
         services.AddScoped<ISavingsGoalStore, SavingsGoalStore>();
         services.AddScoped<IOverviewStore, OverviewStore>();
         services.AddScoped<IReportStore, ReportStore>();
+        services.AddScoped<IFinanceBackupStore, FinanceBackupStore>();
+        services.AddSingleton<ISecuritySettingsStore, JsonSecuritySettingsStore>();
         services.AddScoped<IGoalContributionStore, GoalContributionStore>();
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
         services.AddSingleton<IDateProvider, SystemDateProvider>();
         services.AddSingleton<IDatabaseInitializer, DatabaseInitializer>();
+        services.AddSingleton<IPendingRestoreApplier, PendingRestoreApplier>();
 
         return services;
     }

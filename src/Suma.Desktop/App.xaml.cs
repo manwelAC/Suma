@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Suma.Desktop.Composition;
 using Suma.Infrastructure.Runtime;
+using Suma.Desktop.Operations.Settings;
 
 namespace Suma.Desktop;
 
@@ -25,8 +26,18 @@ public partial class App : Microsoft.UI.Xaml.Application
 
         try
         {
+            var requiresPin = await _services.GetRequiredService<ISettingsOperations>().IsPinEnabledAsync();
+            var restore = await _services.GetRequiredService<IPendingRestoreApplier>().ApplyAsync();
+            var mainWindow = _services.GetRequiredService<MainWindow>();
+            _window = mainWindow;
+            var destination = StartupDestinationSelector.Select(restore, requiresPin);
+            if (destination == StartupDestination.Recovery)
+            {
+                mainWindow.ShowRecovery(restore.UserMessage!); _window.Activate(); logger.LogCritical("Suma finance startup was blocked because restore recovery is required."); return;
+            }
             await _services.GetRequiredService<IDatabaseInitializer>().InitializeAsync();
-            _window = _services.GetRequiredService<MainWindow>();
+            if (destination == StartupDestination.Lock) mainWindow.ShowLock(); else mainWindow.ShowShell();
+            if (!string.IsNullOrWhiteSpace(restore.UserMessage)) mainWindow.ShowStartupError(restore.UserMessage);
             _window.Activate();
             logger.LogInformation("Suma main window activated.");
         }

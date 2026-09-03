@@ -3,8 +3,5 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Title="Suma">
-    <ContentControl
-        x:Name="ShellHost"
-        HorizontalContentAlignment="Stretch"
-        VerticalContentAlignment="Stretch" />
+    <Grid><ContentControl x:Name="RootHost" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/><InfoBar x:Name="StartupInfo" HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="24" Severity="Error" IsOpen="False"/></Grid>
 </Window>

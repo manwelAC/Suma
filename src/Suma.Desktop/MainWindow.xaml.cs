@@ -1,6 +1,9 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Suma.Desktop.Shell;
+using Suma.Desktop.Pages.Lock;
+using Suma.Desktop.Pages.Recovery;
+using Suma.Desktop.ViewModels;
 using Windows.Graphics;
 using Windows.UI;
 using Windows.UI.ViewManagement;
@@ -9,13 +12,18 @@ namespace Suma.Desktop;
 
 public sealed partial class MainWindow : Window
 {
-    public MainWindow(ShellPage shellPage)
+    private readonly Func<ShellPage> shellFactory; private readonly LockViewModel lockViewModel;
+    public MainWindow(Func<ShellPage> shellFactory, LockViewModel lockViewModel)
     {
-        InitializeComponent();
+        this.shellFactory = shellFactory; this.lockViewModel = lockViewModel; InitializeComponent();
         CustomizeTitleBar();
-        ShellHost.Content = shellPage;
         AppWindow.Resize(new SizeInt32(1200, 760));
     }
+
+    public void ShowShell() => RootHost.Content = shellFactory();
+    public void ShowLock() => RootHost.Content = new LockPage(lockViewModel, ShowShell);
+    public void ShowRecovery(string message) => RootHost.Content = new RecoveryPage(message);
+    public void ShowStartupError(string message) { StartupInfo.Message = message; StartupInfo.IsOpen = true; }
 
     private void CustomizeTitleBar()
     {

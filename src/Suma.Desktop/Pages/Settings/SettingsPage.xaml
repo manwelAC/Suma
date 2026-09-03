@@ -1,22 +1,11 @@
-<Page
-    x:Class="Suma.Desktop.Pages.Settings.SettingsPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Background="{StaticResource SumaBackgroundBrush}">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <Grid Padding="{StaticResource SumaPagePadding}">
-            <StackPanel MaxWidth="{StaticResource SumaPageContentMaxWidth}" HorizontalAlignment="Left" Spacing="{StaticResource SumaSpace20}">
-                <StackPanel Spacing="{StaticResource SumaSpace8}">
-                    <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Settings" />
-                    <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Preferences and local data controls will appear here." />
-                </StackPanel>
-                <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}">
-                    <StackPanel Spacing="{StaticResource SumaSpace8}">
-                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Designed for your device" />
-                        <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Appearance, data, and security settings are intentionally deferred until their dedicated milestones." />
-                    </StackPanel>
-                </Border>
-            </StackPanel>
-        </Grid>
-    </ScrollViewer>
+<Page x:Class="Suma.Desktop.Pages.Settings.SettingsPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Background="{StaticResource SumaBackgroundBrush}">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"><Grid Padding="{StaticResource SumaPagePadding}"><StackPanel MaxWidth="720" HorizontalAlignment="Left" Spacing="20">
+        <StackPanel Spacing="8"><TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Settings"/><TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Security and local finance data controls."/></StackPanel>
+        <InfoBar IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}"/><InfoBar IsOpen="{Binding HasSuccess}" Severity="Success" Message="{Binding SuccessMessage}"/>
+        <StackPanel Spacing="12"><TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Security"/><TextBlock x:Name="PinStatusText"/><TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="PIN locks Suma on this Windows device. It does not encrypt your finance database. Suma has no online PIN recovery."/>
+            <StackPanel x:Name="EnablePanel" Spacing="8"><PasswordBox x:Name="NewPinBox" Header="New PIN" PlaceholderText="4–6 numeric digits" PasswordChar="●"/><PasswordBox x:Name="ConfirmPinBox" Header="Confirm new PIN" PasswordChar="●"/><Button Content="Enable PIN" IsEnabled="{Binding CanEnablePin}" Click="OnEnablePin"/></StackPanel>
+            <StackPanel x:Name="EnabledPanel" Spacing="8"><PasswordBox x:Name="CurrentPinBox" Header="Current PIN" PasswordChar="●"/><PasswordBox x:Name="ChangedPinBox" Header="New PIN" PlaceholderText="4–6 numeric digits" PasswordChar="●"/><PasswordBox x:Name="ChangedConfirmBox" Header="Confirm new PIN" PasswordChar="●"/><StackPanel Orientation="Horizontal" Spacing="8"><Button Content="Change PIN" IsEnabled="{Binding CanChangePin}" Click="OnChangePin"/><Button Content="Disable PIN" IsEnabled="{Binding CanDisablePin}" Click="OnDisablePin"/></StackPanel></StackPanel>
+        </StackPanel>
+        <StackPanel Spacing="12"><TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Local data"/><TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Backups contain your finance database but not your device PIN. Restore replaces your current Suma financial data; your local PIN setting will not change."/><StackPanel Orientation="Horizontal" Spacing="8"><Button Content="Create Backup" IsEnabled="{Binding CanManageData}" Click="OnBackup"/><Button Content="Restore Backup" IsEnabled="{Binding CanManageData}" Click="OnRestore"/></StackPanel><TextBlock x:Name="RestartText" Visibility="Collapsed" TextWrapping="Wrap" Text="Close Suma and open it again to finish Restore."/></StackPanel>
+    </StackPanel></Grid></ScrollViewer>
 </Page>

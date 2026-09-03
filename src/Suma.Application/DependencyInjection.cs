@@ -1,4 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
+using Suma.Application.DataManagement;
+using Suma.Application.Security;
 using Suma.Application.Accounts.GetAccountBalance;
 using Suma.Application.Accounts.GetAccounts;
 using Suma.Application.Accounts.ArchiveAccount;
@@ -84,6 +86,8 @@ public static class DependencyInjection
         services.AddScoped<GetOverviewUseCase>();
         services.AddScoped<GetFinancialReportUseCase>();
         services.AddScoped<GetReportOptionsUseCase>();
+        services.AddScoped<PinSecurityService>();
+        services.AddScoped<FinanceBackupService>();
         services.AddScoped<GetAccountMovementDetailUseCase>();
         services.AddScoped<ReportCsvSerializer>();
 

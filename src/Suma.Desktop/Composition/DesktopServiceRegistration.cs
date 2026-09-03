@@ -8,6 +8,7 @@ using Suma.Desktop.Operations.Reports;
 using Suma.Desktop.Operations.Transactions;
 using Suma.Desktop.Operations.Recurring;
 using Suma.Desktop.Operations.Savings;
+using Suma.Desktop.Operations.Settings;
 using Suma.Desktop.Pages.Accounts;
 using Suma.Desktop.Pages.Activity;
 using Suma.Desktop.Pages.Overview;
@@ -34,7 +35,10 @@ public static class DesktopServiceRegistration
         services.AddSingleton<IOverviewOperations, OverviewOperations>();
         services.AddSingleton<OverviewViewModel>();
         services.AddSingleton<IReportOperations, ReportOperations>();
+        services.AddSingleton<ISettingsOperations, SettingsOperations>();
         services.AddSingleton<ReportsViewModel>();
+        services.AddSingleton<SettingsViewModel>();
+        services.AddSingleton<LockViewModel>();
         services.AddSingleton<AccountsViewModel>();
         services.AddSingleton<CategoriesViewModel>();
         services.AddSingleton<ActivityViewModel>();
@@ -47,6 +51,7 @@ public static class DesktopServiceRegistration
         services.AddSingleton<SavingsGoalEditorViewModel>();
         services.AddSingleton<ShellViewModel>();
         services.AddSingleton<ShellPage>();
+        services.AddSingleton<Func<ShellPage>>(provider => () => provider.GetRequiredService<ShellPage>());
         services.AddSingleton<MainWindow>();
 
         services.AddSingleton<OverviewPage>();
