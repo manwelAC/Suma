@@ -10,7 +10,8 @@ public sealed record CreateAccountRequest(
     AccountType Type,
     long OpeningBalanceMinor,
     string CurrencyCode,
-    bool IncludeInAvailableToSpend);
+    bool IncludeInAvailableToSpend,
+    string? AccountNumber = null);
 
 public sealed record CreateAccountResult(
     Guid Id,
@@ -18,7 +19,8 @@ public sealed record CreateAccountResult(
     AccountType Type,
     long OpeningBalanceMinor,
     string CurrencyCode,
-    bool IncludeInAvailableToSpend);
+    bool IncludeInAvailableToSpend,
+    string? AccountNumber = null);
 
 public sealed class CreateAccountUseCase(IAccountStore accounts, IUnitOfWork unitOfWork)
 {
@@ -35,7 +37,8 @@ public sealed class CreateAccountUseCase(IAccountStore accounts, IUnitOfWork uni
                 request.Type,
                 openingBalance,
                 request.CurrencyCode,
-                request.IncludeInAvailableToSpend);
+                request.IncludeInAvailableToSpend,
+                request.AccountNumber);
         }
         catch (ArgumentException exception)
         {
@@ -50,6 +53,7 @@ public sealed class CreateAccountUseCase(IAccountStore accounts, IUnitOfWork uni
             account.Type,
             account.OpeningBalance.AmountMinor,
             account.CurrencyCode,
-            account.IncludeInAvailableToSpend);
+            account.IncludeInAvailableToSpend,
+            account.AccountNumber);
     }
 }

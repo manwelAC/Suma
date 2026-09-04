@@ -64,7 +64,7 @@ public sealed class FinanceViewModelTests
     {
         private readonly List<AccountSummary> items =
         [
-            new(Guid.NewGuid(), "Wallet", AccountType.Cash, 1_250, "PHP", true)
+            new(Guid.NewGuid(), "Wallet", AccountType.Cash, 1_250, "PHP", true, 1_250)
         ];
 
         public int CreateCount { get; private set; }
@@ -75,17 +75,136 @@ public sealed class FinanceViewModelTests
         public Task<CreateAccountResult> CreateAsync(CreateAccountRequest request, CancellationToken cancellationToken = default)
         {
             var id = Guid.NewGuid();
-            items.Add(new AccountSummary(id, request.Name, request.Type, request.OpeningBalanceMinor, request.CurrencyCode, request.IncludeInAvailableToSpend));
+            items.Add(new AccountSummary(id, request.Name, request.Type, request.OpeningBalanceMinor, request.CurrencyCode, request.IncludeInAvailableToSpend, request.OpeningBalanceMinor, request.AccountNumber));
             CreateCount++;
-            return Task.FromResult(new CreateAccountResult(id, request.Name, request.Type, request.OpeningBalanceMinor, request.CurrencyCode, request.IncludeInAvailableToSpend));
+            return Task.FromResult(new CreateAccountResult(id, request.Name, request.Type, request.OpeningBalanceMinor, request.CurrencyCode, request.IncludeInAvailableToSpend, request.AccountNumber));
         }
 
-        public Task<UpdateAccountResult> UpdateAsync(UpdateAccountRequest request, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new UpdateAccountResult(request.AccountId, request.Name, request.Type, request.IncludeInAvailableToSpend));
+        public Task<UpdateAccountResult> UpdateAsync(UpdateAccountRequest request, CancellationToken cancellationToken = default)
+        {
+            var index = items.FindIndex(item => item.Id == request.AccountId);
+            long openingMinor = 0;
+            if (index >= 0)
+            {
+                var existing = items[index];
+                openingMinor = request.OpeningBalanceMinor ?? existing.OpeningBalanceMinor;
+                var balanceMinor = request.OpeningBalanceMinor.HasValue ? request.OpeningBalanceMinor.Value : existing.BalanceMinor;
+                items[index] = existing with
+                {
+                    Name = request.Name,
+                    Type = request.Type,
+                    IncludeInAvailableToSpend = request.IncludeInAvailableToSpend,
+                    AccountNumber = request.AccountNumber,
+                    OpeningBalanceMinor = openingMinor,
+                    BalanceMinor = balanceMinor
+                };
+            }
+            return Task.FromResult(new UpdateAccountResult(request.AccountId, request.Name, request.Type, request.IncludeInAvailableToSpend, request.AccountNumber, openingMinor));
+        }
 
         public Task ArchiveAsync(Guid accountId, CancellationToken cancellationToken = default) => Task.CompletedTask;
 
         public Task RestoreAsync(Guid accountId, CancellationToken cancellationToken = default) => Task.CompletedTask;
+
+        public Task<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>> GetRecentTransactionsAsync(Guid accountId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>>([]);
+    }
+
+    [Fact]
+    public async Task Accounts_view_model_create_and_update_with_account_number_and_opening_balance()
+    {
+        var operations = new FakeAccountOperations();
+        var viewModel = new AccountsViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+
+        // Create an e-wallet with mobile number
+        var created = await viewModel.CreateAsync(
+            new AccountEditorInput("GCash", AccountType.EWallet, true, 100_000, "PHP", "09171234567"), Token);
+        Assert.True(created);
+
+        var gcash = viewModel.ActiveAccounts.First(a => a.Name == "GCash");
+        Assert.Equal("•••• 4567", gcash.MaskedNumber);
+        Assert.Equal("09171234567", gcash.AccountNumber);
+        Assert.True(gcash.HasAccountNumber);
+
+        // Update opening balance and account number
+        viewModel.SelectAccount(gcash);
+        var updated = await viewModel.UpdateAsync(
+            gcash.Id,
+            new AccountEditorInput("GCash", AccountType.EWallet, true, 250_000, "PHP", "09189998888"), Token);
+        Assert.True(updated);
+
+        var refreshed = viewModel.ActiveAccounts.First(a => a.Name == "GCash");
+        Assert.Equal("•••• 8888", refreshed.MaskedNumber);
+        Assert.Equal("09189998888", refreshed.AccountNumber);
+        Assert.Contains("2,500.00", refreshed.BalanceDisplay);
+    }
+
+    [Fact]
+    public async Task Accounts_view_model_computes_included_and_excluded_balances_and_active_count()
+    {
+        var operations = new FakeAccountOperations();
+        var viewModel = new AccountsViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        // Default fake has 1 Cash Wallet with 1,250 minor (12.50 PHP), included in ATS
+        Assert.Single(viewModel.ActiveAccounts);
+        Assert.Contains("12.50", viewModel.IncludedBalanceDisplay);
+        Assert.Contains("0.00", viewModel.ExcludedBalanceDisplay);
+        Assert.Equal(1, viewModel.ActiveAccountsCount);
+
+        // Add a bank account excluded from ATS
+        await viewModel.CreateAsync(
+            new AccountEditorInput("Vault", AccountType.Bank, false, 50_000, "PHP"), Token);
+
+        Assert.Equal(2, viewModel.ActiveAccounts.Count);
+        Assert.Contains("12.50", viewModel.IncludedBalanceDisplay);
+        Assert.Contains("500.00", viewModel.ExcludedBalanceDisplay);
+        Assert.Equal(2, viewModel.ActiveAccountsCount);
+    }
+
+    [Fact]
+    public async Task Accounts_view_model_card_styling_and_selection()
+    {
+        var operations = new FakeAccountOperations();
+        var viewModel = new AccountsViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        var walletCard = viewModel.ActiveAccounts[0];
+
+        // Cash wallet card styling assertions
+        Assert.True(walletCard.IsWallet);
+        Assert.Equal("WALLET", walletCard.MaskedNumber);
+        Assert.Equal("Included in ATS", walletCard.AtsBadgeText);
+
+        // Selection
+        Assert.Equal(walletCard, viewModel.SelectedAccount);
+        Assert.True(walletCard.IsSelected);
+        Assert.Equal("Wallet", viewModel.SelectedAccountName);
+
+        // Theme switching
+        viewModel.SetCardTheme(2);
+        Assert.Equal(2, viewModel.SelectedThemeIndex);
+        Assert.Equal(2, walletCard.ThemeIndex);
+    }
+
+    [Fact]
+    public async Task Accounts_view_model_toggle_ats_updates_metrics()
+    {
+        var operations = new FakeAccountOperations();
+        var viewModel = new AccountsViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        var wallet = viewModel.ActiveAccounts[0];
+        Assert.True(wallet.IncludeInAvailableToSpend);
+
+        // Toggle to excluded
+        await viewModel.ToggleAtsAsync(wallet, Token);
+
+        Assert.False(viewModel.ActiveAccounts[0].IncludeInAvailableToSpend);
+        Assert.Contains("0.00", viewModel.IncludedBalanceDisplay);
+        Assert.Contains("12.50", viewModel.ExcludedBalanceDisplay);
     }
 
     private sealed class FakeCategoryOperations : ICategoryOperations

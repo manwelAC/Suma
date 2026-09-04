@@ -43,6 +43,18 @@ public sealed class RecurringOccurrence : Entity
         Status = RecurringOccurrenceStatus.Skipped;
     }
 
+    public void ResetToPending()
+    {
+        if (Status != RecurringOccurrenceStatus.Paid)
+        {
+            throw new InvalidOperationException(
+                $"Only a paid recurring occurrence can be reset to pending.");
+        }
+
+        Status = RecurringOccurrenceStatus.Pending;
+        TransactionId = null;
+    }
+
     private void EnsurePending()
     {
         if (Status != RecurringOccurrenceStatus.Pending)

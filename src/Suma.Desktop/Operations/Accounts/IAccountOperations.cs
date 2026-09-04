@@ -15,4 +15,6 @@ public interface IAccountOperations
     Task ArchiveAsync(Guid accountId, CancellationToken cancellationToken = default);
 
     Task RestoreAsync(Guid accountId, CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>> GetRecentTransactionsAsync(Guid accountId, CancellationToken cancellationToken = default);
 }

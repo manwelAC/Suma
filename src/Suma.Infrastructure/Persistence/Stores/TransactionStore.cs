@@ -12,6 +12,15 @@ public sealed class TransactionStore(SumaDbContext context) : ITransactionStore
     public async Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default) =>
         await context.Transactions.AddAsync(transaction, cancellationToken);
 
+    public Task RemoveAsync(Transaction transaction, CancellationToken cancellationToken = default)
+    {
+        context.Transactions.Remove(transaction);
+        return Task.CompletedTask;
+    }
+
+    public async Task<bool> HasRefundsAsync(Guid transactionId, CancellationToken cancellationToken = default) =>
+        await context.Transactions.AsNoTracking().AnyAsync(transaction => transaction.Type == TransactionType.Refund && transaction.OriginalTransactionId == transactionId, cancellationToken);
+
     public async Task<IReadOnlyList<Transaction>> GetRecentAsync(int limit, CancellationToken cancellationToken = default) =>
         await context.Transactions.AsNoTracking().OrderByDescending(transaction => transaction.TransactionDate).ThenByDescending(transaction => transaction.Id).Take(limit).ToListAsync(cancellationToken);
 

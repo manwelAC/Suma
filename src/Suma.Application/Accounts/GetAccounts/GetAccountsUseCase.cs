@@ -3,7 +3,7 @@ using Suma.Domain.Accounts;
 
 namespace Suma.Application.Accounts.GetAccounts;
 
-public sealed record AccountSummary(Guid Id, string Name, AccountType Type, long BalanceMinor, string CurrencyCode, bool IncludeInAvailableToSpend);
+public sealed record AccountSummary(Guid Id, string Name, AccountType Type, long BalanceMinor, string CurrencyCode, bool IncludeInAvailableToSpend, long OpeningBalanceMinor = 0, string? AccountNumber = null);
 
 public sealed class GetAccountsUseCase(IAccountStore accounts, ITransactionStore transactions)
 {
@@ -26,7 +26,15 @@ public sealed class GetAccountsUseCase(IAccountStore accounts, ITransactionStore
         {
             var ledger = await transactions.GetForAccountAsync(account.Id, cancellationToken);
             var balance = AccountBalanceCalculator.Calculate(account, ledger);
-            results.Add(new AccountSummary(account.Id, account.Name, account.Type, balance, account.CurrencyCode, account.IncludeInAvailableToSpend));
+            results.Add(new AccountSummary(
+                account.Id,
+                account.Name,
+                account.Type,
+                balance,
+                account.CurrencyCode,
+                account.IncludeInAvailableToSpend,
+                account.OpeningBalance.AmountMinor,
+                account.AccountNumber));
         }
 
         return results;

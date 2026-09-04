@@ -5,368 +5,613 @@
     xmlns:models="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
 
+    <Page.Resources>
+        <!-- Deep Forest Green Primary Action Button -->
+        <Style x:Key="AccountPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Background" Value="#264E36" />
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Background="{TemplateBinding Background}"
+                            Foreground="{TemplateBinding Foreground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#1E3F2B" />
+                                            <Setter Target="ContentPresenter.Foreground" Value="#FFFFFFFF" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#162E20" />
+                                            <Setter Target="ContentPresenter.Foreground" Value="#FFE0E0E0" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Opacity" Value="0.45" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Metric Card Surface Style -->
+        <Style x:Key="AccountMetricCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="20,16" />
+        </Style>
+
+        <!-- Bottom Workspace Card Style -->
+        <Style x:Key="AccountWorkspaceCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="22" />
+        </Style>
+    </Page.Resources>
+
     <ScrollViewer
         HorizontalScrollBarVisibility="Disabled"
         VerticalScrollBarVisibility="Auto"
         VerticalScrollMode="Auto">
-    <Grid Padding="{StaticResource SumaPagePadding}" RowSpacing="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+        <Grid Padding="36,24,36,32" RowSpacing="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <StackPanel Spacing="8">
-            <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Money setup" />
-            <TextBlock
-                Style="{StaticResource SumaLeadTextStyle}"
-                Text="Keep your accounts and categories clear, local, and ready for everyday use." />
-        </StackPanel>
+            <!-- Panoramic Atmospheric Background Landscape with Seamless Edge Fades Behind Cards -->
+            <Grid Grid.Row="0" Grid.RowSpan="4" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="480" Margin="-36,-24,-36,0" IsHitTestVisible="False">
+                <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
+                <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
+                <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
+                <Ellipse Width="170" Height="170" Fill="#4C8FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,170,0" />
 
-        <Border
-            Grid.Row="1"
-            HorizontalAlignment="Left"
-            Background="{StaticResource SumaSurfaceSecondaryBrush}"
-            CornerRadius="{StaticResource SumaCornerMedium}"
-            Padding="4">
-            <StackPanel Orientation="Horizontal" Spacing="4">
-                <ToggleButton
-                    x:Name="AccountsSectionButton"
-                    AutomationProperties.Name="Show accounts section"
-                    Click="OnAccountsSectionClick"
-                    Content="Accounts"
-                    Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                <ToggleButton
-                    x:Name="CategoriesSectionButton"
-                    AutomationProperties.Name="Show categories section"
-                    Click="OnCategoriesSectionClick"
-                    Content="Categories"
-                    Style="{StaticResource SumaNavigationItemStyle}" />
-            </StackPanel>
-        </Border>
+                <!-- Left atmospheric mist -->
+                <Ellipse Width="420" Height="260" Fill="#1A4A624E" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-20,0,0" />
 
-        <Grid Grid.Row="2">
-            <Grid x:Name="AccountsSection" RowSpacing="16">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+                <!-- Flying cranes in the serene sky -->
+                <Canvas HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Height="100" Margin="0,30,360,0">
+                    <Path Data="M 10,40 Q 20,30 30,40 Q 40,30 50,40" Stroke="#5A556B5A" StrokeThickness="2" />
+                    <Path Data="M 52,24 Q 60,16 68,24 Q 76,16 84,24" Stroke="#4A556B5A" StrokeThickness="1.6" />
+                    <Path Data="M 80,48 Q 87,42 94,48 Q 101,42 108,48" Stroke="#3E556B5A" StrokeThickness="1.4" />
+                </Canvas>
 
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Spacing="4">
-                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Accounts" />
-                        <TextBlock
-                            Style="{StaticResource SumaBodySecondaryTextStyle}"
-                            Text="Real balances, derived from each opening balance and the shared ledger." />
-                    </StackPanel>
-                    <Button
-                        Grid.Column="1"
-                        AutomationProperties.Name="Add account"
-                        Click="OnAddAccountClick"
-                        Content="Add account" />
-                </Grid>
+                <!-- Layer 1: Distant majestic mountain ridge (farthest, tall peaks) -->
+                <Path Data="M 0,340 C 180,240 380,280 620,180 C 850,100 1100,200 1350,130 C 1600,70 1850,170 2100,120 L 2100,480 L 0,480 Z" Fill="#2F667A68" VerticalAlignment="Bottom" Stretch="Fill" Height="340" />
 
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-                    <ToggleButton
-                        x:Name="ActiveAccountsButton"
-                        AutomationProperties.Name="View active accounts"
-                        Click="OnActiveAccountsClick"
-                        Content="Active"
-                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                    <ToggleButton
-                        x:Name="ArchivedAccountsButton"
-                        AutomationProperties.Name="View archived accounts"
-                        Click="OnArchivedAccountsClick"
-                        Content="Archived"
-                        Style="{StaticResource SumaNavigationItemStyle}" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SumaCaptionTextStyle}"
-                        Text="{x:Bind AccountsViewModel.ActiveFilterLabel, Mode=OneWay}" />
-                </StackPanel>
+                <!-- Layer 2: Mid-ground rolling mountain range -->
+                <Path Data="M 0,380 C 220,270 480,330 780,220 C 1050,140 1350,250 1620,180 C 1850,130 2000,190 2100,170 L 2100,480 L 0,480 Z" Fill="#44556C58" VerticalAlignment="Bottom" Stretch="Fill" Height="280" />
 
-                <Grid Grid.Row="2" MinHeight="240">
-                    <ListView
-                        AutomationProperties.Name="Account list"
-                        ItemsSource="{x:Bind AccountsViewModel.Items, Mode=OneWay}"
-                        SelectionMode="None">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,0,8" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:AccountRowViewModel">
-                                <Border
-                                    Background="{StaticResource SumaSurfaceSecondaryBrush}"
-                                    CornerRadius="{StaticResource SumaCornerLarge}"
-                                    Padding="20">
-                                    <Grid RowSpacing="12">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Grid ColumnSpacing="16">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Spacing="4">
-                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
-                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" />
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
-                                                <TextBlock
-                                                    HorizontalAlignment="Right"
-                                                    Style="{StaticResource SumaSectionTitleTextStyle}"
-                                                    Text="{x:Bind BalanceDisplay}" />
-                                                <TextBlock
-                                                    HorizontalAlignment="Right"
-                                                    Style="{StaticResource SumaCaptionTextStyle}"
-                                                    Text="{x:Bind CurrencyCode}" />
-                                            </StackPanel>
-                                        </Grid>
-                                        <Grid Grid.Row="1" ColumnSpacing="12">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                Style="{StaticResource SumaBodySecondaryTextStyle}"
-                                                Text="{x:Bind AvailableToSpendDisplay}" />
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                                <Button
-                                                    AutomationProperties.Name="Edit account"
-                                                    Click="OnEditAccountClick"
-                                                    Content="Edit"
-                                                    Tag="{x:Bind Id}"
-                                                    Visibility="{x:Bind ActiveActionsVisibility}" />
-                                                <Button
-                                                    AutomationProperties.Name="Archive account"
-                                                    Click="OnArchiveAccountClick"
-                                                    Content="Archive"
-                                                    Tag="{x:Bind Id}"
-                                                    Visibility="{x:Bind ActiveActionsVisibility}" />
-                                                <Button
-                                                    AutomationProperties.Name="Restore account"
-                                                    Click="OnRestoreAccountClick"
-                                                    Content="Restore"
-                                                    Tag="{x:Bind Id}"
-                                                    Visibility="{x:Bind RestoreActionVisibility}" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                <!-- Layer 3: Foreground lush rolling knolls -->
+                <Path Data="M 0,400 C 280,300 600,240 920,310 C 1220,340 1520,240 1820,280 C 1960,295 2040,265 2100,275 L 2100,480 L 0,480 Z" Fill="#58435A47" VerticalAlignment="Bottom" Stretch="Fill" Height="210" />
 
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="12"
-                        Visibility="{x:Bind AccountsViewModel.EmptyVisibility, Mode=OneWay}">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource SumaSectionTitleTextStyle}"
-                            Text="No accounts yet" />
-                        <TextBlock
-                            MaxWidth="360"
-                            HorizontalAlignment="Center"
-                            TextAlignment="Center"
-                            Style="{StaticResource SumaBodySecondaryTextStyle}"
-                            Text="Add your cash, bank, e-wallet, or savings account to start organizing your money." />
-                        <Button
-                            HorizontalAlignment="Center"
-                            AutomationProperties.Name="Add first account"
-                            Click="OnAddAccountClick"
-                            Content="Add account" />
-                    </StackPanel>
+                <!-- Stylized trees on ridges -->
+                <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="300" Width="440">
+                    <!-- Right Ridge Trees -->
+                    <Ellipse Width="18" Height="42" Fill="#72364C3B" Canvas.Left="180" Canvas.Top="125" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="188" Canvas.Top="157" />
 
-                    <ProgressRing
-                        Width="32"
-                        Height="32"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsActive="{x:Bind AccountsViewModel.IsLoading, Mode=OneWay}"
-                        Visibility="{x:Bind AccountsViewModel.LoadingVisibility, Mode=OneWay}" />
-                </Grid>
+                    <Ellipse Width="24" Height="52" Fill="#7D364C3B" Canvas.Left="228" Canvas.Top="130" />
+                    <Rectangle Width="2.5" Height="18" Fill="#85303D32" Canvas.Left="239" Canvas.Top="170" />
 
-                <InfoBar
-                    Grid.Row="2"
-                    Margin="0,0,0,8"
-                    VerticalAlignment="Top"
-                    IsClosable="False"
-                    IsOpen="True"
-                    Message="{x:Bind AccountsViewModel.ErrorMessage, Mode=OneWay}"
-                    Severity="Error"
-                    Visibility="{x:Bind AccountsViewModel.ErrorVisibility, Mode=OneWay}" />
+                    <Ellipse Width="16" Height="36" Fill="#66364C3B" Canvas.Left="295" Canvas.Top="115" />
+                    <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="302" Canvas.Top="143" />
+
+                    <Ellipse Width="20" Height="46" Fill="#75364C3B" Canvas.Left="340" Canvas.Top="138" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="349" Canvas.Top="174" />
+                </Canvas>
+
+                <!-- Left Ridge Trees -->
+                <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="300" Width="300">
+                    <Ellipse Width="18" Height="40" Fill="#68364C3B" Canvas.Left="80" Canvas.Top="150" />
+                    <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="88" Canvas.Top="182" />
+
+                    <Ellipse Width="22" Height="48" Fill="#72364C3B" Canvas.Left="120" Canvas.Top="142" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="130" Canvas.Top="180" />
+                </Canvas>
+
+                <!-- Multi-stop Vertical Fade Overlay: Keeps top vivid, melts seamlessly into page background (#FFF8F7F3) at bottom -->
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#00F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="0.52" />
+                            <GradientStop Color="#2AF8F7F3" Offset="0.68" />
+                            <GradientStop Color="#85F8F7F3" Offset="0.84" />
+                            <GradientStop Color="#FAF8F7F3" Offset="0.97" />
+                            <GradientStop Color="#FFF8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Left Soft Feathering: Melts outer edges seamlessly -->
+                <Rectangle HorizontalAlignment="Left" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Right Soft Feathering -->
+                <Rectangle HorizontalAlignment="Right" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
             </Grid>
 
-            <Grid x:Name="CategoriesSection" RowSpacing="16" Visibility="Collapsed">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <!-- Row 0: Header & Top Actions -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
 
-                <Grid ColumnSpacing="16">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Spacing="4">
-                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Categories" />
-                        <TextBlock
-                            Style="{StaticResource SumaBodySecondaryTextStyle}"
-                            Text="Organize future income and spending without changing transaction semantics." />
-                    </StackPanel>
-                    <Button
-                        Grid.Column="1"
-                        AutomationProperties.Name="Add category"
-                        Click="OnAddCategoryClick"
-                        Content="Add category" />
-                </Grid>
-
-                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-                    <ToggleButton
-                        x:Name="ExpenseCategoriesButton"
-                        AutomationProperties.Name="Show expense categories"
-                        Click="OnExpenseCategoriesClick"
-                        Content="Expense"
-                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                    <ToggleButton
-                        x:Name="IncomeCategoriesButton"
-                        AutomationProperties.Name="Show income categories"
-                        Click="OnIncomeCategoriesClick"
-                        Content="Income"
-                        Style="{StaticResource SumaNavigationItemStyle}" />
+                <StackPanel Spacing="4">
+                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="32" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="Accounts" />
+                    <TextBlock FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Your money, organized in one place." />
                 </StackPanel>
 
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
-                    <ToggleButton
-                        x:Name="ActiveCategoriesButton"
-                        AutomationProperties.Name="View active categories"
-                        Click="OnActiveCategoriesClick"
-                        Content="Active"
-                        Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                    <ToggleButton
-                        x:Name="ArchivedCategoriesButton"
-                        AutomationProperties.Name="View archived categories"
-                        Click="OnArchivedCategoriesClick"
-                        Content="Archived"
-                        Style="{StaticResource SumaNavigationItemStyle}" />
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{StaticResource SumaCaptionTextStyle}"
-                        Text="{x:Bind CategoriesViewModel.FilterLabel, Mode=OneWay}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <ComboBox Height="38" MinWidth="95" CornerRadius="8" Background="{StaticResource SumaSurfaceBrush}" BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="1" ItemsSource="{x:Bind AccountsViewModel.Currencies, Mode=OneWay}" SelectedItem="{x:Bind AccountsViewModel.SelectedCurrency, Mode=TwoWay}" VerticalAlignment="Center" />
+                    <Button Style="{StaticResource AccountPrimaryButtonStyle}" Click="OnAddAccountClick" AutomationProperties.Name="Add account" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE710;" FontSize="12" Foreground="White" />
+                            <TextBlock Text="Add account" FontSize="13" FontWeight="SemiBold" Foreground="White" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
+            </Grid>
 
-                <Grid Grid.Row="3" MinHeight="240">
-                    <ListView
-                        AutomationProperties.Name="Category list"
-                        ItemsSource="{x:Bind CategoriesViewModel.Items, Mode=OneWay}"
-                        SelectionMode="None">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListViewItem">
-                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="0,0,0,8" />
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:CategoryRowViewModel">
-                                <Border
-                                    Background="{StaticResource SumaSurfaceSecondaryBrush}"
-                                    CornerRadius="{StaticResource SumaCornerLarge}"
-                                    Padding="20">
-                                    <Grid ColumnSpacing="16">
+            <!-- Row 1: Summary Metric Cards (3 Cards) -->
+            <Grid Grid.Row="1" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Included Balance Card -->
+                <Border Grid.Column="0" Style="{StaticResource AccountMetricCardStyle}">
+                    <Grid>
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="INCLUDED BALANCE" />
+                                <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" ToolTipService.ToolTip="Balance of active accounts included in Available to Spend" />
+                            </StackPanel>
+                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind AccountsViewModel.IncludedBalanceDisplay, Mode=OneWay}" Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <Border Width="36" Height="36" CornerRadius="10" Background="#EDF5EE" HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <FontIcon Glyph="&#xE8C7;" FontSize="16" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Active Accounts Card -->
+                <Border Grid.Column="1" Style="{StaticResource AccountMetricCardStyle}">
+                    <Grid>
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="ACTIVE ACCOUNTS" />
+                                <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" ToolTipService.ToolTip="Total active accounts" />
+                            </StackPanel>
+                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind AccountsViewModel.ActiveAccountsCount, Mode=OneWay}" Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <Border Width="36" Height="36" CornerRadius="10" Background="#EDF5EE" HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <FontIcon Glyph="&#xE80F;" FontSize="16" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Excluded Balance Card -->
+                <Border Grid.Column="2" Style="{StaticResource AccountMetricCardStyle}">
+                    <Grid>
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="EXCLUDED BALANCE" />
+                                <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" ToolTipService.ToolTip="Balance of accounts excluded from Available to Spend" />
+                            </StackPanel>
+                            <TextBlock FontSize="24" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind AccountsViewModel.ExcludedBalanceDisplay, Mode=OneWay}" Margin="0,4,0,0" />
+                        </StackPanel>
+
+                        <Border Width="36" Height="36" CornerRadius="10" Background="#FDF3E7" HorizontalAlignment="Right" VerticalAlignment="Top">
+                            <FontIcon Glyph="&#xED1A;" FontSize="16" Foreground="#D97706" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Row 2: Card Themes Swatches Bar -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                <TextBlock Text="Card themes" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <Button Width="26" Height="26" CornerRadius="13" Background="#4E7257" BorderBrush="#264E36" BorderThickness="2" Padding="0" Click="OnThemeSwatchClick" Tag="0" ToolTipService.ToolTip="Sage green" />
+                <Button Width="24" Height="24" CornerRadius="12" Background="#20402E" BorderBrush="Transparent" BorderThickness="0" Padding="0" Click="OnThemeSwatchClick" Tag="1" ToolTipService.ToolTip="Forest green" />
+                <Button Width="24" Height="24" CornerRadius="12" Background="#2B2E33" BorderBrush="Transparent" BorderThickness="0" Padding="0" Click="OnThemeSwatchClick" Tag="2" ToolTipService.ToolTip="Charcoal slate" />
+                <Button Width="24" Height="24" CornerRadius="12" Background="#C09858" BorderBrush="Transparent" BorderThickness="0" Padding="0" Click="OnThemeSwatchClick" Tag="3" ToolTipService.ToolTip="Warm bronze" />
+                <Button Width="24" Height="24" CornerRadius="12" Background="#4A6277" BorderBrush="Transparent" BorderThickness="0" Padding="0" Click="OnThemeSwatchClick" Tag="4" ToolTipService.ToolTip="Slate blue" />
+                <Button Width="24" Height="24" CornerRadius="12" Background="#7E7796" BorderBrush="Transparent" BorderThickness="0" Padding="0" Click="OnThemeSwatchClick" Tag="5" ToolTipService.ToolTip="Soft lavender" />
+            </StackPanel>
+
+            <!-- Row 3: Horizontal Credit Cards Shelf -->
+            <Grid Grid.Row="3">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled" VerticalScrollMode="Disabled">
+                    <ItemsControl ItemsSource="{x:Bind AccountsViewModel.ActiveAccounts, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="16" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:AccountRowViewModel">
+                                <Button Padding="0" Background="Transparent" BorderThickness="0" Click="OnCardClick" Tag="{x:Bind}">
+                                    <Grid Width="260" Height="162" CornerRadius="16" Background="{x:Bind GradientBrush, Mode=OneWay}" BorderThickness="{x:Bind CardBorderThickness, Mode=OneWay}" BorderBrush="{x:Bind CardBorderBrush, Mode=OneWay}">
+                                        <!-- Decorative Embossed Wave Curves -->
+                                        <Canvas IsHitTestVisible="False">
+                                            <Path Data="M-10,95 C60,135 150,55 265,105" Stroke="#18FFFFFF" StrokeThickness="2" />
+                                            <Path Data="M-10,120 C70,160 160,80 265,130" Stroke="#10FFFFFF" StrokeThickness="1.6" />
+                                            <Path Data="M30,-10 C110,50 170,110 220,170" Stroke="#0CFFFFFF" StrokeThickness="1.4" />
+                                            <!-- Subtle organic leaf watermark for theme 0 -->
+                                            <Path Data="M185,162 C185,115 220,95 260,85 C260,125 230,162 185,162 Z" Fill="#10FFFFFF" />
+                                            <Path Data="M215,162 C215,132 242,115 260,110 C260,135 240,155 215,162 Z" Fill="#0DFFFFFF" />
+                                        </Canvas>
+
+                                        <!-- Card Front Content -->
+                                        <Grid Padding="18,16">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <!-- Row 0: Top Header with Name & Checkmark / Menu -->
+                                            <Grid Grid.Row="0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Spacing="1">
+                                                    <TextBlock Text="{x:Bind Name}" FontSize="15" FontWeight="SemiBold" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{x:Bind TypeSubtitle}" FontSize="11" Foreground="#CCFFFFFF" />
+                                                </StackPanel>
+
+                                                <!-- Selected Checkmark Circle Badge -->
+                                                <Border Grid.Column="1" Width="22" Height="22" CornerRadius="11" Background="White" Visibility="{x:Bind CheckmarkVisibility, Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                    <FontIcon Glyph="&#xE73E;" FontSize="11" Foreground="#264E36" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+
+                                                <!-- Unselected Card Context Menu -->
+                                                <Button Grid.Column="1" Width="26" Height="26" Padding="0" Background="Transparent" BorderThickness="0" Visibility="{x:Bind MenuVisibility, Mode=OneWay}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                    <FontIcon Glyph="&#xE712;" FontSize="13" Foreground="White" />
+                                                    <Button.Flyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem Text="Edit account" Click="OnEditAccountClick" Tag="{x:Bind Id}" />
+                                                            <MenuFlyoutItem Text="Archive account" Click="OnArchiveAccountClick" Tag="{x:Bind Id}" />
+                                                        </MenuFlyout>
+                                                    </Button.Flyout>
+                                                </Button>
+                                            </Grid>
+
+                                            <!-- Row 1: Masked Card Number / Wallet Badge -->
+                                            <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                                                <Border HorizontalAlignment="Left" Background="#33FFFFFF" CornerRadius="6" Padding="7,2" Visibility="{x:Bind WalletBadgeVisibility}">
+                                                    <TextBlock Text="WALLET" FontSize="10" FontWeight="Bold" Foreground="White" CharacterSpacing="60" />
+                                                </Border>
+                                                <TextBlock Text="{x:Bind MaskedNumber}" FontSize="13" Foreground="#CCFFFFFF" CharacterSpacing="80" Visibility="{x:Bind CardNumberVisibility}" />
+                                            </StackPanel>
+
+                                            <!-- Row 2: Balance -->
+                                            <TextBlock Grid.Row="2" Text="{x:Bind BalanceDisplay}" FontSize="20" FontWeight="Bold" Foreground="White" TextTrimming="CharacterEllipsis" Margin="0,0,0,8" />
+
+                                            <!-- Row 3: ATS Pill Badge -->
+                                            <Border Grid.Row="3" HorizontalAlignment="Left" Background="{x:Bind AtsBadgeBackground, Mode=OneWay}" BorderBrush="{x:Bind AtsBadgeBorder, Mode=OneWay}" BorderThickness="1" CornerRadius="11" Padding="9,3">
+                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                                    <Ellipse Width="5" Height="5" Fill="White" VerticalAlignment="Center" />
+                                                    <TextBlock Text="{x:Bind AtsBadgeText, Mode=OneWay}" FontSize="10.5" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Empty State if no active accounts -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" Visibility="{x:Bind AccountsViewModel.EmptyVisibility, Mode=OneWay}" Padding="20">
+                    <FontIcon Glyph="&#xE8C7;" FontSize="32" Foreground="{StaticResource SumaAccentBrush}" />
+                    <TextBlock HorizontalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="No accounts yet" />
+                    <TextBlock MaxWidth="340" TextAlignment="Center" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Add your bank, cash wallet, or savings account to start organizing your money." />
+                    <Button HorizontalAlignment="Center" Style="{StaticResource AccountPrimaryButtonStyle}" Click="OnAddAccountClick" Content="Add account" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Row 4: Bottom 3-Column Workspace -->
+            <Grid Grid.Row="4" ColumnSpacing="16" RowSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*" />
+                    <ColumnDefinition Width="1.5*" />
+                    <ColumnDefinition Width="1.1*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Column 0: Account Details Card -->
+                <Border Grid.Column="0" Style="{StaticResource AccountWorkspaceCardStyle}">
+                    <Grid>
+                        <!-- Content when account is selected -->
+                        <StackPanel Spacing="14" Visibility="{x:Bind AccountsViewModel.AccountDetailsVisibility, Mode=OneWay}">
+                            <TextBlock Text="Account details" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+
+                            <!-- Header banner with icon and name -->
+                            <Grid Margin="0,2,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border Width="40" Height="40" CornerRadius="10" Background="#EDF5EE" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <FontIcon Glyph="&#xE8C7;" FontSize="18" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                    <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountName, Mode=OneWay}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountDetailSubtitle, Mode=OneWay}" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="#F0EFEA" />
+
+                            <!-- Key-Value Metadata Rows -->
+                            <Grid Visibility="{x:Bind AccountsViewModel.SelectedAccountHasAccountNumberVisibility, Mode=OneWay}">
+                                <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountIdentifierLabel, Mode=OneWay}" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountAccountNumber, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <Grid>
+                                <TextBlock Text="Currency" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountCurrency, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <Grid>
+                                <TextBlock Text="Opening balance" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountOpeningBalance, Mode=OneWay}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <Grid>
+                                <TextBlock Text="Current balance" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind AccountsViewModel.SelectedAccountCurrentBalance, Mode=OneWay}" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="#F0EFEA" />
+
+                            <!-- Available to Spend Switch -->
+                            <Grid VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2" Margin="0,0,12,0">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="Available to Spend (ATS)" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                        <FontIcon Glyph="&#xE946;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" ToolTipService.ToolTip="Whether this account's funds are available for everyday spending" />
+                                    </StackPanel>
+                                    <TextBlock Text="Include this account in your ATS calculations" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <ToggleSwitch Grid.Column="1" x:Name="AtsToggle" IsOn="{x:Bind AccountsViewModel.SelectedAccountIsAtsIncluded, Mode=OneWay}" Toggled="OnAtsToggled" OnContent="" OffContent="" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0" MinWidth="0" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Empty state when no account selected -->
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Visibility="{x:Bind AccountsViewModel.AccountDetailsEmptyVisibility, Mode=OneWay}">
+                            <FontIcon Glyph="&#xE8C7;" FontSize="28" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                            <TextBlock Text="Select an account" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Click any card above to view details." FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" TextAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Column 1: Recent Activity Card -->
+                <Border Grid.Column="1" Style="{StaticResource AccountWorkspaceCardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header with View all link -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="Recent activity" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            <HyperlinkButton Content="View all →" FontSize="13" FontWeight="SemiBold" Foreground="#2E7D32" Click="OnViewAllActivityClick" HorizontalAlignment="Right" VerticalAlignment="Center" Padding="0" />
+                        </Grid>
+
+                        <!-- Recent transactions list -->
+                        <ItemsControl Grid.Row="1" ItemsSource="{x:Bind AccountsViewModel.RecentTransactions, Mode=OneWay}" Visibility="{x:Bind AccountsViewModel.RecentActivityListVisibility, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:AccountTransactionItem">
+                                    <Grid Padding="0,7" BorderBrush="#F4F3EE" BorderThickness="0,0,0,1">
                                         <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="36" />
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ParentDisplay}" />
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind SystemDisplay}" />
+
+                                        <Border Width="32" Height="32" CornerRadius="16" Background="{x:Bind IconBackground}" VerticalAlignment="Center">
+                                            <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="13" Foreground="{x:Bind IconForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0" Spacing="2">
+                                            <TextBlock Text="{x:Bind Title}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{x:Bind DateDisplay}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Orientation="Horizontal" Spacing="8">
-                                            <Button
-                                                AutomationProperties.Name="Edit category"
-                                                Click="OnEditCategoryClick"
-                                                Content="Edit"
-                                                Tag="{x:Bind Id}"
-                                                Visibility="{x:Bind EditVisibility}" />
-                                            <Button
-                                                AutomationProperties.Name="Archive category"
-                                                Click="OnArchiveCategoryClick"
-                                                Content="Archive"
-                                                Tag="{x:Bind Id}"
-                                                Visibility="{x:Bind ArchiveVisibility}" />
-                                            <Button
-                                                AutomationProperties.Name="Restore category"
-                                                Click="OnRestoreCategoryClick"
-                                                Content="Restore"
-                                                Tag="{x:Bind Id}"
-                                                Visibility="{x:Bind RestoreVisibility}" />
-                                        </StackPanel>
+
+                                        <TextBlock Grid.Column="2" Text="{x:Bind AmountDisplay}" FontSize="13" FontWeight="SemiBold" Foreground="{x:Bind AmountForeground}" VerticalAlignment="Center" />
                                     </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                    </ListView>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Spacing="12"
-                        Visibility="{x:Bind CategoriesViewModel.EmptyVisibility, Mode=OneWay}">
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            Style="{StaticResource SumaSectionTitleTextStyle}"
-                            Text="{x:Bind CategoriesViewModel.EmptyTitle, Mode=OneWay}" />
-                        <TextBlock
-                            MaxWidth="360"
-                            HorizontalAlignment="Center"
-                            TextAlignment="Center"
-                            Style="{StaticResource SumaBodySecondaryTextStyle}"
-                            Text="Create a category when you are ready to organize real money activity." />
-                        <Button
-                            HorizontalAlignment="Center"
-                            AutomationProperties.Name="Add first category"
-                            Click="OnAddCategoryClick"
-                            Content="Add category" />
-                    </StackPanel>
+                        <!-- Empty state when no transactions -->
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" Visibility="{x:Bind AccountsViewModel.RecentActivityEmptyVisibility, Mode=OneWay}" Margin="0,24">
+                            <FontIcon Glyph="&#xE8A5;" FontSize="24" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                            <TextBlock Text="No recent transactions" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                        </StackPanel>
 
-                    <ProgressRing
-                        Width="32"
-                        Height="32"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        IsActive="{x:Bind CategoriesViewModel.IsLoading, Mode=OneWay}"
-                        Visibility="{x:Bind CategoriesViewModel.LoadingVisibility, Mode=OneWay}" />
-                </Grid>
+                        <!-- Action buttons: Edit account & Archive -->
+                        <Grid Grid.Row="2" ColumnSpacing="12" Margin="0,16,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                <InfoBar
-                    Grid.Row="3"
-                    Margin="0,0,0,8"
-                    VerticalAlignment="Top"
-                    IsClosable="False"
-                    IsOpen="True"
-                    Message="{x:Bind CategoriesViewModel.ErrorMessage, Mode=OneWay}"
-                    Severity="Error"
-                    Visibility="{x:Bind CategoriesViewModel.ErrorVisibility, Mode=OneWay}" />
+                            <Button Grid.Column="0" HorizontalAlignment="Stretch" Height="38" Background="#F2F0EA" CornerRadius="8" BorderThickness="0" Click="OnEditSelectedAccountClick" ToolTipService.ToolTip="Edit account details">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE70F;" FontSize="12" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                    <TextBlock Text="Edit account" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Grid.Column="1" HorizontalAlignment="Stretch" Height="38" Background="Transparent" BorderBrush="#E07A70" BorderThickness="1" CornerRadius="8" Click="OnArchiveSelectedAccountClick" ToolTipService.ToolTip="Archive this account">
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="12" Foreground="#C74B3E" />
+                                    <TextBlock Text="Archive" FontSize="13" FontWeight="SemiBold" Foreground="#C74B3E" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- Column 2: Archived Accounts Card -->
+                <Border Grid.Column="2" Style="{StaticResource AccountWorkspaceCardStyle}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Header with count & toggle -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="{x:Bind AccountsViewModel.ArchivedAccountsHeader, Mode=OneWay}" FontSize="15" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            <FontIcon Glyph="&#xE70E;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+
+                        <!-- Archived accounts list (frosted card style) -->
+                        <ItemsControl Grid.Row="1" ItemsSource="{x:Bind AccountsViewModel.ArchivedAccounts, Mode=OneWay}" Visibility="{x:Bind AccountsViewModel.ArchivedCardVisibility, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:AccountRowViewModel">
+                                    <Grid Width="220" Height="136" Margin="0,0,0,12" CornerRadius="14" Background="{x:Bind GradientBrush}" BorderThickness="1" BorderBrush="#40FFFFFF" Padding="14,12">
+                                        <!-- Ambient wave curve -->
+                                        <Canvas IsHitTestVisible="False">
+                                            <Path Data="M-10,80 C60,110 140,50 230,90" Stroke="#18FFFFFF" StrokeThickness="1.5" />
+                                        </Canvas>
+
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <Grid Grid.Row="0">
+                                                <StackPanel Spacing="1">
+                                                    <TextBlock Text="{x:Bind Name}" FontSize="13" FontWeight="SemiBold" Foreground="White" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{x:Bind TypeSubtitle}" FontSize="10" Foreground="#E0FFFFFF" />
+                                                </StackPanel>
+
+                                                <Button Width="24" Height="24" Padding="0" Background="Transparent" BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                                    <FontIcon Glyph="&#xE712;" FontSize="12" Foreground="White" />
+                                                    <Button.Flyout>
+                                                        <MenuFlyout>
+                                                            <MenuFlyoutItem Text="Restore account" Click="OnRestoreAccountClick" Tag="{x:Bind Id}" />
+                                                        </MenuFlyout>
+                                                    </Button.Flyout>
+                                                </Button>
+                                            </Grid>
+
+                                            <TextBlock Grid.Row="1" Text="{x:Bind MaskedNumber}" FontSize="11" Foreground="#CCFFFFFF" VerticalAlignment="Center" />
+
+                                            <TextBlock Grid.Row="2" Text="{x:Bind BalanceDisplay}" FontSize="16" FontWeight="Bold" Foreground="White" Margin="0,0,0,6" />
+
+                                            <Border Grid.Row="3" HorizontalAlignment="Left" Background="#40000000" CornerRadius="8" Padding="6,2">
+                                                <TextBlock Text="Archived" FontSize="10" Foreground="White" FontWeight="SemiBold" />
+                                            </Border>
+                                        </Grid>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Empty state when no archived accounts -->
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6" Visibility="{x:Bind AccountsViewModel.EmptyVisibility, Mode=OneWay}" Margin="0,24">
+                            <FontIcon Glyph="&#xE74D;" FontSize="22" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                            <TextBlock Text="No archived accounts" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Row 5: Footer Status Bar & Categories Link -->
+            <Grid Grid.Row="5" Padding="4,4,4,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Border Width="16" Height="16" CornerRadius="8" Background="#EDF5EE" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE73E;" FontSize="9" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Text="All accounts are up to date" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                    <Rectangle Width="1" Height="12" Fill="#D0CECB" Margin="4,0" VerticalAlignment="Center" />
+                    <TextBlock Text="{x:Bind AccountsViewModel.LastSyncDisplay, Mode=OneWay}" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                    <Button Background="Transparent" BorderThickness="0" Padding="4" Click="OnRefreshClick" ToolTipService.ToolTip="Refresh accounts" VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE72C;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                    </Button>
+                </StackPanel>
+
+                <HyperlinkButton Grid.Column="1" Content="Manage categories →" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Click="OnManageCategoriesClick" VerticalAlignment="Center" Padding="0" />
             </Grid>
         </Grid>
-    </Grid>
     </ScrollViewer>
 </Page>

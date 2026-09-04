@@ -14,7 +14,10 @@ public sealed record SavingsGoalRowViewModel(SavingsGoalSummary Value)
     public string TargetDateDisplay => Value.TargetDate?.ToString("MMM d, yyyy") ?? "No target date";
     public string DestinationDisplay => Value.DestinationAccountName ?? "No destination account";
     public string StatusDisplay => Value.IsArchived ? "Archived" : Value.ProgressMinor >= Value.TargetAmountMinor ? "Target reached" : "In progress";
-    public double ProgressPercent => (double)Math.Clamp(checked((decimal)Value.ProgressMinor * 100m / Value.TargetAmountMinor), 0m, 100m);
+    public double ProgressPercent => Value.TargetAmountMinor > 0 ? (double)Math.Clamp(checked((decimal)Value.ProgressMinor * 100m / Value.TargetAmountMinor), 0m, 100m) : 0;
+    public string ProgressPercentDisplay => $"{ProgressPercent:0}%";
+    public string TargetRatioDisplay => $"{ProgressDisplay} of {TargetDisplay}";
+    public string TargetDateLabel => Value.TargetDate.HasValue ? $"Target date: {Value.TargetDate.Value:MMM d, yyyy}" : "No target date";
 }
 
 public sealed record GoalContributionRowViewModel(GoalContributionHistoryRecord Value)

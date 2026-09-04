@@ -88,6 +88,7 @@
     <Style x:Key="SumaModalPrimaryButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="44" />
         <Setter Property="MinHeight" Value="44" />
+        <Setter Property="MinWidth" Value="130" />
         <Setter Property="CornerRadius" Value="{StaticResource SumaCornerLarge}" />
         <Setter Property="Background" Value="{StaticResource SumaAccentBrush}" />
         <Setter Property="Foreground" Value="#FFFFFFFF" />
@@ -112,7 +113,30 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         Padding="{TemplateBinding Padding}"
                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="#5B6C5A" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="#FFFFFFFF" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="#4D5C4C" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="#FFE0E0E0" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Opacity" Value="0.45" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </ContentPresenter>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -121,6 +145,7 @@
     <Style x:Key="SumaModalSecondaryButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="44" />
         <Setter Property="MinHeight" Value="44" />
+        <Setter Property="MinWidth" Value="130" />
         <Setter Property="CornerRadius" Value="{StaticResource SumaCornerLarge}" />
         <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
         <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
@@ -146,7 +171,32 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         Padding="{TemplateBinding Padding}"
                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="#F2F0EA" />
+                                        <Setter Target="ContentPresenter.BorderBrush" Value="#C8C5BD" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="{StaticResource SumaTextPrimaryBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="#E6E3DB" />
+                                        <Setter Target="ContentPresenter.BorderBrush" Value="#B5B2A9" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="{StaticResource SumaTextPrimaryBrush}" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Opacity" Value="0.45" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </ContentPresenter>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -155,6 +205,7 @@
     <Style x:Key="SumaModalDestructiveButtonStyle" TargetType="Button">
         <Setter Property="Height" Value="44" />
         <Setter Property="MinHeight" Value="44" />
+        <Setter Property="MinWidth" Value="130" />
         <Setter Property="CornerRadius" Value="{StaticResource SumaCornerLarge}" />
         <Setter Property="Background" Value="{StaticResource SumaDestructiveBrush}" />
         <Setter Property="Foreground" Value="#FFFFFFFF" />
@@ -179,7 +230,30 @@
                         CornerRadius="{TemplateBinding CornerRadius}"
                         Padding="{TemplateBinding Padding}"
                         HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal" />
+                                <VisualState x:Name="PointerOver">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="{StaticResource SumaDestructiveHoverBrush}" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="#FFFFFFFF" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Background" Value="{StaticResource SumaDestructivePressedBrush}" />
+                                        <Setter Target="ContentPresenter.Foreground" Value="#FFE0E0E0" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Disabled">
+                                    <VisualState.Setters>
+                                        <Setter Target="ContentPresenter.Opacity" Value="0.45" />
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </ContentPresenter>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

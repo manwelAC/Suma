@@ -85,6 +85,89 @@ public sealed class PlanningViewModel(IBudgetOperations operations) : ViewModelB
 
     public string RemainingDisplay { get => remainingDisplay; private set => SetProperty(ref remainingDisplay, value); }
 
+    public long ProtectedAllocationsMinor => Allocations.Where(a => a.ReserveFromAvailable).Sum(a => a.AmountMinor);
+
+    public string ProtectedAllocationsTotalDisplay => SelectedBudget is not null
+        ? MoneyText.Format(ProtectedAllocationsMinor, SelectedBudget.CurrencyCode)
+        : "PHP 0.00";
+
+    public int ProtectedCategoriesCount => Allocations.Count(a => a.ReserveFromAvailable);
+    public string ProtectedCategoriesCountDisplay => ProtectedCategoriesCount.ToString();
+
+    public string AvailableToSpendDisplay
+    {
+        get
+        {
+            if (SelectedBudget is null) return "PHP 0.00";
+            var income = SelectedBudget.ExpectedIncomeMinor;
+            var protectedMinor = ProtectedAllocationsMinor;
+            var available = Math.Max(0, income - protectedMinor);
+            return MoneyText.Format(available, SelectedBudget.CurrencyCode);
+        }
+    }
+
+    public string IncludedBalanceDisplay => SelectedBudget is not null
+        ? MoneyText.Format(SelectedBudget.ExpectedIncomeMinor, SelectedBudget.CurrencyCode)
+        : "PHP 0.00";
+
+    public string ProtectedCategoriesPercentDisplay
+    {
+        get
+        {
+            var total = Allocations.Sum(a => a.AmountMinor);
+            if (total <= 0) return "0% of total budget";
+            var pct = (ProtectedAllocationsMinor * 100m) / total;
+            return $"{pct:0.#}% of total budget";
+        }
+    }
+
+    public double ProtectedCategoriesPercentValue
+    {
+        get
+        {
+            var total = Allocations.Sum(a => a.AmountMinor);
+            if (total <= 0) return 0;
+            return (double)Math.Clamp((ProtectedAllocationsMinor * 100m) / total, 0m, 100m);
+        }
+    }
+
+    public double BudgetAvailablePercent
+    {
+        get
+        {
+            var total = Allocations.Sum(a => a.AmountMinor);
+            if (total <= 0) return 100;
+            var spent = Allocations.Sum(a => a.SpentMinor);
+            var remaining = Math.Max(0, total - spent);
+            return (double)Math.Clamp((remaining * 100m) / total, 0m, 100m);
+        }
+    }
+
+    public string BudgetAvailablePercentDisplay => $"{BudgetAvailablePercent:0.#}% available";
+
+    public string TotalIncomeDisplay => SelectedBudget is not null
+        ? MoneyText.Format(SelectedBudget.ExpectedIncomeMinor, SelectedBudget.CurrencyCode)
+        : "PHP 0.00";
+
+    public string TotalExpensesDisplay => string.IsNullOrEmpty(AllocatedDisplay) ? "PHP 0.00" : AllocatedDisplay;
+
+    public string ProjectedSavingsDisplay
+    {
+        get
+        {
+            if (SelectedBudget is null) return "PHP 0.00";
+            var income = SelectedBudget.ExpectedIncomeMinor;
+            var allocated = Allocations.Sum(a => a.AmountMinor);
+            var savings = income - allocated;
+            return MoneyText.Format(savings, SelectedBudget.CurrencyCode);
+        }
+    }
+
+    public string ProjectedEndBalanceDisplay => ProjectedSavingsDisplay;
+
+    public Visibility EmptyAllocationsVisibility => Allocations.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility HasAllocationsVisibility => Allocations.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
     public string EmptyTitle => ShowArchived ? "No archived budgets" : "No budgets yet";
 
     public Visibility LoadingVisibility => IsLoading ? Visibility.Visible : Visibility.Collapsed;
@@ -396,6 +479,22 @@ public sealed class PlanningViewModel(IBudgetOperations operations) : ViewModelB
         OnPropertyChanged(nameof(DetailsLoadingVisibility));
         OnPropertyChanged(nameof(DetailsContentVisibility));
         OnPropertyChanged(nameof(AllocationsEmptyVisibility));
+        OnPropertyChanged(nameof(EmptyAllocationsVisibility));
+        OnPropertyChanged(nameof(HasAllocationsVisibility));
+        OnPropertyChanged(nameof(ProtectedAllocationsMinor));
+        OnPropertyChanged(nameof(ProtectedAllocationsTotalDisplay));
+        OnPropertyChanged(nameof(ProtectedCategoriesCount));
+        OnPropertyChanged(nameof(ProtectedCategoriesCountDisplay));
+        OnPropertyChanged(nameof(AvailableToSpendDisplay));
+        OnPropertyChanged(nameof(IncludedBalanceDisplay));
+        OnPropertyChanged(nameof(ProtectedCategoriesPercentDisplay));
+        OnPropertyChanged(nameof(ProtectedCategoriesPercentValue));
+        OnPropertyChanged(nameof(BudgetAvailablePercent));
+        OnPropertyChanged(nameof(BudgetAvailablePercentDisplay));
+        OnPropertyChanged(nameof(TotalIncomeDisplay));
+        OnPropertyChanged(nameof(TotalExpensesDisplay));
+        OnPropertyChanged(nameof(ProjectedSavingsDisplay));
+        OnPropertyChanged(nameof(ProjectedEndBalanceDisplay));
     }
 
     private static string UserMessage(Exception exception, string action) => exception switch

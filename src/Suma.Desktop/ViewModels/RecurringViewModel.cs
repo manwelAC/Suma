@@ -28,6 +28,12 @@ public sealed class RecurringViewModel(IRecurringOperations operations) : ViewMo
     public Visibility EmptyOccurrencesVisibility => !IsLoading && Occurrences.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility EmptySchedulesVisibility => !IsLoading && Schedules.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
     public Visibility ErrorVisibility => string.IsNullOrEmpty(ErrorMessage) ? Visibility.Collapsed : Visibility.Visible;
+    public int UpcomingCount => Occurrences.Count;
+    public string UpcomingCountDisplay => UpcomingCount.ToString();
+    public long UpcomingTotalDueMinor => Occurrences.Sum(x => x.Value.AmountMinor);
+    public string UpcomingTotalDueDisplay => MoneyText.Format(UpcomingTotalDueMinor, Occurrences.FirstOrDefault()?.Value.CurrencyCode ?? "PHP");
+    public string NextDueDisplay => Occurrences.FirstOrDefault()?.DueLabel ?? "None";
+    public Visibility HasOccurrencesVisibility => Occurrences.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -147,6 +153,12 @@ public sealed class RecurringViewModel(IRecurringOperations operations) : ViewMo
         OnPropertyChanged(nameof(EmptyOccurrencesVisibility));
         OnPropertyChanged(nameof(EmptySchedulesVisibility));
         OnPropertyChanged(nameof(ErrorVisibility));
+        OnPropertyChanged(nameof(UpcomingCount));
+        OnPropertyChanged(nameof(UpcomingCountDisplay));
+        OnPropertyChanged(nameof(UpcomingTotalDueMinor));
+        OnPropertyChanged(nameof(UpcomingTotalDueDisplay));
+        OnPropertyChanged(nameof(NextDueDisplay));
+        OnPropertyChanged(nameof(HasOccurrencesVisibility));
     }
 
     private static string UserMessage(Exception exception, string action) => exception switch

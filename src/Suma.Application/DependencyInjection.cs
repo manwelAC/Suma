@@ -34,6 +34,7 @@ using Suma.Application.Transactions.CreateExpense;
 using Suma.Application.Transactions.CreateIncome;
 using Suma.Application.Transactions.CreateRefund;
 using Suma.Application.Transactions.CreateTransfer;
+using Suma.Application.Transactions.DeleteTransaction;
 using Suma.Application.Transactions.GetTransactions;
 using Suma.Application.Transactions.GetRefundableExpenses;
 using Suma.Application.Overview.GetOverview;
@@ -63,6 +64,7 @@ public static class DependencyInjection
         services.AddScoped<CreateIncomeUseCase>();
         services.AddScoped<CreateTransferUseCase>();
         services.AddScoped<CreateRefundUseCase>();
+        services.AddScoped<DeleteTransactionUseCase>();
         services.AddScoped<GetTransactionsUseCase>();
         services.AddScoped<GetRefundableExpensesUseCase>();
         services.AddScoped<CreateBudgetUseCase>();

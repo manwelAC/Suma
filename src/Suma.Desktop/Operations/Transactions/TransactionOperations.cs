@@ -4,6 +4,7 @@ using Suma.Application.Transactions.CreateExpense;
 using Suma.Application.Transactions.CreateIncome;
 using Suma.Application.Transactions.CreateRefund;
 using Suma.Application.Transactions.CreateTransfer;
+using Suma.Application.Transactions.DeleteTransaction;
 using Suma.Application.Transactions.GetRefundableExpenses;
 using Suma.Application.Transactions.GetTransactions;
 
@@ -45,5 +46,11 @@ public sealed class TransactionOperations(IServiceScopeFactory scopeFactory) : I
     {
         await using var scope = scopeFactory.CreateAsyncScope();
         return await scope.ServiceProvider.GetRequiredService<CreateRefundUseCase>().ExecuteAsync(request, cancellationToken);
+    }
+
+    public async Task DeleteAsync(Guid transactionId, CancellationToken cancellationToken = default)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        await scope.ServiceProvider.GetRequiredService<DeleteTransactionUseCase>().ExecuteAsync(transactionId, cancellationToken);
     }
 }

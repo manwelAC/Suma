@@ -37,6 +37,16 @@ public sealed class SavingsViewModel(ISavingsOperations operations) : ViewModelB
     public Visibility AddContributionVisibility => SelectedGoal is { Value.IsArchived: false } ? Visibility.Visible : Visibility.Collapsed;
     public Visibility ArchiveVisibility => SelectedGoal is { Value.IsArchived: false } ? Visibility.Visible : Visibility.Collapsed;
     public Visibility RestoreVisibility => SelectedGoal is { Value.IsArchived: true } ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility HasGoalsVisibility => Goals.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility EmptyGoalsVisibility => Goals.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+    public int ActiveGoalsCount => Goals.Count(g => !g.Value.IsArchived);
+    public string ActiveGoalsCountDisplay => ActiveGoalsCount.ToString();
+    public long TotalSavedMinor => Goals.Where(g => !g.Value.IsArchived).Sum(g => g.Value.ProgressMinor);
+    public string TotalSavedDisplay => MoneyText.Format(TotalSavedMinor, Goals.FirstOrDefault()?.Value.CurrencyCode ?? "PHP");
+    public long TotalTargetMinor => Goals.Where(g => !g.Value.IsArchived).Sum(g => g.Value.TargetAmountMinor);
+    public string TotalTargetDisplay => MoneyText.Format(TotalTargetMinor, Goals.FirstOrDefault()?.Value.CurrencyCode ?? "PHP");
+    public int OverallProgressPercent => TotalTargetMinor <= 0 ? 0 : Math.Clamp((int)Math.Round((double)TotalSavedMinor / TotalTargetMinor * 100), 0, 100);
+    public string OverallProgressPercentDisplay => $"{OverallProgressPercent}%";
 
     public Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -139,6 +149,11 @@ public sealed class SavingsViewModel(ISavingsOperations operations) : ViewModelB
         OnPropertyChanged(nameof(LoadingVisibility)); OnPropertyChanged(nameof(EmptyVisibility)); OnPropertyChanged(nameof(DetailsVisibility));
         OnPropertyChanged(nameof(ContributionsEmptyVisibility)); OnPropertyChanged(nameof(ErrorVisibility)); OnPropertyChanged(nameof(NewGoalVisibility));
         OnPropertyChanged(nameof(AddContributionVisibility)); OnPropertyChanged(nameof(ArchiveVisibility)); OnPropertyChanged(nameof(RestoreVisibility));
+        OnPropertyChanged(nameof(HasGoalsVisibility)); OnPropertyChanged(nameof(EmptyGoalsVisibility));
+        OnPropertyChanged(nameof(ActiveGoalsCount)); OnPropertyChanged(nameof(ActiveGoalsCountDisplay));
+        OnPropertyChanged(nameof(TotalSavedMinor)); OnPropertyChanged(nameof(TotalSavedDisplay));
+        OnPropertyChanged(nameof(TotalTargetMinor)); OnPropertyChanged(nameof(TotalTargetDisplay));
+        OnPropertyChanged(nameof(OverallProgressPercent)); OnPropertyChanged(nameof(OverallProgressPercentDisplay));
     }
 
     private static string UserMessage(Exception exception, string action) => exception switch

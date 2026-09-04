@@ -9,13 +9,17 @@ public sealed record UpdateAccountRequest(
     Guid AccountId,
     string Name,
     AccountType Type,
-    bool IncludeInAvailableToSpend);
+    bool IncludeInAvailableToSpend,
+    string? AccountNumber = null,
+    long? OpeningBalanceMinor = null);
 
 public sealed record UpdateAccountResult(
     Guid Id,
     string Name,
     AccountType Type,
-    bool IncludeInAvailableToSpend);
+    bool IncludeInAvailableToSpend,
+    string? AccountNumber = null,
+    long OpeningBalanceMinor = 0);
 
 public sealed class UpdateAccountUseCase(IAccountStore accounts, IUnitOfWork unitOfWork)
 {
@@ -40,12 +44,20 @@ public sealed class UpdateAccountUseCase(IAccountStore accounts, IUnitOfWork uni
         account.Rename(request.Name);
         account.ChangeType(request.Type);
         account.SetAvailableToSpendInclusion(request.IncludeInAvailableToSpend);
+        account.UpdateAccountNumber(request.AccountNumber);
+        if (request.OpeningBalanceMinor.HasValue)
+        {
+            account.UpdateOpeningBalance(request.OpeningBalanceMinor.Value);
+        }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new UpdateAccountResult(
             account.Id,
             account.Name,
             account.Type,
-            account.IncludeInAvailableToSpend);
+            account.IncludeInAvailableToSpend,
+            account.AccountNumber,
+            account.OpeningBalance.AmountMinor);
     }
 }

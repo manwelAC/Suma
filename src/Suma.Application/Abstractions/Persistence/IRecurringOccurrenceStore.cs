@@ -7,6 +7,8 @@ public interface IRecurringOccurrenceStore
 {
     Task<RecurringOccurrence?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
 
+    Task<RecurringOccurrence?> GetByTransactionIdAsync(Guid transactionId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlySet<(Guid RecurringTransactionId, DateOnly DueDate)>> GetExistingKeysAsync(
         IReadOnlyCollection<Guid> recurringTransactionIds,
         DateOnly from,

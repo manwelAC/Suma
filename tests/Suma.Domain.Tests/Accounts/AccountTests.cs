@@ -110,6 +110,31 @@ public sealed class AccountTests
         Assert.Throws<ArgumentOutOfRangeException>(() => account.ChangeType((AccountType)999));
     }
 
+    [Fact]
+    public void UpdateAccountNumber_StoresTrimmedOrNull()
+    {
+        var account = CreateAccount();
+        Assert.Null(account.AccountNumber);
+
+        account.UpdateAccountNumber(" 09171234567 ");
+        Assert.Equal("09171234567", account.AccountNumber);
+
+        account.UpdateAccountNumber("   ");
+        Assert.Null(account.AccountNumber);
+    }
+
+    [Fact]
+    public void UpdateOpeningBalance_UpdatesAmountAndPreservesCurrency()
+    {
+        var account = new Account("Bank", AccountType.Bank, new Money(5_000, "PHP"), "PHP", true, "12345678");
+        Assert.Equal(5_000, account.OpeningBalance.AmountMinor);
+        Assert.Equal("12345678", account.AccountNumber);
+
+        account.UpdateOpeningBalance(25_000);
+        Assert.Equal(25_000, account.OpeningBalance.AmountMinor);
+        Assert.Equal("PHP", account.CurrencyCode);
+    }
+
     private static Account CreateAccount() =>
         new("Cash", AccountType.Cash, Money.Zero("PHP"), "PHP", true);
 }

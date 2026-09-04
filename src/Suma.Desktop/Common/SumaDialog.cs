@@ -56,8 +56,10 @@ public static class SumaDialog
             CloseButtonText = closeText,
             DefaultButton = isDestructive ? ContentDialogButton.Close : ContentDialogButton.Primary
         };
+        PrepareBody(body);
 
         dialog.CornerRadius = new CornerRadius(16);
+        dialog.Resources["ContentDialogButtonMinWidth"] = 130.0;
 
         if (GetResource<Brush>("SumaSurfaceBrush") is { } surface)
         {
@@ -342,7 +344,10 @@ public static class SumaDialog
 
         if (GetResource<Style>("SumaModalPrimaryButtonStyle") is { } primaryStyle)
         {
-            dialog.CloseButtonStyle = primaryStyle;
+            var fullWidthStyle = new Style(typeof(Button)) { BasedOn = primaryStyle };
+            fullWidthStyle.Setters.Add(new Setter(FrameworkElement.WidthProperty, contentWidth));
+            fullWidthStyle.Setters.Add(new Setter(FrameworkElement.HorizontalAlignmentProperty, HorizontalAlignment.Stretch));
+            dialog.CloseButtonStyle = fullWidthStyle;
         }
 
         var rootGrid = new Grid
@@ -441,8 +446,8 @@ public static class SumaDialog
             Text = text,
             AcceptsReturn = acceptsReturn,
             TextWrapping = acceptsReturn ? TextWrapping.Wrap : TextWrapping.NoWrap,
-            MinHeight = acceptsReturn ? 80 : 44,
-            CornerRadius = new CornerRadius(10),
+            MinHeight = acceptsReturn ? 96 : 48,
+            CornerRadius = new CornerRadius(12),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(14, 10, 14, 10),
             FontSize = 14,
@@ -483,8 +488,8 @@ public static class SumaDialog
         var combo = new ComboBox
         {
             ItemsSource = items,
-            MinHeight = 44,
-            CornerRadius = new CornerRadius(10),
+            MinHeight = 48,
+            CornerRadius = new CornerRadius(12),
             BorderThickness = new Thickness(1),
             Padding = new Thickness(14, 0, 14, 0),
             FontSize = 14,
@@ -520,8 +525,8 @@ public static class SumaDialog
         var picker = new DatePicker
         {
             Date = date ?? DateTimeOffset.Now,
-            MinHeight = 44,
-            CornerRadius = new CornerRadius(10),
+            MinHeight = 48,
+            CornerRadius = new CornerRadius(12),
             BorderThickness = new Thickness(1),
             HorizontalAlignment = HorizontalAlignment.Stretch,
             RequestedTheme = ElementTheme.Light
@@ -781,5 +786,20 @@ public static class SumaDialog
     {
         textBlock.Text = message;
         textBlock.Visibility = Visibility.Visible;
+    }
+
+    private static void PrepareBody(UIElement element)
+    {
+        switch (element)
+        {
+            case TextBox textBox when GetResource<Style>("SumaModalTextBoxStyle") is { } style: textBox.Style = style; break;
+            case ComboBox comboBox when GetResource<Style>("SumaModalComboBoxStyle") is { } style: comboBox.Style = style; break;
+            case DatePicker datePicker when GetResource<Style>("SumaModalDatePickerStyle") is { } style: datePicker.Style = style; break;
+            case NumberBox numberBox when GetResource<Style>("SumaModalNumberBoxStyle") is { } style: numberBox.Style = style; break;
+            case PasswordBox passwordBox when GetResource<Style>("SumaModalPasswordBoxStyle") is { } style: passwordBox.Style = style; break;
+        }
+        if (element is Panel panel) foreach (var panelChild in panel.Children) PrepareBody(panelChild);
+        else if (element is Border { Child: UIElement borderChild }) PrepareBody(borderChild);
+        else if (element is ContentControl { Content: UIElement contentChild }) PrepareBody(contentChild);
     }
 }

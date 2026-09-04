@@ -9,6 +9,9 @@ public sealed class RecurringOccurrenceStore(SumaDbContext context) : IRecurring
     public Task<RecurringOccurrence?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default) =>
         context.RecurringOccurrences.SingleOrDefaultAsync(occurrence => occurrence.Id == id, cancellationToken);
 
+    public Task<RecurringOccurrence?> GetByTransactionIdAsync(Guid transactionId, CancellationToken cancellationToken = default) =>
+        context.RecurringOccurrences.SingleOrDefaultAsync(occurrence => occurrence.TransactionId == transactionId, cancellationToken);
+
     public async Task<IReadOnlySet<(Guid RecurringTransactionId, DateOnly DueDate)>> GetExistingKeysAsync(
         IReadOnlyCollection<Guid> recurringTransactionIds,
         DateOnly from,

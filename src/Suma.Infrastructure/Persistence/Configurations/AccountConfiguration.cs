@@ -28,6 +28,10 @@ public sealed class AccountConfiguration : IEntityTypeConfiguration<Account>
         builder.Ignore(account => account.CurrencyCode);
         builder.Property(account => account.IncludeInAvailableToSpend)
             .HasColumnName("include_in_available_to_spend");
+        builder.Property(account => account.AccountNumber)
+            .HasColumnName("account_number")
+            .HasMaxLength(64)
+            .IsRequired(false);
         builder.Property(account => account.IsArchived)
             .HasColumnName("is_archived");
     }

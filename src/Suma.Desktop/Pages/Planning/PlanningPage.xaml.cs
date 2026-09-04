@@ -15,7 +15,13 @@ namespace Suma.Desktop.Pages.Planning;
 
 public sealed partial class PlanningPage : Page
 {
-    public PlanningPage(PlanningViewModel viewModel, BudgetEditorViewModel editorViewModel, RecurringViewModel recurringViewModel, RecurringEditorViewModel recurringEditorViewModel, SavingsViewModel savingsViewModel, SavingsGoalEditorViewModel savingsGoalEditorViewModel)
+    public PlanningPage(
+        PlanningViewModel viewModel,
+        BudgetEditorViewModel editorViewModel,
+        RecurringViewModel recurringViewModel,
+        RecurringEditorViewModel recurringEditorViewModel,
+        SavingsViewModel savingsViewModel,
+        SavingsGoalEditorViewModel savingsGoalEditorViewModel)
     {
         ViewModel = viewModel;
         EditorViewModel = editorViewModel;
@@ -25,235 +31,84 @@ public sealed partial class PlanningPage : Page
         SavingsGoalEditorViewModel = savingsGoalEditorViewModel;
         InitializeComponent();
         Loaded += OnLoaded;
-        SizeChanged += OnPageSizeChanged;
-        ViewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName is nameof(ViewModel.SelectedBudget) or nameof(ViewModel.SelectedBudgetVisibility))
-            {
-                UpdateResponsiveLayout(ActualWidth);
-            }
-        };
-        SavingsViewModel.PropertyChanged += (_, args) =>
-        {
-            if (args.PropertyName is nameof(SavingsViewModel.SelectedGoal) or nameof(SavingsViewModel.DetailsVisibility))
-            {
-                UpdateResponsiveLayout(ActualWidth);
-            }
-        };
     }
 
     public PlanningViewModel ViewModel { get; }
-
     public BudgetEditorViewModel EditorViewModel { get; }
-
     public RecurringViewModel RecurringViewModel { get; }
-
     public RecurringEditorViewModel RecurringEditorViewModel { get; }
-
     public SavingsViewModel SavingsViewModel { get; }
-
     public SavingsGoalEditorViewModel SavingsGoalEditorViewModel { get; }
-
-    private void OnPageSizeChanged(object sender, SizeChangedEventArgs e) => UpdateResponsiveLayout(e.NewSize.Width);
-
-    private void UpdateResponsiveLayout(double availableWidth)
-    {
-        if (availableWidth <= 0) availableWidth = ActualWidth;
-        if (availableWidth <= 0) return;
-
-        var isWide = availableWidth >= 960;
-
-        // 1. Budgets Section
-        if (isWide && ViewModel.SelectedBudget != null)
-        {
-            BudgetListColDef.Width = new GridLength(380);
-            BudgetDetailColDef.Width = new GridLength(1, GridUnitType.Star);
-            Grid.SetColumn(BudgetDetailPanel, 1);
-            Grid.SetRow(BudgetDetailPanel, 0);
-        }
-        else
-        {
-            BudgetListColDef.Width = new GridLength(1, GridUnitType.Star);
-            BudgetDetailColDef.Width = new GridLength(0);
-            Grid.SetColumn(BudgetDetailPanel, 0);
-            Grid.SetRow(BudgetDetailPanel, 1);
-        }
-
-        // 2. Recurring Section
-        if (isWide)
-        {
-            RecurringOccurrencesColDef.Width = new GridLength(1.1, GridUnitType.Star);
-            RecurringSchedulesColDef.Width = new GridLength(1, GridUnitType.Star);
-            Grid.SetColumn(RecurringSchedulesPanel, 1);
-            Grid.SetRow(RecurringSchedulesPanel, 0);
-        }
-        else
-        {
-            RecurringOccurrencesColDef.Width = new GridLength(1, GridUnitType.Star);
-            RecurringSchedulesColDef.Width = new GridLength(0);
-            Grid.SetColumn(RecurringSchedulesPanel, 0);
-            Grid.SetRow(RecurringSchedulesPanel, 1);
-        }
-
-        // 3. Savings Section
-        if (isWide && SavingsViewModel.SelectedGoal != null)
-        {
-            SavingsListColDef.Width = new GridLength(380);
-            SavingsDetailColDef.Width = new GridLength(1, GridUnitType.Star);
-            Grid.SetColumn(SavingsDetailPanel, 1);
-            Grid.SetRow(SavingsDetailPanel, 0);
-        }
-        else
-        {
-            SavingsListColDef.Width = new GridLength(1, GridUnitType.Star);
-            SavingsDetailColDef.Width = new GridLength(0);
-            Grid.SetColumn(SavingsDetailPanel, 0);
-            Grid.SetRow(SavingsDetailPanel, 1);
-        }
-    }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.LoadAsync();
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
-        UpdateResponsiveLayout(ActualWidth);
+        await Task.WhenAll(
+            ViewModel.LoadAsync(),
+            RecurringViewModel.LoadAsync(),
+            SavingsViewModel.LoadAsync()
+        );
     }
 
-    private async void OnActiveBudgetsClick(object sender, RoutedEventArgs e)
+    private async void OnRefreshClick(object sender, RoutedEventArgs e)
     {
-        SetToggleState(ActiveBudgetsButton, true);
-        SetToggleState(ArchivedBudgetsButton, false);
-        await ViewModel.SetArchivedViewAsync(false);
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
-        UpdateResponsiveLayout(ActualWidth);
+        await Task.WhenAll(
+            ViewModel.LoadAsync(),
+            RecurringViewModel.LoadAsync(),
+            SavingsViewModel.LoadAsync()
+        );
     }
 
-    private async void OnArchivedBudgetsClick(object sender, RoutedEventArgs e)
+    private void OnAddPlanClick(object sender, RoutedEventArgs e)
     {
-        SetToggleState(ActiveBudgetsButton, false);
-        SetToggleState(ArchivedBudgetsButton, true);
-        await ViewModel.SetArchivedViewAsync(true);
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnBudgetItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is BudgetRowViewModel budget)
-        {
-            BudgetList.SelectedItem = budget;
-            await ViewModel.SelectBudgetAsync(budget.Id);
-            UpdateResponsiveLayout(ActualWidth);
-        }
     }
 
     private async void OnNewBudgetClick(object sender, RoutedEventArgs e) => await ShowBudgetEditorAsync();
-
-    private void OnBudgetsSectionClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(BudgetsSectionButton, true);
-        SetToggleState(RecurringSectionButton, false);
-        SetToggleState(SavingsSectionButton, false);
-        BudgetSection.Visibility = Visibility.Visible;
-        RecurringSection.Visibility = Visibility.Collapsed;
-        SavingsSection.Visibility = Visibility.Collapsed;
-        NewBudgetButton.Visibility = ViewModel.NewBudgetVisibility;
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnRecurringSectionClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(BudgetsSectionButton, false);
-        SetToggleState(RecurringSectionButton, true);
-        SetToggleState(SavingsSectionButton, false);
-        BudgetSection.Visibility = Visibility.Collapsed;
-        RecurringSection.Visibility = Visibility.Visible;
-        SavingsSection.Visibility = Visibility.Collapsed;
-        NewBudgetButton.Visibility = Visibility.Collapsed;
-        await RecurringViewModel.LoadAsync();
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnUpcomingOccurrencesClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(UpcomingOccurrencesButton, true);
-        SetToggleState(HistoryOccurrencesButton, false);
-        await RecurringViewModel.SetHistoryAsync(false);
-    }
-
-    private async void OnHistoryOccurrencesClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(UpcomingOccurrencesButton, false);
-        SetToggleState(HistoryOccurrencesButton, true);
-        await RecurringViewModel.SetHistoryAsync(true);
-    }
-
-    private async void OnMarkPaidClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { DataContext: RecurringOccurrenceRowViewModel occurrence }) await RecurringViewModel.MarkPaidAsync(occurrence);
-    }
-
-    private async void OnSkipOccurrenceClick(object sender, RoutedEventArgs e)
-    {
-        if (sender is FrameworkElement { DataContext: RecurringOccurrenceRowViewModel occurrence }) await RecurringViewModel.SkipAsync(occurrence);
-    }
-
+    private async void OnEditBudgetClick(object sender, RoutedEventArgs e) => await ShowBudgetEditorAsync();
+    private async void OnAddAllocationClick(object sender, RoutedEventArgs e) => await ShowAllocationEditorAsync();
     private async void OnNewRecurringClick(object sender, RoutedEventArgs e) => await ShowRecurringEditorAsync();
-
-    private async void OnSavingsSectionClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(BudgetsSectionButton, false); SetToggleState(RecurringSectionButton, false); SetToggleState(SavingsSectionButton, true);
-        BudgetSection.Visibility = Visibility.Collapsed; RecurringSection.Visibility = Visibility.Collapsed; SavingsSection.Visibility = Visibility.Visible;
-        NewBudgetButton.Visibility = Visibility.Collapsed; await SavingsViewModel.LoadAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnActiveSavingsClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(ActiveSavingsButton, true); SetToggleState(ArchivedSavingsButton, false);
-        await SavingsViewModel.SetArchivedAsync(false); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnArchivedSavingsClick(object sender, RoutedEventArgs e)
-    {
-        SetToggleState(ActiveSavingsButton, false); SetToggleState(ArchivedSavingsButton, true);
-        await SavingsViewModel.SetArchivedAsync(true); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
-        UpdateResponsiveLayout(ActualWidth);
-    }
-
-    private async void OnSavingsGoalClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is SavingsGoalRowViewModel goal) { SavingsGoalList.SelectedItem = goal; await SavingsViewModel.SelectGoalAsync(goal.Id); UpdateResponsiveLayout(ActualWidth); }
-    }
-
+    private async void OnManageRecurringClick(object sender, RoutedEventArgs e) => await ShowRecurringEditorAsync();
     private async void OnNewSavingsGoalClick(object sender, RoutedEventArgs e) => await ShowSavingsGoalEditorAsync();
-    private async void OnAddSavingsContributionClick(object sender, RoutedEventArgs e) => await ShowSavingsContributionEditorAsync();
-    private async void OnArchiveSavingsClick(object sender, RoutedEventArgs e)
+
+    private async void OnViewBudgetDetailsClick(object sender, RoutedEventArgs e)
     {
-        if (SavingsViewModel.SelectedGoal is { } goal)
+        if (ViewModel.Budgets.Count == 0)
         {
-            var dialog = SumaDialog.CreateDestructive(
-                XamlRoot,
-                "Archive savings goal?",
-                $"{goal.Name} will be moved to Archived goals. You can view it anytime or restore it later.",
-                "Archived goals do not accept new contributions until restored.",
-                destructiveButtonText: "Archive");
-            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
-            {
-                await SavingsViewModel.ArchiveAsync();
-                SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
-                UpdateResponsiveLayout(ActualWidth);
-            }
+            await ShowBudgetEditorAsync();
+            return;
         }
+
+        var listView = new ListView
+        {
+            ItemsSource = ViewModel.Budgets,
+            DisplayMemberPath = nameof(BudgetRowViewModel.Name),
+            SelectedItem = ViewModel.SelectedBudget,
+            MinHeight = 120,
+            MaxHeight = 260
+        };
+        var dialog = Dialog("Budgets & Details", DialogContent(listView));
+        dialog.PrimaryButtonClick += async (_, _) =>
+        {
+            if (listView.SelectedItem is BudgetRowViewModel selected)
+            {
+                await ViewModel.SelectBudgetAsync(selected.Id);
+            }
+        };
+        _ = await dialog.ShowAsync();
     }
-    private async void OnRestoreSavingsClick(object sender, RoutedEventArgs e)
+
+    private async void OnViewAllRecurringClick(object sender, RoutedEventArgs e) => await ShowRecurringEditorAsync();
+    private async void OnViewAllSavingsClick(object sender, RoutedEventArgs e) => await ShowSavingsGoalEditorAsync();
+
+    private async void OnViewForecastDetailsClick(object sender, RoutedEventArgs e)
     {
-        await SavingsViewModel.RestoreAsync();
-        SetToggleState(ActiveSavingsButton, !SavingsViewModel.ShowArchived);
-        SetToggleState(ArchivedSavingsButton, SavingsViewModel.ShowArchived);
-        SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
-        UpdateResponsiveLayout(ActualWidth);
+        var info = new TextBlock
+        {
+            Text = "The monthly plan and forecast aggregates your active budgets, scheduled recurring transactions, and savings contributions to project your month-end financial position.",
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 13
+        };
+        var dialog = Dialog("Monthly Plan & Forecast", DialogContent(info), primaryText: "Close");
+        _ = await dialog.ShowAsync();
     }
 
     private async Task ShowSavingsGoalEditorAsync()
@@ -281,7 +136,7 @@ public sealed partial class PlanningPage : Page
             }
             finally { dialog.IsPrimaryButtonEnabled = true; deferral.Complete(); }
         };
-        _ = await dialog.ShowAsync(); SavingsGoalList.SelectedItem = SavingsViewModel.SelectedGoal;
+        _ = await dialog.ShowAsync();
     }
 
     private async Task ShowSavingsContributionEditorAsync()
@@ -355,7 +210,7 @@ public sealed partial class PlanningPage : Page
         typeBox.SelectionChanged += (_, _) => ApplyType();
         frequencyBox.SelectionChanged += (_, _) => ApplyFrequency();
         ApplyType(); ApplyFrequency();
-        var dialog = Dialog("New recurring transaction", DialogContent(typeBox, sourceBox, destinationBox, categoryBox, amountBox, descriptionBox, frequencyBox, intervalBox, dayOfWeekBox, dayOfMonthBox, monthOfYearBox, startBox, error));
+        var dialog = Dialog("New recurring transaction", DialogContent(typeBox, sourceBox, destinationBox, categoryBox, amountBox, descriptionBox, frequencyBox, intervalBox, dayOfWeekBox, dayOfMonthBox, monthOfYearBox, startBox, error), size: ModalSize.Large);
         dialog.PrimaryButtonClick += async (_, args) =>
         {
             var deferral = args.GetDeferral();
@@ -404,8 +259,6 @@ public sealed partial class PlanningPage : Page
         _ = await dialog.ShowAsync();
     }
 
-    private async void OnAddAllocationClick(object sender, RoutedEventArgs e) => await ShowAllocationEditorAsync();
-
     private async void OnArchiveBudgetClick(object sender, RoutedEventArgs e)
     {
         if (ViewModel.SelectedBudget is { } budget)
@@ -419,8 +272,6 @@ public sealed partial class PlanningPage : Page
             if (await dialog.ShowAsync() == ContentDialogResult.Primary)
             {
                 await ViewModel.ArchiveAsync();
-                BudgetList.SelectedItem = ViewModel.SelectedBudget;
-                UpdateResponsiveLayout(ActualWidth);
             }
         }
     }
@@ -428,13 +279,6 @@ public sealed partial class PlanningPage : Page
     private async void OnRestoreBudgetClick(object sender, RoutedEventArgs e)
     {
         await ViewModel.RestoreAsync();
-        if (!ViewModel.ShowArchived)
-        {
-            SetToggleState(ActiveBudgetsButton, true);
-            SetToggleState(ArchivedBudgetsButton, false);
-        }
-
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
     }
 
     private async Task ShowBudgetEditorAsync()
@@ -492,11 +336,11 @@ public sealed partial class PlanningPage : Page
                 var end = DateOnly.FromDateTime(endPicker.Date.DateTime);
                 if (end < start)
                 {
-                    Reject(args, error, "End date must be on or after the start date.");
+                    Reject(args, error, "End date cannot be earlier than start date.");
                     return;
                 }
 
-                var currency = currencyBox.Text.Trim().ToUpperInvariant();
+                var currency = currencyBox.Text.Trim();
                 if (currency.Length != 3 || !currency.All(char.IsLetter))
                 {
                     Reject(args, error, "Enter a three-letter currency code.");
@@ -522,14 +366,21 @@ public sealed partial class PlanningPage : Page
         };
 
         _ = await dialog.ShowAsync();
-        BudgetList.SelectedItem = ViewModel.SelectedBudget;
     }
 
     private async Task ShowAllocationEditorAsync()
     {
         if (ViewModel.SelectedBudget is null)
         {
-            return;
+            if (ViewModel.Budgets.Count > 0)
+            {
+                await ViewModel.SelectBudgetAsync(ViewModel.Budgets[0].Id);
+            }
+            else
+            {
+                await ShowBudgetEditorAsync();
+                return;
+            }
         }
 
         if (!await EditorViewModel.LoadExpenseCategoriesAsync())
@@ -556,7 +407,7 @@ public sealed partial class PlanningPage : Page
         };
         var amountBox = new TextBox
         {
-            Header = $"Amount ({ViewModel.SelectedBudget.CurrencyCode})",
+            Header = $"Amount ({ViewModel.SelectedBudget?.CurrencyCode ?? "PHP"})",
             InputScope = new InputScope { Names = { new InputScopeName(InputScopeNameValue.CurrencyAmount) } },
             PlaceholderText = "0.00"
         };
@@ -566,7 +417,7 @@ public sealed partial class PlanningPage : Page
         };
         var reserveNote = new TextBlock
         {
-            Text = "Marks this allocation as protected for future Available-to-Spend calculations. M13 does not calculate Available-to-Spend.",
+            Text = "Marks this allocation as protected for future Available-to-Spend calculations.",
             TextWrapping = TextWrapping.Wrap,
             Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources["SumaBodySecondaryTextStyle"]
         };
@@ -668,13 +519,6 @@ public sealed partial class PlanningPage : Page
     {
         args.Cancel = true;
         SumaDialog.SetError(error, message);
-    }
-
-    private static void SetToggleState(ToggleButton button, bool selected)
-    {
-        button.IsChecked = selected;
-        button.Style = (Style)Microsoft.UI.Xaml.Application.Current.Resources[
-            selected ? "SumaNavigationItemSelectedStyle" : "SumaNavigationItemStyle"];
     }
 
     private static bool TryGetWholeNumber(double value, int minimum, int maximum, out int result)

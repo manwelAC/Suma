@@ -16,7 +16,8 @@ public sealed class Account : Entity
         AccountType type,
         Money openingBalance,
         string currencyCode,
-        bool includeInAvailableToSpend)
+        bool includeInAvailableToSpend,
+        string? accountNumber = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentNullException.ThrowIfNull(openingBalance);
@@ -38,6 +39,7 @@ public sealed class Account : Entity
         Type = type;
         OpeningBalance = openingBalance;
         IncludeInAvailableToSpend = includeInAvailableToSpend;
+        AccountNumber = string.IsNullOrWhiteSpace(accountNumber) ? null : accountNumber.Trim();
     }
 
     public string Name { get; private set; }
@@ -47,6 +49,8 @@ public sealed class Account : Entity
     public Money OpeningBalance { get; private set; }
 
     public string CurrencyCode => OpeningBalance.CurrencyCode;
+
+    public string? AccountNumber { get; private set; }
 
     public bool IncludeInAvailableToSpend { get; private set; }
 
@@ -66,6 +70,16 @@ public sealed class Account : Entity
         }
 
         Type = type;
+    }
+
+    public void UpdateAccountNumber(string? accountNumber)
+    {
+        AccountNumber = string.IsNullOrWhiteSpace(accountNumber) ? null : accountNumber.Trim();
+    }
+
+    public void UpdateOpeningBalance(long amountMinor)
+    {
+        OpeningBalance = new Money(amountMinor, OpeningBalance.CurrencyCode);
     }
 
     public void Archive() => IsArchived = true;

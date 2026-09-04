@@ -11,9 +11,10 @@ using Suma.Infrastructure.Persistence;
 namespace Suma.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(SumaDbContext))]
-    partial class SumaDbContextModelSnapshot : ModelSnapshot
+    [Microsoft.EntityFrameworkCore.Migrations.Migration("20260904073000_AddAccountNumberToAccounts")]
+    partial class AddAccountNumberToAccounts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.11");

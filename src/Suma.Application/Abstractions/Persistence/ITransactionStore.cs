@@ -8,6 +8,10 @@ public interface ITransactionStore
 
     Task AddAsync(Transaction transaction, CancellationToken cancellationToken = default);
 
+    Task RemoveAsync(Transaction transaction, CancellationToken cancellationToken = default);
+
+    Task<bool> HasRefundsAsync(Guid transactionId, CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<Transaction>> GetRecentAsync(int limit, CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Transaction>> GetForAccountAsync(Guid accountId, CancellationToken cancellationToken = default);

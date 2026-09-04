@@ -7,4 +7,5 @@ public sealed record AccountEditorInput(
     AccountType Type,
     bool IncludeInAvailableToSpend,
     long OpeningBalanceMinor = 0,
-    string CurrencyCode = "");
+    string CurrencyCode = "",
+    string? AccountNumber = null);

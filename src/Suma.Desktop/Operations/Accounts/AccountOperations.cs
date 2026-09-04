@@ -51,4 +51,17 @@ public sealed class AccountOperations(IServiceScopeFactory scopeFactory) : IAcco
         await scope.ServiceProvider.GetRequiredService<RestoreAccountUseCase>()
             .ExecuteAsync(accountId, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>> GetRecentTransactionsAsync(
+        Guid accountId,
+        CancellationToken cancellationToken = default)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var useCase = scope.ServiceProvider.GetRequiredService<Suma.Application.Transactions.GetTransactions.GetTransactionsUseCase>();
+        var results = await useCase.ExecuteAsync(new Suma.Application.Transactions.GetTransactions.GetTransactionsRequest(Limit: 50), cancellationToken);
+        return results
+            .Where(t => t.SourceAccountId == accountId || t.DestinationAccountId == accountId)
+            .Take(4)
+            .ToArray();
+    }
 }

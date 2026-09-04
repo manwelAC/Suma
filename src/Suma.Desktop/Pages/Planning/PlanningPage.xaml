@@ -4,440 +4,855 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:models="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
+
+    <Page.Resources>
+        <!-- Deep Forest Green Primary Action Button (+ Add plan) -->
+        <Style x:Key="PlanningPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Background" Value="#264E36" />
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Background="{TemplateBinding Background}"
+                            Foreground="{TemplateBinding Foreground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#1E3F2B" />
+                                            <Setter Target="ContentPresenter.Foreground" Value="#FFFFFFFF" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#162E20" />
+                                            <Setter Target="ContentPresenter.Foreground" Value="#FFE0E0E0" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Opacity" Value="0.45" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Outline Secondary Action Button (Refresh, Add Category, Edit Budget, Manage Recurring, Create Goal) -->
+        <Style x:Key="PlanningOutlineButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource SumaTextPrimaryBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Background="{TemplateBinding Background}"
+                            Foreground="{TemplateBinding Foreground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#F3F5F2" />
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="#CFD5CD" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#E7EFE8" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Card Header Text Button (View details / View all) -->
+        <Style x:Key="PlanningCardActionLinkStyle" TargetType="Button">
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="{StaticResource SumaTextSecondaryBrush}" />
+            <Setter Property="BorderBrush" Value="#E2EADF" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter
+                            x:Name="ContentPresenter"
+                            Background="{TemplateBinding Background}"
+                            Foreground="{TemplateBinding Foreground}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal" />
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#F2F5F2" />
+                                            <Setter Target="ContentPresenter.Foreground" Value="#1B3E26" />
+                                            <Setter Target="ContentPresenter.BorderBrush" Value="#B4C7B5" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="ContentPresenter.Background" Value="#E2EDE3" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Metric Card Surface Style -->
+        <Style x:Key="PlanningMetricCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Padding" Value="18,16" />
+        </Style>
+
+        <!-- Main Workspace Card Surface Style -->
+        <Style x:Key="PlanningWorkspaceCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFFFF" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="22" />
+        </Style>
+    </Page.Resources>
+
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" VerticalScrollMode="Auto">
-        <Grid Padding="{StaticResource SumaPagePadding}" MaxWidth="1440" HorizontalAlignment="Stretch" RowSpacing="20">
+        <Grid Padding="36,24,36,32" RowSpacing="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" ColumnSpacing="16">
+            <!-- Panoramic Atmospheric Background Landscape with Seamless Edge Fades Behind Cards -->
+            <Grid Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="480" Margin="-36,-24,-36,0" IsHitTestVisible="False">
+                <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
+                <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
+                <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
+                <Ellipse Width="170" Height="170" Fill="#4C8FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,170,0" />
+
+                <!-- Left atmospheric mist -->
+                <Ellipse Width="420" Height="260" Fill="#1A4A624E" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-20,0,0" />
+
+                <!-- Flying cranes in the serene sky -->
+                <Canvas HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Height="100" Margin="0,30,360,0">
+                    <Path Data="M 10,40 Q 20,30 30,40 Q 40,30 50,40" Stroke="#5A556B5A" StrokeThickness="2" />
+                    <Path Data="M 52,24 Q 60,16 68,24 Q 76,16 84,24" Stroke="#4A556B5A" StrokeThickness="1.6" />
+                    <Path Data="M 80,48 Q 87,42 94,48 Q 101,42 108,48" Stroke="#3E556B5A" StrokeThickness="1.4" />
+                </Canvas>
+
+                <!-- Layer 1: Distant majestic mountain ridge (farthest, tall peaks) -->
+                <Path Data="M 0,340 C 180,240 380,280 620,180 C 850,100 1100,200 1350,130 C 1600,70 1850,170 2100,120 L 2100,480 L 0,480 Z" Fill="#2F667A68" VerticalAlignment="Bottom" Stretch="Fill" Height="340" />
+
+                <!-- Layer 2: Mid-ground rolling mountain range -->
+                <Path Data="M 0,380 C 220,270 480,330 780,220 C 1050,140 1350,250 1620,180 C 1850,130 2000,190 2100,170 L 2100,480 L 0,480 Z" Fill="#44556C58" VerticalAlignment="Bottom" Stretch="Fill" Height="280" />
+
+                <!-- Layer 3: Foreground lush rolling knolls -->
+                <Path Data="M 0,400 C 280,300 600,240 920,310 C 1220,340 1520,240 1820,280 C 1960,295 2040,265 2100,275 L 2100,480 L 0,480 Z" Fill="#58435A47" VerticalAlignment="Bottom" Stretch="Fill" Height="210" />
+
+                <!-- Stylized trees on ridges -->
+                <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="300" Width="440">
+                    <Ellipse Width="18" Height="42" Fill="#72364C3B" Canvas.Left="180" Canvas.Top="125" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="188" Canvas.Top="157" />
+                    <Ellipse Width="24" Height="52" Fill="#7D364C3B" Canvas.Left="228" Canvas.Top="130" />
+                    <Rectangle Width="2.5" Height="18" Fill="#85303D32" Canvas.Left="239" Canvas.Top="170" />
+                    <Ellipse Width="16" Height="36" Fill="#66364C3B" Canvas.Left="295" Canvas.Top="115" />
+                    <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="302" Canvas.Top="143" />
+                    <Ellipse Width="20" Height="46" Fill="#75364C3B" Canvas.Left="340" Canvas.Top="138" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="349" Canvas.Top="174" />
+                </Canvas>
+
+                <!-- Multi-stop Vertical Fade Overlay -->
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#00F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="0.52" />
+                            <GradientStop Color="#2AF8F7F3" Offset="0.68" />
+                            <GradientStop Color="#85F8F7F3" Offset="0.84" />
+                            <GradientStop Color="#FAF8F7F3" Offset="0.97" />
+                            <GradientStop Color="#FFF8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Left Soft Feathering -->
+                <Rectangle HorizontalAlignment="Left" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Right Soft Feathering -->
+                <Rectangle HorizontalAlignment="Right" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Grid>
+
+            <!-- Row 0: Header & Top Actions -->
+            <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Spacing="{StaticResource SumaSpace4}">
-                    <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Planning" />
-                    <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Plan where your money should go." />
+
+                <StackPanel Spacing="4">
+                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="32" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="Planning" />
+                    <TextBlock FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Plan with purpose. Manage budgets, recurring transactions, and savings goals." />
                 </StackPanel>
-                <Button x:Name="NewBudgetButton" Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Create new budget" Click="OnNewBudgetClick" Content="New budget" Visibility="{x:Bind ViewModel.NewBudgetVisibility, Mode=OneWay}" />
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock Text="Currency" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                        <ComboBox x:Name="CurrencyPicker" Height="36" MinWidth="90" CornerRadius="8" Background="{StaticResource SumaSurfaceBrush}" BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="1" SelectedIndex="0" VerticalAlignment="Center">
+                            <ComboBoxItem Content="PHP" />
+                            <ComboBoxItem Content="USD" />
+                            <ComboBoxItem Content="EUR" />
+                        </ComboBox>
+                    </StackPanel>
+
+                    <Button Style="{StaticResource PlanningOutlineButtonStyle}" Click="OnRefreshClick" AutomationProperties.Name="Refresh planning" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE72C;" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                            <TextBlock Text="Refresh" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Style="{StaticResource PlanningPrimaryButtonStyle}" Click="OnAddPlanClick" AutomationProperties.Name="Add plan" VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                <MenuFlyoutItem Text="New budget" Click="OnNewBudgetClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE8C7;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="New recurring transaction" Click="OnNewRecurringClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE823;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutItem Text="New savings goal" Click="OnNewSavingsGoalClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE7C1;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                                <MenuFlyoutSeparator />
+                                <MenuFlyoutItem Text="Add category allocation" Click="OnAddAllocationClick">
+                                    <MenuFlyoutItem.Icon>
+                                        <FontIcon Glyph="&#xE710;" />
+                                    </MenuFlyoutItem.Icon>
+                                </MenuFlyoutItem>
+                            </MenuFlyout>
+                        </Button.Flyout>
+                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                            <FontIcon Glyph="&#xE710;" FontSize="12" Foreground="White" />
+                            <TextBlock Text="+ Add plan" FontSize="13" FontWeight="SemiBold" Foreground="White" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </Grid>
 
-            <!-- Navigation Switcher Pills -->
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
-                <ToggleButton x:Name="BudgetsSectionButton" AutomationProperties.Name="Show budgets planning section" Click="OnBudgetsSectionClick" Content="Budgets" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                <ToggleButton x:Name="RecurringSectionButton" AutomationProperties.Name="Show recurring planning section" Click="OnRecurringSectionClick" Content="Recurring" Style="{StaticResource SumaNavigationItemStyle}" />
-                <ToggleButton x:Name="SavingsSectionButton" AutomationProperties.Name="Show savings planning section" Click="OnSavingsSectionClick" Content="Savings" Style="{StaticResource SumaNavigationItemStyle}" />
-            </StackPanel>
+            <!-- Row 1: Summary Metric Cards (4 Cards) -->
+            <Grid Grid.Row="1" ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <!-- Main Planning Workspaces -->
-            <Grid Grid.Row="2">
-                <!-- 1. Budgets Section -->
-                <Grid x:Name="BudgetSection" ColumnSpacing="28" RowSpacing="20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="BudgetListColDef" Width="380" />
-                        <ColumnDefinition x:Name="BudgetDetailColDef" Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <!-- 1. Current Budget Metric Card -->
+                <Border Grid.Column="0" Style="{StaticResource PlanningMetricCardStyle}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
 
-                    <!-- Left: Budget List -->
-                    <StackPanel x:Name="BudgetListPanel" Grid.Column="0" Grid.Row="0" Spacing="12">
-                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Budgets" />
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ToggleButton x:Name="ActiveBudgetsButton" AutomationProperties.Name="View active budgets" Click="OnActiveBudgetsClick" Content="Active" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                            <ToggleButton x:Name="ArchivedBudgetsButton" AutomationProperties.Name="View archived budgets" Click="OnArchivedBudgetsClick" Content="Archived" Style="{StaticResource SumaNavigationItemStyle}" />
-                        </StackPanel>
-                        <Grid MinHeight="150">
-                            <ListView x:Name="BudgetList" AutomationProperties.Name="Budget list" IsItemClickEnabled="True" ItemClick="OnBudgetItemClick" ItemsSource="{x:Bind ViewModel.Budgets, Mode=OneWay}" SelectionMode="Single">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        <Setter Property="Padding" Value="0" />
-                                        <Setter Property="Margin" Value="0,0,0,8" />
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="models:BudgetRowViewModel">
-                                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20">
-                                            <Grid ColumnSpacing="16">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind PeriodDisplay}" />
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="4">
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind CurrencyCode}" />
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ExpectedIncomeDisplay}" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" Visibility="{x:Bind ViewModel.EmptyVisibility, Mode=OneWay}">
-                                <TextBlock HorizontalAlignment="Center" Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.EmptyTitle, Mode=OneWay}" />
-                                <TextBlock MaxWidth="380" HorizontalAlignment="Center" Text="Create a budget to plan how much you want to set aside for each spending category." TextAlignment="Center" TextWrapping="Wrap" Style="{StaticResource SumaBodySecondaryTextStyle}" Visibility="{x:Bind ViewModel.NewBudgetVisibility, Mode=OneWay}" />
-                                <Button HorizontalAlignment="Center" AutomationProperties.Name="Create first budget" Click="OnNewBudgetClick" Content="New budget" Visibility="{x:Bind ViewModel.NewBudgetVisibility, Mode=OneWay}" />
+                        <!-- Top Title & View details -->
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Width="32" Height="32" CornerRadius="10" Background="#EDF5EE" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE8C7;" FontSize="14" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="Current Budget" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
                             </StackPanel>
-                            <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind ViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind ViewModel.LoadingVisibility, Mode=OneWay}" />
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View details" Click="OnViewBudgetDetailsClick" />
                         </Grid>
-                    </StackPanel>
 
-                    <!-- Right: Selected Budget Details & Allocations -->
-                    <StackPanel x:Name="BudgetDetailPanel" Grid.Column="1" Grid.Row="0" Spacing="16">
-                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="24" Visibility="{x:Bind ViewModel.SelectedBudgetVisibility, Mode=OneWay}">
+                        <!-- Big Amount & Protected Info -->
+                        <StackPanel Grid.Row="1" Spacing="2" Margin="0,2,0,4">
+                            <TextBlock Text="{x:Bind ViewModel.AllocatedDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="22" FontWeight="Bold" Foreground="#1B3E26" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Protected budget" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind ViewModel.ProtectedAllocationsTotalDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Availability Progress Bar & Footer -->
+                        <StackPanel Grid.Row="2" Spacing="4">
+                            <ProgressBar Value="{x:Bind ViewModel.BudgetAvailablePercent, Mode=OneWay}" Maximum="100" Height="4" Foreground="#2E7D32" Background="#E8EFE9" CornerRadius="2" />
                             <Grid>
-                                <StackPanel Spacing="20" Visibility="{x:Bind ViewModel.DetailsContentVisibility, Mode=OneWay}">
-                                    <Grid ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.SelectedBudget.Name, Mode=OneWay, FallbackValue='Budget details'}" />
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ViewModel.SelectedBudget.PeriodDisplay, Mode=OneWay}" />
+                                <TextBlock Text="{x:Bind ViewModel.BudgetAvailablePercentDisplay, Mode=OneWay, FallbackValue='100% available'}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind ViewModel.AllocatedDisplay, Mode=OneWay, FallbackValue='of PHP 0.00'}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 2. Protected Categories Metric Card -->
+                <Border Grid.Column="1" Style="{StaticResource PlanningMetricCardStyle}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Top Title & View -->
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Width="32" Height="32" CornerRadius="10" Background="#EDF5EE" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE727;" FontSize="14" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="Protected Categories" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View" Click="OnViewBudgetDetailsClick" />
+                        </Grid>
+
+                        <!-- Big Count & Protected Amount -->
+                        <StackPanel Grid.Row="1" Spacing="2" Margin="0,2,0,4">
+                            <TextBlock Text="{x:Bind ViewModel.ProtectedCategoriesCountDisplay, Mode=OneWay, FallbackValue='0'}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Protected amount" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind ViewModel.ProtectedAllocationsTotalDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Progress Bar & Footer -->
+                        <StackPanel Grid.Row="2" Spacing="4">
+                            <ProgressBar Value="{x:Bind ViewModel.ProtectedCategoriesPercentValue, Mode=OneWay}" Maximum="100" Height="4" Foreground="#2E7D32" Background="#E8EFE9" CornerRadius="2" />
+                            <TextBlock Text="{x:Bind ViewModel.ProtectedCategoriesPercentDisplay, Mode=OneWay, FallbackValue='0% of total budget'}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 3. Recurring This Month Metric Card -->
+                <Border Grid.Column="2" Style="{StaticResource PlanningMetricCardStyle}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Top Title & View -->
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Width="32" Height="32" CornerRadius="10" Background="#EDF5EE" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="Recurring This Month" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View" Click="OnViewAllRecurringClick" />
+                        </Grid>
+
+                        <!-- Big Count & Due Amount -->
+                        <StackPanel Grid.Row="1" Spacing="2" Margin="0,2,0,4">
+                            <TextBlock Text="{x:Bind RecurringViewModel.UpcomingCountDisplay, Mode=OneWay, FallbackValue='0'}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Total due" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind RecurringViewModel.UpcomingTotalDueDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Footer Due Date with Calendar Icon -->
+                        <Grid Grid.Row="2" Margin="0,4,0,0">
+                            <TextBlock Text="{x:Bind RecurringViewModel.NextDueDisplay, Mode=OneWay, FallbackValue='No upcoming dues'}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                            <FontIcon Glyph="&#xE787;" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- 4. Active Savings Goals Metric Card -->
+                <Border Grid.Column="3" Style="{StaticResource PlanningMetricCardStyle}">
+                    <Grid RowSpacing="8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Top Title & View -->
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                <Border Width="32" Height="32" CornerRadius="10" Background="#EDF5EE" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="Active Savings Goals" FontSize="13" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View" Click="OnViewAllSavingsClick" />
+                        </Grid>
+
+                        <!-- Big Count & Total Saved -->
+                        <StackPanel Grid.Row="1" Spacing="2" Margin="0,2,0,4">
+                            <TextBlock Text="{x:Bind SavingsViewModel.ActiveGoalsCountDisplay, Mode=OneWay, FallbackValue='0'}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="Total saved" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Text="{x:Bind SavingsViewModel.TotalSavedDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Progress Bar & Footer -->
+                        <StackPanel Grid.Row="2" Spacing="4">
+                            <ProgressBar Value="{x:Bind SavingsViewModel.OverallProgressPercent, Mode=OneWay}" Maximum="100" Height="4" Foreground="#2E7D32" Background="#E8EFE9" CornerRadius="2" />
+                            <TextBlock Text="{x:Bind SavingsViewModel.OverallProgressPercentDisplay, Mode=OneWay, FallbackValue='0%'}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Row 2: Main Content Area (3 Columns Layout) -->
+            <Grid Grid.Row="2" ColumnSpacing="18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.35*" />
+                    <ColumnDefinition Width="1.05*" />
+                    <ColumnDefinition Width="1.1*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- ============================================== -->
+                <!-- COLUMN 0: Current Budget & Category Allocation -->
+                <!-- ============================================== -->
+                <Border Grid.Column="0" Style="{StaticResource PlanningWorkspaceCardStyle}">
+                    <Grid RowSpacing="16">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Card Header -->
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="Current Budget" FontSize="16" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View details" Click="OnViewBudgetDetailsClick" />
+                        </Grid>
+
+                        <!-- Available to Spend Banner with Serene Vector Landscape -->
+                        <Border Grid.Row="1" CornerRadius="12" BorderThickness="1" BorderBrush="#D8E5DB" Padding="18,16">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#F2F7F3" Offset="0.0" />
+                                    <GradientStop Color="#E6EFE8" Offset="1.0" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="130" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left Stats -->
+                                <StackPanel Grid.Column="0" Spacing="3">
+                                    <TextBlock Text="AVAILABLE TO SPEND" FontSize="10" FontWeight="Bold" Foreground="#4A654E" CharacterSpacing="40" />
+                                    <TextBlock Text="{x:Bind ViewModel.AvailableToSpendDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="22" FontWeight="Bold" Foreground="#1B3E26" Margin="0,2,0,2" />
+                                    <TextBlock Text="Included account balances minus protected budget remaining." FontSize="11" Foreground="#6E6E73" TextWrapping="Wrap" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,10,0,0">
+                                        <!-- Included Balance Badge -->
+                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                            <Ellipse Width="7" Height="7" Fill="#2E7D32" VerticalAlignment="Center" />
+                                            <StackPanel Spacing="0">
+                                                <TextBlock Text="INCLUDED BALANCE" FontSize="9" FontWeight="Bold" Foreground="#6E6E73" />
+                                                <TextBlock Text="{x:Bind ViewModel.IncludedBalanceDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="#1C1C1E" />
+                                            </StackPanel>
                                         </StackPanel>
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                            <Button AutomationProperties.Name="Archive selected budget" Click="OnArchiveBudgetClick" Content="Archive budget" Visibility="{x:Bind ViewModel.ArchiveActionVisibility, Mode=OneWay}" />
-                                            <Button AutomationProperties.Name="Restore selected budget" Click="OnRestoreBudgetClick" Content="Restore budget" Visibility="{x:Bind ViewModel.RestoreActionVisibility, Mode=OneWay}" />
+
+                                        <!-- Protected Budget Badge -->
+                                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                            <Ellipse Width="7" Height="7" Fill="#9E9E9E" VerticalAlignment="Center" />
+                                            <StackPanel Spacing="0">
+                                                <TextBlock Text="PROTECTED BUDGET" FontSize="9" FontWeight="Bold" Foreground="#6E6E73" />
+                                                <TextBlock Text="{x:Bind ViewModel.ProtectedAllocationsTotalDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="#1C1C1E" />
+                                            </StackPanel>
                                         </StackPanel>
-                                    </Grid>
-                                    <Grid ColumnSpacing="16" RowSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="*" />
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Expected income" />
-                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.ExpectedIncomeDisplay, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Column="1" Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Allocated" />
-                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.AllocatedDisplay, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Row="1" Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Spent" />
-                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.SpentDisplay, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </Border>
-                                        <Border Grid.Row="1" Grid.Column="1" Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                            <StackPanel Spacing="2">
-                                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Remaining" />
-                                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind ViewModel.RemainingDisplay, Mode=OneWay}" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                    <Grid ColumnSpacing="12">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <StackPanel Spacing="4">
-                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Allocations" />
-                                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Actual spending comes from Expense transactions and their refunds." />
-                                        </StackPanel>
-                                        <Button Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Add budget allocation" Click="OnAddAllocationClick" Content="Add allocation" Visibility="{x:Bind ViewModel.AddAllocationVisibility, Mode=OneWay}" />
-                                    </Grid>
-                                    <ListView AutomationProperties.Name="Budget allocations" ItemsSource="{x:Bind ViewModel.Allocations, Mode=OneWay}" SelectionMode="None">
-                                        <ListView.ItemContainerStyle>
-                                            <Style TargetType="ListViewItem">
-                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                                <Setter Property="Padding" Value="0" />
-                                                <Setter Property="Margin" Value="0,0,0,8" />
-                                            </Style>
-                                        </ListView.ItemContainerStyle>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate x:DataType="models:BudgetAllocationRowViewModel">
-                                                <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,1,0,0" Padding="0,14,0,6">
-                                                    <Grid ColumnSpacing="16">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="*" />
-                                                            <ColumnDefinition Width="Auto" />
-                                                        </Grid.ColumnDefinitions>
-                                                        <StackPanel Spacing="4">
-                                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind CategoryDisplay}" />
-                                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ReserveDisplay}" TextWrapping="Wrap" />
-                                                        </StackPanel>
-                                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="3">
-                                                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind AllocatedDisplay}" />
-                                                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind SpentDisplay}" />
-                                                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind RemainingDisplay}" />
-                                                            <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind UtilizationDisplay}" />
-                                                        </StackPanel>
-                                                    </Grid>
-                                                </Border>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                    <StackPanel HorizontalAlignment="Center" Spacing="8" Visibility="{x:Bind ViewModel.AllocationsEmptyVisibility, Mode=OneWay}">
-                                        <TextBlock HorizontalAlignment="Center" Style="{StaticResource SumaBodyTextStyle}" Text="No allocations yet" />
-                                        <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Add an expense category to start planning this budget." TextWrapping="Wrap" />
                                     </StackPanel>
                                 </StackPanel>
-                                <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind ViewModel.IsDetailsLoading, Mode=OneWay}" Visibility="{x:Bind ViewModel.DetailsLoadingVisibility, Mode=OneWay}" />
+
+                                <!-- Right Atmospheric Vector Hills & Pines -->
+                                <Canvas Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Width="120" Height="85" IsHitTestVisible="False">
+                                    <!-- Gentle Sun Haze -->
+                                    <Ellipse Width="45" Height="45" Fill="#208FA28C" Canvas.Left="45" Canvas.Top="5" />
+                                    <!-- Distant Hill -->
+                                    <Path Data="M0,70 Q45,30 90,60 T120,55 L120,85 L0,85 Z" Fill="#2A6D8C72" />
+                                    <!-- Near Hill -->
+                                    <Path Data="M0,80 Q40,45 85,75 T120,65 L120,85 L0,85 Z" Fill="#3E556B5A" />
+                                    <!-- Pine 1 -->
+                                    <Path Data="M35,35 L42,50 L28,50 Z" Fill="#5A364C3B" />
+                                    <Rectangle Width="2" Height="6" Fill="#40364C3B" Canvas.Left="34" Canvas.Top="50" />
+                                    <!-- Pine 2 -->
+                                    <Path Data="M55,25 L64,45 L46,45 Z" Fill="#6A364C3B" />
+                                    <Rectangle Width="2" Height="7" Fill="#40364C3B" Canvas.Left="54" Canvas.Top="45" />
+                                    <!-- Pine 3 -->
+                                    <Path Data="M95,38 L102,52 L88,52 Z" Fill="#55364C3B" />
+                                    <Rectangle Width="2" Height="6" Fill="#40364C3B" Canvas.Left="94" Canvas.Top="52" />
+                                </Canvas>
                             </Grid>
                         </Border>
-                        <InfoBar IsClosable="False" IsOpen="True" Message="{x:Bind ViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind ViewModel.ErrorVisibility, Mode=OneWay}" />
-                    </StackPanel>
-                </Grid>
 
-                <!-- 2. Recurring Section -->
-                <Grid x:Name="RecurringSection" ColumnSpacing="28" RowSpacing="20" Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="RecurringOccurrencesColDef" Width="1.1*" />
-                        <ColumnDefinition x:Name="RecurringSchedulesColDef" Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                        <!-- Category Allocation Section -->
+                        <StackPanel Grid.Row="2" Spacing="10">
+                            <!-- Table Header -->
+                            <Grid Margin="4,4,4,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="65" />
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="20" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Category Allocation" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                <TextBlock Grid.Column="3" Text="Spent" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" />
+                                <TextBlock Grid.Column="4" Text="Budget" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" />
+                            </Grid>
 
-                    <!-- Left: Occurrences -->
-                    <StackPanel x:Name="RecurringOccurrencesPanel" Grid.Column="0" Grid.Row="0" Spacing="16">
-                        <Grid ColumnSpacing="16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Spacing="4">
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Recurring" />
-                                <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Scheduled money movements become real only when marked paid." TextWrapping="Wrap" />
-                            </StackPanel>
-                            <Button Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Create new recurring transaction" Click="OnNewRecurringClick" Content="New recurring" />
-                        </Grid>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ToggleButton x:Name="UpcomingOccurrencesButton" AutomationProperties.Name="Show pending recurring occurrences" Click="OnUpcomingOccurrencesClick" Content="Upcoming" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                            <ToggleButton x:Name="HistoryOccurrencesButton" AutomationProperties.Name="Show paid and skipped recurring occurrences" Click="OnHistoryOccurrencesClick" Content="History" Style="{StaticResource SumaNavigationItemStyle}" />
+                            <!-- Empty Allocations State -->
+                            <Border Visibility="{x:Bind ViewModel.EmptyAllocationsVisibility, Mode=OneWay}" Padding="24,20" Background="#FBFDFB" BorderBrush="#E2ECE2" BorderThickness="1" CornerRadius="10" HorizontalAlignment="Stretch">
+                                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                                    <FontIcon Glyph="&#xE8C7;" FontSize="24" Foreground="#8EA893" HorizontalAlignment="Center" />
+                                    <TextBlock Text="No budget allocations yet" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Click 'Add category' below to allocate spending limits." FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Dynamic Allocation Items -->
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.Allocations, Mode=OneWay}" Visibility="{x:Bind ViewModel.HasAllocationsVisibility, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:BudgetAllocationRowViewModel">
+                                        <Border Padding="8,6" CornerRadius="8" Background="Transparent">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="45" />
+                                                    <ColumnDefinition Width="60" />
+                                                    <ColumnDefinition Width="100" />
+                                                    <ColumnDefinition Width="100" />
+                                                    <ColumnDefinition Width="20" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                    <Border Width="28" Height="28" CornerRadius="6" Background="{x:Bind IconBackground}">
+                                                        <FontIcon Glyph="{x:Bind Glyph}" FontSize="13" Foreground="{x:Bind IconForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                    </Border>
+                                                    <TextBlock Text="{x:Bind CategoryName}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <TextBlock Grid.Column="1" Text="{x:Bind PercentDisplay}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                                                <ProgressBar Grid.Column="2" Value="{x:Bind ProgressValue}" Maximum="100" Height="4" Foreground="{x:Bind ProgressBrush}" Background="#E8EFE9" CornerRadius="2" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="3" Text="{x:Bind SpentAmountDisplay}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="4" Text="{x:Bind BudgetAmountDisplay}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                                <FontIcon Grid.Column="5" Glyph="&#xE76C;" FontSize="10" Foreground="#B0B0B0" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
-                        <Grid MinHeight="120">
-                            <ListView AutomationProperties.Name="Recurring occurrences" ItemsSource="{x:Bind RecurringViewModel.Occurrences, Mode=OneWay}" SelectionMode="None">
-                                <ListView.ItemTemplate>
+
+                        <!-- Bottom Category Management Actions -->
+                        <Grid Grid.Row="3" Margin="0,4,0,0">
+                            <Button Style="{StaticResource PlanningOutlineButtonStyle}" Click="OnAddAllocationClick" AutomationProperties.Name="Add category">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <FontIcon Glyph="&#xE710;" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                    <TextBlock Text="Add category" FontSize="12" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                </StackPanel>
+                            </Button>
+                            <Button HorizontalAlignment="Right" Style="{StaticResource PlanningOutlineButtonStyle}" Click="OnEditBudgetClick" AutomationProperties.Name="Edit budget">
+                                <TextBlock Text="Edit budget" FontSize="12" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <!-- ============================================== -->
+                <!-- COLUMN 1: Recurring Schedule                   -->
+                <!-- ============================================== -->
+                <Border Grid.Column="1" Style="{StaticResource PlanningWorkspaceCardStyle}">
+                    <Grid RowSpacing="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <!-- Card Header -->
+                        <Grid Grid.Row="0">
+                            <TextBlock Text="Recurring Schedule" FontSize="16" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                            <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View all" Click="OnViewAllRecurringClick" />
+                        </Grid>
+
+                        <!-- Top Upcoming Summary Card -->
+                        <Border Grid.Row="1" Background="#F4F8F4" BorderBrush="#E2ECE2" BorderThickness="1" CornerRadius="10" Padding="14,10">
+                            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                <Border Width="32" Height="32" CornerRadius="8" Background="#EDF5EE" VerticalAlignment="Center">
+                                    <FontIcon Glyph="&#xE787;" FontSize="15" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <StackPanel Spacing="1" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="{x:Bind RecurringViewModel.UpcomingCountDisplay, Mode=OneWay, FallbackValue='0'}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                        <TextBlock Text="upcoming payments" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="Total due" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind RecurringViewModel.UpcomingTotalDueDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Recurring Items List -->
+                        <StackPanel Grid.Row="2" Spacing="4">
+                            <!-- Empty Recurring State -->
+                            <Border Visibility="{x:Bind RecurringViewModel.EmptyOccurrencesVisibility, Mode=OneWay}" Padding="24,20" Background="#FBFDFB" BorderBrush="#E2ECE2" BorderThickness="1" CornerRadius="10" HorizontalAlignment="Stretch">
+                                <StackPanel HorizontalAlignment="Center" Spacing="6">
+                                    <FontIcon Glyph="&#xE823;" FontSize="24" Foreground="#8EA893" HorizontalAlignment="Center" />
+                                    <TextBlock Text="No recurring payments due" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                                    <TextBlock Text="Manage recurring bills and subscriptions below." FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Dynamic Recurring Occurrences -->
+                            <ItemsControl ItemsSource="{x:Bind RecurringViewModel.Occurrences, Mode=OneWay}" Visibility="{x:Bind RecurringViewModel.HasOccurrencesVisibility, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:RecurringOccurrenceRowViewModel">
-                                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20" Margin="0,0,0,8">
-                                            <Grid ColumnSpacing="16">
+                                        <Border Padding="6,8" CornerRadius="8" Background="Transparent">
+                                            <Grid>
                                                 <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Title}" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ContextDisplay}" TextWrapping="Wrap" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind DueDisplay}" />
-                                                    <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind StatusDisplay}" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TransactionDisplay}" Visibility="{x:Bind TransactionVisibility}" />
+                                                <Border Width="30" Height="30" CornerRadius="15" Background="{x:Bind IconBackground}" Margin="0,0,10,0" VerticalAlignment="Center">
+                                                    <FontIcon Glyph="{x:Bind Glyph}" FontSize="14" Foreground="{x:Bind IconForeground}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" Spacing="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{x:Bind Title}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{x:Bind CategoryDisplay}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" TextTrimming="CharacterEllipsis" />
                                                 </StackPanel>
-                                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="8">
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind AmountDisplay}" />
-                                                    <StackPanel Orientation="Horizontal" Spacing="8" Visibility="{x:Bind PendingVisibility}">
-                                                        <Button AutomationProperties.Name="Mark recurring occurrence paid" Click="OnMarkPaidClick" Content="Mark paid" IsEnabled="{x:Bind CanMarkPaid}" />
-                                                        <Button AutomationProperties.Name="Skip recurring occurrence" Click="OnSkipOccurrenceClick" Content="Skip" />
-                                                    </StackPanel>
+                                                <StackPanel Grid.Column="2" Spacing="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0">
+                                                    <TextBlock Text="{x:Bind DueLabel}" FontSize="10" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Right" />
+                                                    <TextBlock Text="{x:Bind AmountDisplay}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
                                                 </StackPanel>
+                                                <FontIcon Grid.Column="3" Glyph="&#xE76C;" FontSize="10" Foreground="#B0B0B0" VerticalAlignment="Center" />
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SumaBodySecondaryTextStyle}" Text="No occurrences in this view." Visibility="{x:Bind RecurringViewModel.EmptyOccurrencesVisibility, Mode=OneWay}" />
-                            <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind RecurringViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind RecurringViewModel.LoadingVisibility, Mode=OneWay}" />
-                        </Grid>
-                    </StackPanel>
-
-                    <!-- Right: Schedules -->
-                    <StackPanel x:Name="RecurringSchedulesPanel" Grid.Column="1" Grid.Row="0" Spacing="16">
-                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="24">
-                            <StackPanel Spacing="12">
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Schedules" />
-                                <ListView AutomationProperties.Name="Recurring schedules" ItemsSource="{x:Bind RecurringViewModel.Schedules, Mode=OneWay}" SelectionMode="None">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="models:RecurringScheduleRowViewModel">
-                                            <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,1,0,0" Padding="0,14,0,8">
-                                                <Grid ColumnSpacing="16">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Spacing="3">
-                                                        <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind Title}" />
-                                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind ContextDisplay}" TextWrapping="Wrap" />
-                                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind PatternDisplay}" />
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="3">
-                                                        <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind AmountDisplay}" />
-                                                        <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TypeDisplay}" />
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="No recurring schedules yet." Visibility="{x:Bind RecurringViewModel.EmptySchedulesVisibility, Mode=OneWay}" />
-                            </StackPanel>
-                        </Border>
-                        <InfoBar IsClosable="False" IsOpen="True" Message="{x:Bind RecurringViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind RecurringViewModel.ErrorVisibility, Mode=OneWay}" />
-                    </StackPanel>
-                </Grid>
-
-                <!-- 3. Savings Section -->
-                <Grid x:Name="SavingsSection" ColumnSpacing="28" RowSpacing="20" Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="SavingsListColDef" Width="380" />
-                        <ColumnDefinition x:Name="SavingsDetailColDef" Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- Left: Savings Goals List -->
-                    <StackPanel x:Name="SavingsListPanel" Grid.Column="0" Grid.Row="0" Spacing="16">
-                        <Grid ColumnSpacing="16">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Spacing="4">
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Savings goals" />
-                                <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Attribute existing transactions toward goals without moving money." TextWrapping="Wrap" />
-                            </StackPanel>
-                            <Button Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Create new savings goal" Click="OnNewSavingsGoalClick" Content="New goal" Visibility="{x:Bind SavingsViewModel.NewGoalVisibility, Mode=OneWay}" />
-                        </Grid>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <ToggleButton x:Name="ActiveSavingsButton" AutomationProperties.Name="Show active savings goals" Click="OnActiveSavingsClick" Content="Active" Style="{StaticResource SumaNavigationItemSelectedStyle}" />
-                            <ToggleButton x:Name="ArchivedSavingsButton" AutomationProperties.Name="Show archived savings goals" Click="OnArchivedSavingsClick" Content="Archived" Style="{StaticResource SumaNavigationItemStyle}" />
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
-                        <Grid MinHeight="140">
-                            <ListView x:Name="SavingsGoalList" AutomationProperties.Name="Savings goal list" IsItemClickEnabled="True" ItemClick="OnSavingsGoalClick" ItemsSource="{x:Bind SavingsViewModel.Goals, Mode=OneWay}" SelectionMode="Single">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate x:DataType="models:SavingsGoalRowViewModel">
-                                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20" Margin="0,0,0,8">
-                                            <Grid ColumnSpacing="16">
+
+                        <!-- Bottom Action Button: Manage Recurring -->
+                        <Button Grid.Row="3" HorizontalAlignment="Stretch" Style="{StaticResource PlanningOutlineButtonStyle}" Click="OnManageRecurringClick" AutomationProperties.Name="Manage recurring">
+                            <TextBlock Text="Manage recurring" FontSize="12" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                        </Button>
+                    </Grid>
+                </Border>
+
+                <!-- ============================================== -->
+                <!-- COLUMN 2: Savings Goals & Monthly Forecast     -->
+                <!-- ============================================== -->
+                <StackPanel Grid.Column="2" Spacing="16">
+                    <!-- Top Card: Savings Goals -->
+                    <Border Style="{StaticResource PlanningWorkspaceCardStyle}">
+                        <Grid RowSpacing="14">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Savings Goals" FontSize="16" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View all" Click="OnViewAllSavingsClick" />
+                            </Grid>
+
+                            <!-- Goals List with Circular Ring Gauges -->
+                            <StackPanel Grid.Row="1" Spacing="14">
+                                <!-- Empty Savings Goals State -->
+                                <Border Visibility="{x:Bind SavingsViewModel.EmptyGoalsVisibility, Mode=OneWay}" Padding="24,20" Background="#FBFDFB" BorderBrush="#E2ECE2" BorderThickness="1" CornerRadius="10" HorizontalAlignment="Stretch">
+                                    <StackPanel HorizontalAlignment="Center" Spacing="6">
+                                        <FontIcon Glyph="&#xE7C1;" FontSize="24" Foreground="#8EA893" HorizontalAlignment="Center" />
+                                        <TextBlock Text="No savings goals yet" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock Text="Create a savings goal below to start tracking." FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Dynamic Savings Goals -->
+                                <ItemsControl ItemsSource="{x:Bind SavingsViewModel.Goals, Mode=OneWay}" Visibility="{x:Bind SavingsViewModel.HasGoalsVisibility, Mode=OneWay}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:SavingsGoalRowViewModel">
+                                            <Grid ColumnSpacing="12" Margin="0,0,0,14">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
                                                     <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
                                                 </Grid.ColumnDefinitions>
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind Name}" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind DestinationDisplay}" />
-                                                    <ProgressBar Maximum="100" Value="{x:Bind ProgressPercent}" />
-                                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind StatusDisplay}" />
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="3">
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind ProgressDisplay}" />
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind TargetDisplay}" />
-                                                    <TextBlock HorizontalAlignment="Right" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind RemainingDisplay}" />
+
+                                                <!-- Circular Gauge -->
+                                                <Grid Width="50" Height="50" VerticalAlignment="Center">
+                                                    <Ellipse Width="46" Height="46" Stroke="#E8EFE9" StrokeThickness="4" />
+                                                    <Ellipse Width="46" Height="46" Stroke="#2E7D32" StrokeThickness="4" StrokeDashArray="3,1" />
+                                                    <TextBlock Text="{x:Bind ProgressPercentDisplay}" FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Grid>
+
+                                                <!-- Goal Details -->
+                                                <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                                    <TextBlock Text="{x:Bind Name}" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{x:Bind TargetRatioDisplay}" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                                    <TextBlock Text="{x:Bind TargetDateLabel}" FontSize="10" Foreground="#8E8E93" />
+                                                    <ProgressBar Value="{x:Bind ProgressPercent}" Maximum="100" Height="3" Foreground="#2E7D32" Background="#E8EFE9" CornerRadius="1.5" Margin="0,4,0,0" />
                                                 </StackPanel>
                                             </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8" Visibility="{x:Bind SavingsViewModel.EmptyVisibility, Mode=OneWay}">
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="No savings goals in this view" />
-                                <Button AutomationProperties.Name="Create first savings goal" Click="OnNewSavingsGoalClick" Content="New goal" Visibility="{x:Bind SavingsViewModel.NewGoalVisibility, Mode=OneWay}" />
-                            </StackPanel>
-                            <ProgressRing Width="32" Height="32" HorizontalAlignment="Center" VerticalAlignment="Center" IsActive="{x:Bind SavingsViewModel.IsLoading, Mode=OneWay}" Visibility="{x:Bind SavingsViewModel.LoadingVisibility, Mode=OneWay}" />
-                        </Grid>
-                    </StackPanel>
-
-                    <!-- Right: Selected Goal Details & Contributions -->
-                    <StackPanel x:Name="SavingsDetailPanel" Grid.Column="1" Grid.Row="0" Spacing="16">
-                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="24" Visibility="{x:Bind SavingsViewModel.DetailsVisibility, Mode=OneWay}">
-                            <StackPanel Spacing="20">
-                                <Grid ColumnSpacing="12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Spacing="3">
-                                        <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind SavingsViewModel.SelectedGoal.Name, Mode=OneWay, FallbackValue='Goal details'}" />
-                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind SavingsViewModel.SelectedGoal.TargetDateDisplay, Mode=OneWay}" />
-                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind SavingsViewModel.SelectedGoal.DestinationDisplay, Mode=OneWay}" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                        <Button AutomationProperties.Name="Archive selected savings goal" Click="OnArchiveSavingsClick" Content="Archive" Visibility="{x:Bind SavingsViewModel.ArchiveVisibility, Mode=OneWay}" />
-                                        <Button AutomationProperties.Name="Restore selected savings goal" Click="OnRestoreSavingsClick" Content="Restore" Visibility="{x:Bind SavingsViewModel.RestoreVisibility, Mode=OneWay}" />
-                                    </StackPanel>
-                                </Grid>
-                                <Grid ColumnSpacing="16">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Target" />
-                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" FontWeight="SemiBold" Text="{x:Bind SavingsViewModel.SelectedGoal.TargetDisplay, Mode=OneWay}" />
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Grid.Column="1" Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Progress" />
-                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" FontWeight="SemiBold" Text="{x:Bind SavingsViewModel.SelectedGoal.ProgressDisplay, Mode=OneWay}" />
-                                        </StackPanel>
-                                    </Border>
-                                    <Border Grid.Column="2" Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Remaining" />
-                                            <TextBlock Style="{StaticResource SumaBodyTextStyle}" FontWeight="SemiBold" Text="{x:Bind SavingsViewModel.SelectedGoal.RemainingDisplay, Mode=OneWay}" />
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Contribution history" />
-                                    <Button Grid.Column="1" VerticalAlignment="Center" AutomationProperties.Name="Add savings goal contribution" Click="OnAddSavingsContributionClick" Content="Add contribution" Visibility="{x:Bind SavingsViewModel.AddContributionVisibility, Mode=OneWay}" />
-                                </Grid>
-                                <ListView AutomationProperties.Name="Savings contribution history" ItemsSource="{x:Bind SavingsViewModel.Contributions, Mode=OneWay}" SelectionMode="None">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="models:GoalContributionRowViewModel">
-                                            <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,1,0,0" Padding="0,12">
-                                                <Grid ColumnSpacing="16">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Spacing="3">
-                                                        <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind Title}" />
-                                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind Description}" />
-                                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind Context}" />
-                                                    </StackPanel>
-                                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right" Spacing="2">
-                                                        <TextBlock Style="{StaticResource SumaBodyTextStyle}" FontWeight="SemiBold" Text="{x:Bind AmountDisplay}" />
-                                                        <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind DateDisplay}" />
-                                                    </StackPanel>
-                                                </Grid>
-                                            </Border>
                                         </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="No contributions yet." Visibility="{x:Bind SavingsViewModel.ContributionsEmptyVisibility, Mode=OneWay}" />
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
-                        </Border>
-                        <InfoBar IsClosable="False" IsOpen="True" Message="{x:Bind SavingsViewModel.ErrorMessage, Mode=OneWay}" Severity="Error" Visibility="{x:Bind SavingsViewModel.ErrorVisibility, Mode=OneWay}" />
-                    </StackPanel>
-                </Grid>
+
+                            <!-- Bottom Action Button: Create Goal -->
+                            <Button Grid.Row="2" HorizontalAlignment="Stretch" Style="{StaticResource PlanningOutlineButtonStyle}" Click="OnNewSavingsGoalClick" AutomationProperties.Name="Create goal">
+                                <TextBlock Text="Create goal" FontSize="12" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <!-- Bottom Card: Monthly Plan & Forecast -->
+                    <Border Style="{StaticResource PlanningWorkspaceCardStyle}">
+                        <Grid RowSpacing="12">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0">
+                                <TextBlock Text="Monthly Plan &amp; Forecast" FontSize="15" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" VerticalAlignment="Center" />
+                                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource PlanningCardActionLinkStyle}" Content="View details" Click="OnViewForecastDetailsClick" />
+                            </Grid>
+
+                            <!-- Body (Left highlight box + Right breakdown stats) -->
+                            <Grid Grid.Row="1" ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Left Highlight Card -->
+                                <Border CornerRadius="10" BorderThickness="1" BorderBrush="#D8E5DB" Padding="12,10">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Color="#F0F6F1" Offset="0.0" />
+                                            <GradientStop Color="#E6EFE8" Offset="1.0" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <Grid>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Text="Projected End Balance" FontSize="10" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                            <TextBlock Text="{x:Bind ViewModel.ProjectedEndBalanceDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="17" FontWeight="Bold" Foreground="#2E7D32" Margin="0,2,0,2" />
+                                            <TextBlock Text="Based on active plan" FontSize="10" FontWeight="SemiBold" Foreground="#2E7D32" />
+                                        </StackPanel>
+                                        <!-- Wave illustration -->
+                                        <Path Data="M0,25 Q30,10 60,18 T120,12 L120,30 L0,30 Z" Fill="#202E7D32" VerticalAlignment="Bottom" Height="18" Stretch="Fill" IsHitTestVisible="False" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Right Financial Forecast Details -->
+                                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                                    <Grid>
+                                        <TextBlock Text="Total Income" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind ViewModel.TotalIncomeDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Grid>
+                                        <TextBlock Text="Total Expenses" FontSize="11" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                        <TextBlock Text="{x:Bind ViewModel.TotalExpensesDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Right" />
+                                    </Grid>
+                                    <Grid Margin="0,2,0,0">
+                                        <TextBlock Text="Projected Savings" FontSize="11" FontWeight="Bold" Foreground="#2E7D32" />
+                                        <TextBlock Text="{x:Bind ViewModel.ProjectedSavingsDisplay, Mode=OneWay, FallbackValue='PHP 0.00'}" FontSize="11" FontWeight="Bold" Foreground="#2E7D32" HorizontalAlignment="Right" />
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Footer Note with Info Icon -->
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,2,0,0">
+                                <TextBlock Text="Forecast is based on your budgets and recurring transactions." FontSize="10" Foreground="#8E8E93" VerticalAlignment="Center" />
+                                <FontIcon Glyph="&#xE946;" FontSize="10" Foreground="#8E8E93" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
             </Grid>
         </Grid>
     </ScrollViewer>

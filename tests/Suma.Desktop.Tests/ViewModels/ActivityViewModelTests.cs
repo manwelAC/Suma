@@ -20,6 +20,7 @@ using Suma.Desktop.ViewModels;
 using Suma.Domain.Accounts;
 using Suma.Domain.Categories;
 using Suma.Domain.Transactions;
+using Microsoft.UI.Xaml;
 using Xunit;
 
 namespace Suma.Desktop.Tests.ViewModels;
@@ -52,6 +53,42 @@ public sealed class ActivityViewModelTests
         await viewModel.SetFilterAsync(TransactionType.Transfer, Token);
         Assert.Equal(TransactionType.Transfer, operations.LastRequest?.Type);
         Assert.Equal(TransactionType.Transfer, viewModel.SelectedType);
+    }
+
+    [Fact]
+    public async Task Workspace_filters_and_summaries_are_currency_isolated_and_keep_detail_selection_authoritative()
+    {
+        var operations = new FakeTransactionOperations();
+        operations.History.AddRange(
+        [
+            Item(TransactionType.Income, "Salary", 100000),
+            Item(TransactionType.Expense, "Lunch", 25000),
+            Item(TransactionType.Refund, "Lunch refund", 5000),
+            Item(TransactionType.Income, "Dollar income", 9000) with { CurrencyCode = "USD" }
+        ]);
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+
+        Assert.Equal("PHP", viewModel.SelectedCurrency);
+        Assert.Equal(3, viewModel.Items.Count);
+        Assert.Contains("1,000.00", viewModel.IncomeDisplay);
+        Assert.Contains("250.00", viewModel.ExpenseDisplay);
+        Assert.Contains("800.00", viewModel.NetFlowDisplay);
+        Assert.NotNull(viewModel.SelectedItem);
+
+        viewModel.SetSearch("Lunch refund");
+
+        Assert.Single(viewModel.Items);
+        Assert.Equal(TransactionType.Refund, viewModel.SelectedItem?.Type);
+        Assert.Equal(Visibility.Visible, viewModel.DetailVisibility);
+        Assert.Equal(1, operations.GetCount);
+
+        viewModel.SetCurrency("USD");
+
+        Assert.Empty(viewModel.Items);
+        Assert.Null(viewModel.SelectedItem);
+        Assert.Equal(Visibility.Visible, viewModel.DetailEmptyVisibility);
     }
 
     [Fact]
@@ -165,6 +202,181 @@ public sealed class ActivityViewModelTests
         Assert.Equal("Suma could not load transaction options. Try again.", viewModel.ErrorMessage);
     }
 
+    [Fact]
+    public async Task Successful_delete_removes_transaction_and_refreshes_ledger()
+    {
+        var operations = new FakeTransactionOperations();
+        var item = Item(TransactionType.Expense, "Groceries", 25000);
+        operations.History.Add(item);
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        Assert.Single(viewModel.Items);
+
+        var succeeded = await viewModel.DeleteTransactionAsync(item.Id, Token);
+
+        Assert.True(succeeded);
+        Assert.Empty(viewModel.Items);
+        Assert.Equal(2, operations.GetCount);
+    }
+
+    [Fact]
+    public async Task Failed_delete_sets_user_facing_error()
+    {
+        var operations = new FakeTransactionOperations
+        {
+            Failure = new ConflictException("Cannot delete transaction because it has associated refunds.")
+        };
+        var viewModel = new ActivityViewModel(operations);
+
+        var succeeded = await viewModel.DeleteTransactionAsync(Guid.NewGuid(), Token);
+
+        Assert.False(succeeded);
+        Assert.Equal("Cannot delete transaction because it has associated refunds.", viewModel.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task SearchAsync_filters_transactions_and_manages_loading_state()
+    {
+        var operations = new FakeTransactionOperations();
+        operations.History.Add(Item(TransactionType.Expense, "Groceries at Market", 25000));
+        operations.History.Add(Item(TransactionType.Expense, "Electric Utility Bill", 45000));
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        Assert.Equal(2, viewModel.Items.Count);
+
+        var searchTask = viewModel.SearchAsync("Groceries", Token);
+        Assert.True(viewModel.IsSearching);
+        Assert.True(viewModel.IsBusy);
+
+        await searchTask;
+
+        Assert.False(viewModel.IsSearching);
+        Assert.False(viewModel.IsBusy);
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Groceries at Market", viewModel.Items[0].Title);
+    }
+
+    [Fact]
+    public async Task SearchAsync_with_empty_text_resets_filter()
+    {
+        var operations = new FakeTransactionOperations();
+        operations.History.Add(Item(TransactionType.Expense, "Groceries at Market", 25000));
+        operations.History.Add(Item(TransactionType.Expense, "Electric Utility Bill", 45000));
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        await viewModel.SearchAsync("Groceries", Token);
+        Assert.Single(viewModel.Items);
+
+        await viewModel.SearchAsync(string.Empty, Token);
+        Assert.Equal(2, viewModel.Items.Count);
+    }
+
+    [Fact]
+    public async Task DateRange_presets_and_custom_ranges_filter_transactions_correctly()
+    {
+        var operations = new FakeTransactionOperations();
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var itemToday = Item(TransactionType.Expense, "Today expense", 1000) with { TransactionDate = today };
+        var itemLastMonth = Item(TransactionType.Expense, "Last month expense", 2000) with { TransactionDate = today.AddMonths(-1) };
+        var itemLastYear = Item(TransactionType.Expense, "Old expense", 5000) with { TransactionDate = new(2024, 1, 15) };
+        var itemMay2025 = Item(TransactionType.Expense, "May 2025 expense", 3000) with { TransactionDate = new(2025, 5, 10) };
+
+        operations.History.AddRange([itemToday, itemLastMonth, itemLastYear, itemMay2025]);
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        Assert.Equal(4, viewModel.Items.Count);
+
+        viewModel.SetDateRange("This month");
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Today expense", viewModel.Items[0].Title);
+
+        viewModel.SetDateRange("Last month");
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Last month expense", viewModel.Items[0].Title);
+
+        viewModel.SetDateRange("May 1 – May 31, 2025");
+        Assert.Single(viewModel.Items);
+        Assert.Equal("May 2025 expense", viewModel.Items[0].Title);
+
+        viewModel.SetDateRange(new DateOnly(2024, 1, 1), new DateOnly(2024, 1, 31));
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Old expense", viewModel.Items[0].Title);
+
+        viewModel.SetDateRange("All time");
+        Assert.Equal(4, viewModel.Items.Count);
+    }
+
+    [Fact]
+    public async Task Category_and_account_filters_isolate_items_and_preserve_selection()
+    {
+        var operations = new FakeTransactionOperations();
+        var foodExpense = Item(TransactionType.Expense, "Groceries", 25000) with { CategoryName = "Food", SourceAccountName = "Cash Wallet" };
+        var rentExpense = Item(TransactionType.Expense, "Apartment Rent", 100000) with { CategoryName = "Housing", SourceAccountName = "Bank Checking" };
+        var salaryIncome = Item(TransactionType.Income, "Monthly Salary", 500000) with { CategoryName = "Salary", DestinationAccountName = "Bank Checking" };
+
+        operations.History.AddRange([foodExpense, rentExpense, salaryIncome]);
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        Assert.Equal(3, viewModel.Items.Count);
+        Assert.Contains("Food", viewModel.Categories);
+        Assert.Contains("Housing", viewModel.Categories);
+        Assert.Contains("Cash Wallet", viewModel.Accounts);
+        Assert.Contains("Bank Checking", viewModel.Accounts);
+
+        // Filter by Category
+        viewModel.SetCategory("Food");
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Groceries", viewModel.Items[0].Title);
+
+        // Filter by Account (Bank Checking matches both rent source and salary destination)
+        viewModel.SetCategory("All categories");
+        viewModel.SetAccount("Bank Checking");
+        Assert.Equal(2, viewModel.Items.Count);
+
+        // Combined Category + Account
+        viewModel.SetCategory("Housing");
+        Assert.Single(viewModel.Items);
+        Assert.Equal("Apartment Rent", viewModel.Items[0].Title);
+
+        // Preserved across reload
+        await viewModel.LoadAsync(Token);
+        Assert.Equal("Housing", viewModel.SelectedCategory);
+        Assert.Equal("Bank Checking", viewModel.SelectedAccount);
+        Assert.Single(viewModel.Items);
+    }
+
+    [Fact]
+    public async Task ResetFiltersAsync_clears_all_active_filters_and_restores_view()
+    {
+        var operations = new FakeTransactionOperations();
+        operations.History.AddRange([
+            Item(TransactionType.Expense, "Groceries", 25000) with { CategoryName = "Food" },
+            Item(TransactionType.Income, "Salary", 500000) with { CategoryName = "Salary" }
+        ]);
+        var viewModel = new ActivityViewModel(operations);
+
+        await viewModel.LoadAsync(Token);
+        viewModel.SetCategory("Food");
+        viewModel.SetSearch("Groc");
+        viewModel.SetDateRange("This month");
+
+        Assert.True(viewModel.HasActiveFilters);
+
+        await viewModel.ResetFiltersAsync(Token);
+
+        Assert.False(viewModel.HasActiveFilters);
+        Assert.Equal(string.Empty, viewModel.SearchText);
+        Assert.Equal("All categories", viewModel.SelectedCategory);
+        Assert.Equal("All accounts", viewModel.SelectedAccount);
+        Assert.Equal("All time", viewModel.SelectedDateRange);
+        Assert.Equal(2, viewModel.Items.Count);
+    }
+
     private static TransactionHistoryResult Item(TransactionType type, string description, long amount) => new(
         Guid.NewGuid(), type, Guid.NewGuid(), "Wallet", Guid.NewGuid(), "Bank", Guid.NewGuid(), "Food", null,
         amount, "PHP", new(2026, 9, 2), description, null);
@@ -216,6 +428,13 @@ public sealed class ActivityViewModelTests
 
         public Task<TransactionResult> CreateRefundAsync(CreateRefundRequest request, CancellationToken cancellationToken = default) => CreateAsync(TransactionType.Refund, request.AmountMinor, request.CurrencyCode, request.TransactionDate);
 
+        public Task DeleteAsync(Guid transactionId, CancellationToken cancellationToken = default)
+        {
+            if (Failure is not null) throw Failure;
+            History.RemoveAll(item => item.Id == transactionId);
+            return Task.CompletedTask;
+        }
+
         private async Task<TransactionResult> CreateAsync(TransactionType type, long amount, string currency, DateOnly date)
         {
             if (Failure is not null) throw Failure;
@@ -244,6 +463,9 @@ public sealed class ActivityViewModelTests
         public Task ArchiveAsync(Guid accountId, CancellationToken cancellationToken = default) => throw new NotSupportedException();
 
         public Task RestoreAsync(Guid accountId, CancellationToken cancellationToken = default) => throw new NotSupportedException();
+
+        public Task<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>> GetRecentTransactionsAsync(Guid accountId, CancellationToken cancellationToken = default) =>
+            Task.FromResult<IReadOnlyList<Suma.Application.Transactions.GetTransactions.TransactionHistoryResult>>([]);
     }
 
     private sealed class EmptyCategoryOperations : ICategoryOperations

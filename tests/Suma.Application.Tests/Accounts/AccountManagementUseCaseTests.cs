@@ -54,7 +54,22 @@ public sealed class AccountManagementUseCaseTests
         Assert.Equal("Daily wallet", result.Name);
         Assert.Equal(AccountType.EWallet, account.Type);
         Assert.False(account.IncludeInAvailableToSpend);
-        Assert.Same(originalOpeningBalance, account.OpeningBalance);
+        Assert.Equal(originalOpeningBalance.AmountMinor, account.OpeningBalance.AmountMinor);
+        Assert.Equal(1, data.SaveCount);
+    }
+
+    [Fact]
+    public async Task Update_updates_account_number_and_opening_balance()
+    {
+        var data = DataWithAccount(out var account);
+
+        var result = await new UpdateAccountUseCase(data, data).ExecuteAsync(
+            new(account.Id, "Daily wallet", AccountType.EWallet, true, "09171234567", 99_000), Token);
+
+        Assert.Equal("09171234567", result.AccountNumber);
+        Assert.Equal("09171234567", account.AccountNumber);
+        Assert.Equal(99_000, result.OpeningBalanceMinor);
+        Assert.Equal(99_000, account.OpeningBalance.AmountMinor);
         Assert.Equal(1, data.SaveCount);
     }
 

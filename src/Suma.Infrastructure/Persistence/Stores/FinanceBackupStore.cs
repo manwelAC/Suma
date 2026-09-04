@@ -8,7 +8,11 @@ namespace Suma.Infrastructure.Persistence.Stores;
 
 public sealed class FinanceBackupStore(SumaRuntimePaths paths) : IFinanceBackupStore
 {
-    internal const string SupportedMigration = "20260901061524_InitialFinancialSchema";
+    internal static readonly string[] SupportedMigrations =
+    [
+        "20260901061524_InitialFinancialSchema",
+        "20260904073000_AddAccountNumberToAccounts"
+    ];
     private static readonly string[] RequiredTables = ["accounts", "budget_allocations", "budgets", "categories", "goal_contributions", "recurring_occurrences", "recurring_transactions", "savings_goals", "transactions", "__EFMigrationsHistory"];
 
     public Task CreateBackupAsync(string destinationPath, CancellationToken cancellationToken = default)
@@ -71,7 +75,7 @@ public sealed class FinanceBackupStore(SumaRuntimePaths paths) : IFinanceBackupS
             if (RequiredTables.Any(table => !tables.Contains(table))) return new(false, BackupValidationFailure.InvalidSchema);
             if (!HasCurrentMappedSchema(connection)) return new(false, BackupValidationFailure.InvalidSchema);
             var migrations = new List<string>(); using (var command = connection.CreateCommand()) { command.CommandText = "SELECT MigrationId FROM __EFMigrationsHistory ORDER BY MigrationId;"; using var reader = command.ExecuteReader(); while (reader.Read()) migrations.Add(reader.GetString(0)); }
-            return migrations.SequenceEqual([SupportedMigration], StringComparer.Ordinal) ? new(true, BackupValidationFailure.None) : new(false, BackupValidationFailure.UnsupportedVersion);
+            return migrations.SequenceEqual(SupportedMigrations, StringComparer.Ordinal) ? new(true, BackupValidationFailure.None) : new(false, BackupValidationFailure.UnsupportedVersion);
         }
         catch (Exception exception) when (exception is SqliteException or InvalidOperationException) { return new(false, BackupValidationFailure.InvalidDatabase); }
     }

@@ -21,4 +21,6 @@ public interface ITransactionOperations
     Task<TransactionResult> CreateTransferAsync(CreateTransferRequest request, CancellationToken cancellationToken = default);
 
     Task<TransactionResult> CreateRefundAsync(CreateRefundRequest request, CancellationToken cancellationToken = default);
+
+    Task DeleteAsync(Guid transactionId, CancellationToken cancellationToken = default);
 }
