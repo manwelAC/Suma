@@ -4,6 +4,106 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     Background="{StaticResource SumaBackgroundBrush}">
 
+    <Page.Resources>
+        <!-- Mascot Celebration Jump Animation -->
+        <Storyboard x:Name="MascotCelebrationStoryboard">
+            <!-- Squash & Stretch on mascot -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MascotTransform" Storyboard.TargetProperty="ScaleX">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="1.0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="1.06" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.32" Value="0.94" KeySpline="0.1,0.9,0.2,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.55" Value="1.03" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.75" Value="1.0" KeySpline="0.1,0.9,0.2,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MascotTransform" Storyboard.TargetProperty="ScaleY">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="1.0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="0.92" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.32" Value="1.08" KeySpline="0.1,0.9,0.2,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.55" Value="0.97" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.75" Value="1.0" KeySpline="0.1,0.9,0.2,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Playful vertical jump -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MascotTransform" Storyboard.TargetProperty="TranslateY">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.1" Value="4" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.32" Value="-32" KeySpline="0.1,0.9,0.2,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.55" Value="3" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.75" Value="0" KeySpline="0.1,0.9,0.2,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Ground shadow tracking jump -->
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="ShadowTransform" Storyboard.TargetProperty="ScaleX">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="1.0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.32" Value="0.72" KeySpline="0.1,0.9,0.2,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.75" Value="1.0" KeySpline="0.1,0.9,0.2,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="MascotShadow" Storyboard.TargetProperty="Opacity">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="1.0" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.32" Value="0.3" KeySpline="0.1,0.9,0.2,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.75" Value="1.0" KeySpline="0.1,0.9,0.2,1" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+
+        <!-- Success Badge Pop & Ripple Animation -->
+        <Storyboard x:Name="SuccessPopStoryboard">
+            <DoubleAnimation Storyboard.TargetName="SuccessPanel" Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0" Duration="0:0:0.3" />
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SuccessBadgeTransform" Storyboard.TargetProperty="ScaleX">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="0.35" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.36" Value="1.18" KeySpline="0.15,0.85,0.3,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.52" Value="0.95" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.70" Value="1.0" KeySpline="0.2,0,0.4,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="SuccessBadgeTransform" Storyboard.TargetProperty="ScaleY">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="0.35" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.36" Value="1.18" KeySpline="0.15,0.85,0.3,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.52" Value="0.95" KeySpline="0.2,0,0.4,1" />
+                <SplineDoubleKeyFrame KeyTime="0:0:0.70" Value="1.0" KeySpline="0.2,0,0.4,1" />
+            </DoubleAnimationUsingKeyFrames>
+            <!-- Expanding Ripple Ring -->
+            <DoubleAnimation Storyboard.TargetName="RippleRingTransform" Storyboard.TargetProperty="ScaleX"
+                             From="0.85" To="1.6" Duration="0:0:0.75" BeginTime="0:0:0.08">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="RippleRingTransform" Storyboard.TargetProperty="ScaleY"
+                             From="0.85" To="1.6" Duration="0:0:0.75" BeginTime="0:0:0.08">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="RippleRing" Storyboard.TargetProperty="Opacity"
+                             From="0.8" To="0.0" Duration="0:0:0.75" BeginTime="0:0:0.08">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <!-- Content slide up & fade in -->
+            <DoubleAnimation Storyboard.TargetName="SuccessContentTransform" Storyboard.TargetProperty="TranslateY"
+                             From="16" To="0" Duration="0:0:0.45" BeginTime="0:0:0.12">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="SuccessContent" Storyboard.TargetProperty="Opacity"
+                             From="0.0" To="1.0" Duration="0:0:0.4" BeginTime="0:0:0.12" />
+        </Storyboard>
+
+        <!-- PIN Boxes Shake Animation for incorrect PIN -->
+        <Storyboard x:Name="PinShakeStoryboard">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="PinBoxesTransform" Storyboard.TargetProperty="TranslateX">
+                <LinearDoubleKeyFrame KeyTime="0:0:0.0" Value="0" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.06" Value="-12" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.12" Value="12" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.18" Value="-8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.24" Value="8" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.30" Value="-4" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.36" Value="4" />
+                <LinearDoubleKeyFrame KeyTime="0:0:0.42" Value="0" />
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Page.Resources>
+
     <Grid x:Name="RootLayoutGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -11,14 +111,105 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!-- Panoramic Atmospheric Background Landscape (Matching Activity/Planning/Accounts styling) -->
+        <Grid Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="580" IsHitTestVisible="False">
+            <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
+            <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
+            <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
+            <Ellipse Width="170" Height="170" Fill="#4C8FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,170,0" />
+
+            <!-- Left atmospheric mist -->
+            <Ellipse Width="420" Height="260" Fill="#1A4A624E" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-20,0,0" />
+
+            <!-- Flying cranes in the serene sky -->
+            <Canvas HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Height="100" Margin="0,30,360,0">
+                <Path Data="M 10,40 Q 20,30 30,40 Q 40,30 50,40" Stroke="#5A556B5A" StrokeThickness="2" />
+                <Path Data="M 52,24 Q 60,16 68,24 Q 76,16 84,24" Stroke="#4A556B5A" StrokeThickness="1.6" />
+                <Path Data="M 80,48 Q 87,42 94,48 Q 101,42 108,48" Stroke="#3E556B5A" StrokeThickness="1.4" />
+            </Canvas>
+
+            <!-- Layer 1: Distant majestic mountain ridge (farthest, tall peaks) -->
+            <Path Data="M 0,340 C 180,240 380,280 620,180 C 850,100 1100,200 1350,130 C 1600,70 1850,170 2100,120 L 2100,580 L 0,580 Z" Fill="#2F667A68" VerticalAlignment="Bottom" Stretch="Fill" Height="380" />
+
+            <!-- Layer 2: Mid-ground rolling mountain range -->
+            <Path Data="M 0,380 C 220,270 480,330 780,220 C 1050,140 1350,250 1620,180 C 1850,130 2000,190 2100,170 L 2100,580 L 0,580 Z" Fill="#44556C58" VerticalAlignment="Bottom" Stretch="Fill" Height="320" />
+
+            <!-- Layer 3: Foreground lush rolling knolls -->
+            <Path Data="M 0,400 C 280,300 600,240 920,310 C 1220,340 1520,240 1820,280 C 1960,295 2040,265 2100,275 L 2100,580 L 0,580 Z" Fill="#58435A47" VerticalAlignment="Bottom" Stretch="Fill" Height="250" />
+
+            <!-- Stylized trees on ridges -->
+            <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="300" Width="440">
+                <!-- Right Ridge Trees -->
+                <Ellipse Width="18" Height="42" Fill="#72364C3B" Canvas.Left="180" Canvas.Top="125" />
+                <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="188" Canvas.Top="157" />
+
+                <Ellipse Width="24" Height="52" Fill="#7D364C3B" Canvas.Left="228" Canvas.Top="130" />
+                <Rectangle Width="2.5" Height="18" Fill="#85303D32" Canvas.Left="239" Canvas.Top="170" />
+
+                <Ellipse Width="16" Height="36" Fill="#66364C3B" Canvas.Left="295" Canvas.Top="115" />
+                <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="302" Canvas.Top="143" />
+
+                <Ellipse Width="20" Height="46" Fill="#75364C3B" Canvas.Left="340" Canvas.Top="138" />
+                <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="349" Canvas.Top="174" />
+            </Canvas>
+
+            <!-- Left Ridge Trees -->
+            <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Left" Height="300" Width="300">
+                <Ellipse Width="18" Height="40" Fill="#68364C3B" Canvas.Left="80" Canvas.Top="150" />
+                <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="88" Canvas.Top="182" />
+
+                <Ellipse Width="22" Height="48" Fill="#72364C3B" Canvas.Left="120" Canvas.Top="142" />
+                <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="130" Canvas.Top="180" />
+            </Canvas>
+
+            <!-- Multi-stop Vertical Fade Overlay: Keeps landscape vivid, melts seamlessly into page background (#FFF8F7F3) at bottom -->
+            <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00F8F7F3" Offset="0.0" />
+                        <GradientStop Color="#00F8F7F3" Offset="0.52" />
+                        <GradientStop Color="#2AF8F7F3" Offset="0.68" />
+                        <GradientStop Color="#85F8F7F3" Offset="0.84" />
+                        <GradientStop Color="#FAF8F7F3" Offset="0.97" />
+                        <GradientStop Color="#FFF8F7F3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- Left Soft Feathering: Melts outer edges seamlessly -->
+            <Rectangle HorizontalAlignment="Left" Width="140" VerticalAlignment="Stretch">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                        <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+
+            <!-- Right Soft Feathering -->
+            <Rectangle HorizontalAlignment="Right" Width="140" VerticalAlignment="Stretch">
+                <Rectangle.Fill>
+                    <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                        <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                        <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Grid>
+
         <!-- Top-Left Branding Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="14" Margin="48,36,48,0" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Image Source="ms-appx:///Assets/Branding/SUMALOGO.png" Width="40" Height="40" Stretch="Uniform" VerticalAlignment="Center" />
-            <StackPanel VerticalAlignment="Center" Spacing="0">
-                <TextBlock Text="Suma" FontFamily="Segoe UI Variable Display" FontSize="22" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
-                <TextBlock Text="Money, made clear." FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+        <Border Grid.Row="0" Margin="44,32,44,0" HorizontalAlignment="Left" VerticalAlignment="Top"
+                Background="#C8FFFFFF" BorderBrush="#80E4E2DC" BorderThickness="1" CornerRadius="16" Padding="14,10,22,10">
+            <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                <Border Width="46" Height="46" CornerRadius="12" Background="#FFF0F5EE" BorderBrush="#FFE0EBE0" BorderThickness="1">
+                    <Image Source="ms-appx:///Assets/Branding/SUMALOGO.png" Width="36" Height="36" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <StackPanel VerticalAlignment="Center" Spacing="1">
+                    <TextBlock Text="Suma" FontFamily="Segoe UI Variable Display" FontSize="24" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                    <TextBlock Text="Money, made clear." FontSize="12" FontWeight="Medium" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </Border>
 
         <!-- Middle Content: Mascot + Unlock Card -->
         <Grid Grid.Row="1" x:Name="ContentGrid" HorizontalAlignment="Center" VerticalAlignment="Center" ColumnSpacing="64" Margin="32,16">
@@ -27,63 +218,79 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <!-- Mascot Illustration -->
-            <Image
-                x:Name="MascotImage"
-                Grid.Column="0"
-                Source="ms-appx:///Assets/Mascot/protected.png"
-                Width="380"
-                Height="380"
-                Stretch="Uniform"
-                VerticalAlignment="Center"
-                HorizontalAlignment="Right" />
+            <!-- Mascot Illustration with Grounding Shadow -->
+            <Grid Grid.Column="0" x:Name="MascotContainer" VerticalAlignment="Center" HorizontalAlignment="Right" Width="400" Height="400">
+                <!-- Grounding Shadow reacting to jump -->
+                <Ellipse x:Name="MascotShadow" Width="240" Height="22" Fill="#1E384D3D" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,16">
+                    <Ellipse.RenderTransform>
+                        <CompositeTransform x:Name="ShadowTransform" CenterX="120" CenterY="11" />
+                    </Ellipse.RenderTransform>
+                </Ellipse>
+
+                <!-- Mascot Character Image with celebration jump transform -->
+                <Image
+                    x:Name="MascotImage"
+                    Source="ms-appx:///Assets/Mascot/protected.png"
+                    Width="380"
+                    Height="380"
+                    Stretch="Uniform"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center">
+                    <Image.RenderTransform>
+                        <CompositeTransform x:Name="MascotTransform" CenterX="190" CenterY="360" />
+                    </Image.RenderTransform>
+                </Image>
+            </Grid>
 
             <!-- Unlock Card -->
             <Border
                 Grid.Column="1"
                 Width="440"
-                Background="{StaticResource SumaSurfaceBrush}"
+                Background="#FDFDFD"
                 BorderBrush="{StaticResource SumaBorderBrush}"
                 BorderThickness="1"
                 CornerRadius="24"
-                Padding="36,36,36,32"
+                Padding="36,36,36,34"
                 VerticalAlignment="Center">
                 <Grid>
                     <!-- Normal PIN Entry Panel -->
-                    <StackPanel x:Name="PinEntryPanel" Spacing="16">
-                        <!-- Shield Icon Badge -->
-                        <Border Width="48" Height="48" CornerRadius="24" Background="#FFEBF2E9" HorizontalAlignment="Center" Margin="0,0,0,4">
-                            <FontIcon Glyph="&#xE8B7;" FontSize="22" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <StackPanel x:Name="PinEntryPanel" Spacing="18">
+                        <!-- Security Lock Icon Badge -->
+                        <Border Width="52" Height="52" CornerRadius="26" Background="#FFEBF2E9" BorderBrush="#FFDEE8DC" BorderThickness="1.5" HorizontalAlignment="Center" Margin="0,0,0,2">
+                            <FontIcon Glyph="&#xE72E;" FontSize="22" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
 
                         <!-- Title Block -->
-                        <StackPanel Spacing="4" HorizontalAlignment="Center">
-                            <TextBlock Text="Welcome back" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
-                            <TextBlock Text="Unlock Suma" FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                        <StackPanel Spacing="5" HorizontalAlignment="Center">
+                            <TextBlock Text="Welcome back" FontSize="13" FontWeight="Medium" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Unlock Suma" FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
                             <TextBlock Text="Enter your local PIN to continue" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
                         </StackPanel>
 
                         <!-- PIN Boxes / Input Area -->
-                        <Grid HorizontalAlignment="Center" Margin="0,10,0,0" Tapped="OnPinBoxesTapped">
+                        <Grid HorizontalAlignment="Center" Margin="0,8,0,0" Tapped="OnPinBoxesTapped">
+                            <Grid.RenderTransform>
+                                <CompositeTransform x:Name="PinBoxesTransform" CenterX="165" CenterY="26" />
+                            </Grid.RenderTransform>
                             <!-- 6 Visual PIN Boxes -->
-                            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                                <Border x:Name="Box0" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot0" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                                <Border x:Name="Box0" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot0" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box1" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot1" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="Box1" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot1" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box2" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot2" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="Box2" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot2" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box3" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot3" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="Box3" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot3" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box4" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot4" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="Box4" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot4" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box5" Width="44" Height="50" CornerRadius="10" Background="#FFFAFAFA" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
-                                    <TextBlock x:Name="Dot5" Text="●" FontSize="16" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+                                <Border x:Name="Box5" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                    <TextBlock x:Name="Dot5" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
                             </StackPanel>
 
@@ -104,70 +311,58 @@
                         <!-- Error / Busy Status -->
                         <StackPanel Spacing="6">
                             <ProgressRing IsActive="{Binding IsBusy}" Height="20" Width="20" Foreground="{StaticResource SumaAccentBrush}" HorizontalAlignment="Center" />
-                            <InfoBar IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}" CornerRadius="10" IsClosable="False" />
+                            <InfoBar x:Name="ErrorInfoBar" IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}" CornerRadius="10" IsClosable="False" />
                         </StackPanel>
 
                         <!-- Unlock Button -->
                         <Button
                             x:Name="UnlockButton"
                             HorizontalAlignment="Stretch"
-                            Height="44"
-                            CornerRadius="10"
-                            Background="#FF6F806D"
+                            Height="46"
+                            CornerRadius="12"
+                            Background="#FF264E36"
                             Foreground="#FFFFFFFF"
                             FontSize="15"
                             FontWeight="SemiBold"
                             Content="Unlock"
                             Click="OnUnlock" />
-
-                        <!-- "or" Separator -->
-                        <Grid Margin="0,2,0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Rectangle Height="1" Fill="{StaticResource SumaBorderBrush}" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="or" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Margin="12,0" VerticalAlignment="Center" />
-                            <Rectangle Grid.Column="2" Height="1" Fill="{StaticResource SumaBorderBrush}" VerticalAlignment="Center" />
-                        </Grid>
-
-                        <!-- Use Another PIN Action -->
-                        <Button
-                            HorizontalAlignment="Stretch"
-                            Height="42"
-                            CornerRadius="10"
-                            Background="Transparent"
-                            BorderBrush="{StaticResource SumaBorderBrush}"
-                            BorderThickness="1"
-                            Click="OnClearPinClick">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                                <FontIcon Glyph="&#xE75F;" FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" />
-                                <TextBlock Text="Use another PIN" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" />
-                            </StackPanel>
-                        </Button>
                     </StackPanel>
 
-                    <!-- Success State Panel -->
-                    <StackPanel x:Name="SuccessPanel" Spacing="16" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,8">
-                        <!-- Big Green Checkmark Badge -->
-                        <Border Width="60" Height="60" CornerRadius="30" Background="#FFEBF2E9" HorizontalAlignment="Center">
-                            <FontIcon Glyph="&#xE73E;" FontSize="28" Foreground="#FF4F6A4C" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
+                    <!-- Success State Panel (Delightful, single asset presentation) -->
+                    <StackPanel x:Name="SuccessPanel" Spacing="22" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,18" Opacity="0">
+                        <!-- Celebratory Checkmark Badge with Expanding Ripple Effect -->
+                        <Grid HorizontalAlignment="Center" Width="96" Height="96">
+                            <!-- Soft Expanding Ripple Wave -->
+                            <Border x:Name="RippleRing" Width="76" Height="76" CornerRadius="38" BorderBrush="#FF4F6A4C" BorderThickness="2" Background="#188FA28C" HorizontalAlignment="Center" VerticalAlignment="Center" Opacity="0">
+                                <Border.RenderTransform>
+                                    <CompositeTransform x:Name="RippleRingTransform" CenterX="38" CenterY="38" />
+                                </Border.RenderTransform>
+                            </Border>
 
-                        <!-- Success Headings -->
-                        <StackPanel Spacing="6" HorizontalAlignment="Center">
-                            <TextBlock Text="PIN Verified!" FontFamily="Segoe UI Variable Display" FontSize="28" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
-                            <TextBlock Text="Welcome back! Unlocking Suma..." FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
-                        </StackPanel>
+                            <!-- Center Checkmark Shield Badge -->
+                            <Border Width="76" Height="76" CornerRadius="38" Background="#FFEBF2E9" BorderBrush="#FFCCE0CA" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border.RenderTransform>
+                                    <CompositeTransform x:Name="SuccessBadgeTransform" CenterX="38" CenterY="38" />
+                                </Border.RenderTransform>
+                                <FontIcon Glyph="&#xE73E;" FontSize="34" Foreground="#FF264E36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                        </Grid>
 
-                        <!-- Mascot Celebration -->
-                        <Image Source="ms-appx:///Assets/Mascot/approved.png" Width="200" Height="200" Stretch="Uniform" HorizontalAlignment="Center" Margin="0,4" />
+                        <!-- Celebratory Messages -->
+                        <StackPanel x:Name="SuccessContent" Spacing="8" HorizontalAlignment="Center">
+                            <StackPanel.RenderTransform>
+                                <CompositeTransform x:Name="SuccessContentTransform" />
+                            </StackPanel.RenderTransform>
+                            <TextBlock Text="PIN Verified!" FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                            <TextBlock Text="Welcome back! Unlocking Suma..." FontSize="14" FontWeight="Medium" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
 
-                        <!-- Subtle Loading Indicator -->
-                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,4,0,0">
-                            <ProgressRing IsActive="True" Width="16" Height="16" Foreground="{StaticResource SumaAccentBrush}" VerticalAlignment="Center" />
-                            <TextBlock Text="Loading your finances..." FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                            <!-- Pill Status Capsule -->
+                            <Border Background="#FFF0F5EE" BorderBrush="#FFE0EBE0" BorderThickness="1" CornerRadius="20" Padding="16,9" HorizontalAlignment="Center" Margin="0,12,0,0">
+                                <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                    <ProgressRing IsActive="True" Width="16" Height="16" Foreground="#FF264E36" VerticalAlignment="Center" />
+                                    <TextBlock Text="Loading your finances..." FontSize="13" FontWeight="SemiBold" Foreground="#FF264E36" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -175,9 +370,11 @@
         </Grid>
 
         <!-- Bottom Privacy Footer -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,12,0,28">
-            <FontIcon Glyph="&#xE72E;" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
-            <TextBlock Text="Your financial data stays on this device." FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
-        </StackPanel>
+        <Border Grid.Row="2" Margin="0,12,0,24" HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <FontIcon Glyph="&#xE72E;" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="Your financial data stays on this device." FontSize="12" FontWeight="Medium" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

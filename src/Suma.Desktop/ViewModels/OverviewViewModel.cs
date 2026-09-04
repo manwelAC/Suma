@@ -76,7 +76,11 @@ public sealed class OverviewViewModel(IOverviewOperations operations) : Observab
             Application.Overview.GetOverview.OverviewResult? result = null;
             Exception? failure = null;
             try { result = await operations.GetAsync(currency, token); }
-            catch (Exception exception) { failure = exception; }
+            catch (Exception exception)
+            {
+                failure = exception;
+                System.Diagnostics.Debug.WriteLine($"[OverviewViewModel] Failed to load overview: {exception}");
+            }
             if (version == Interlocked.Read(ref loadVersion))
             {
                 if (failure is null) Apply(result!);

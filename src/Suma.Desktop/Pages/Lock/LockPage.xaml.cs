@@ -39,12 +39,12 @@ public sealed partial class LockPage : Page
         if (availableWidth < 860)
         {
             MascotColDef.Width = new GridLength(0);
-            MascotImage.Visibility = Visibility.Collapsed;
+            MascotContainer.Visibility = Visibility.Collapsed;
         }
         else
         {
             MascotColDef.Width = GridLength.Auto;
-            MascotImage.Visibility = Visibility.Visible;
+            MascotContainer.Visibility = Visibility.Visible;
         }
     }
 
@@ -55,14 +55,26 @@ public sealed partial class LockPage : Page
             // Switch main mascot to approved Sumo with thumbs up
             MascotImage.Source = new BitmapImage(new Uri("ms-appx:///Assets/Mascot/approved.png"));
 
-            // Switch card to celebration and success state
+            // Play lovely celebratory mascot jump
+            MascotCelebrationStoryboard.Begin();
+
+            // Switch card to celebration and success state with lovely pop & ripple
             PinEntryPanel.Visibility = Visibility.Collapsed;
             SuccessPanel.Visibility = Visibility.Visible;
+            SuccessPopStoryboard.Begin();
 
-            // Wait a brief moment so user enjoys the success confirmation
-            await Task.Delay(1100);
+            // Brief delay so user enjoys the celebration and smooth transition
+            await Task.Delay(1350);
 
             unlocked();
+        }
+        else
+        {
+            // Play tactile shake animation on PIN boxes to signal incorrect PIN
+            PinShakeStoryboard.Begin();
+            PinBox.Password = string.Empty;
+            UpdatePinBoxes();
+            PinBox.Focus(FocusState.Programmatic);
         }
     }
 
@@ -86,13 +98,6 @@ public sealed partial class LockPage : Page
         PinBox.Focus(FocusState.Programmatic);
     }
 
-    private void OnClearPinClick(object sender, RoutedEventArgs e)
-    {
-        PinBox.Password = string.Empty;
-        UpdatePinBoxes();
-        PinBox.Focus(FocusState.Programmatic);
-    }
-
     private void UpdatePinBoxes()
     {
         var length = PinBox.Password.Length;
@@ -104,10 +109,10 @@ public sealed partial class LockPage : Page
         Dot5.Visibility = length >= 6 ? Visibility.Visible : Visibility.Collapsed;
 
         var isFocused = PinBox.FocusState != FocusState.Unfocused;
-        var activeBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0x6F, 0x80, 0x6D));
+        var activeBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0x3E, 0x5C, 0x3B));
         var defaultBorder = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xE4, 0xE2, 0xDC));
         var filledBackground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xF2, 0xF6, 0xF0));
-        var emptyBackground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xFA, 0xFA, 0xFA));
+        var emptyBackground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 0xFD, 0xFD, 0xFD));
 
         Border[] boxes = [Box0, Box1, Box2, Box3, Box4, Box5];
         for (int i = 0; i < boxes.Length; i++)

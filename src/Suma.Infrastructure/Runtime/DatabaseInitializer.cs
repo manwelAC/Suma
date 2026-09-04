@@ -18,6 +18,14 @@ public sealed class DatabaseInitializer(
             await using var scope = scopeFactory.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<SumaDbContext>();
             await context.Database.MigrateAsync(cancellationToken);
+            await context.Database.ExecuteSqlRawAsync(
+                """
+                UPDATE recurring_transactions SET frequency_unit = 'Month' WHERE frequency_unit = 'Monthly';
+                UPDATE recurring_transactions SET frequency_unit = 'Day' WHERE frequency_unit = 'Daily';
+                UPDATE recurring_transactions SET frequency_unit = 'Week' WHERE frequency_unit = 'Weekly';
+                UPDATE recurring_transactions SET frequency_unit = 'Year' WHERE frequency_unit IN ('Yearly', 'Annual', 'Annually');
+                """,
+                cancellationToken);
             logger.LogInformation("Suma database migration completed successfully.");
         }
         catch (Exception exception)

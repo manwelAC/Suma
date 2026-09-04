@@ -4,8 +4,77 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:viewModels="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
+
+    <Page.Resources>
+        <!-- KPI Card Surface Style -->
+        <Style x:Key="ReportKpiCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Padding" Value="20,18" />
+        </Style>
+
+        <!-- Analytics Section Card Style -->
+        <Style x:Key="ReportSectionCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="24,22" />
+        </Style>
+
+        <!-- Segmented Tab Pill Button Style -->
+        <Style x:Key="ReportPillButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Background" Value="{StaticResource SumaSurfaceSecondaryBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource SumaTextSecondaryBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <!-- Active Tab Pill Button Style -->
+        <Style x:Key="ReportActivePillButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="36" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Background" Value="#264E36" />
+            <Setter Property="Foreground" Value="#FFFFFFFF" />
+            <Setter Property="BorderThickness" Value="0" />
+        </Style>
+
+        <!-- Preset Pill Button Style -->
+        <Style x:Key="ReportPresetButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="30" />
+            <Setter Property="CornerRadius" Value="15" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="Background" Value="{StaticResource SumaSurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource SumaBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="{StaticResource SumaTextSecondaryBrush}" />
+        </Style>
+
+        <!-- Small Toggle Segment Button Style -->
+        <Style x:Key="ReportSmallToggleButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="28" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource SumaTextSecondaryBrush}" />
+        </Style>
+    </Page.Resources>
+
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <Grid Padding="{StaticResource SumaPagePadding}" MaxWidth="1440" HorizontalAlignment="Stretch" RowSpacing="24">
+        <Grid Padding="36,24,36,36" HorizontalAlignment="Stretch" RowSpacing="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -14,117 +83,537 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Header -->
-            <StackPanel Grid.Row="0" Spacing="4">
-                <TextBlock Style="{StaticResource SumaPageTitleTextStyle}" Text="Reports" />
-                <TextBlock Style="{StaticResource SumaLeadTextStyle}" Text="Understand actual cash flow, categories, accounts, and Budget performance." />
-            </StackPanel>
+            <!-- Panoramic Atmospheric Background Landscape (Signature Suma Theme) -->
+            <Grid Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="440" Margin="-36,-24,-36,0" IsHitTestVisible="False">
+                <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
+                <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
+                <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
+                <Ellipse Width="170" Height="170" Fill="#4C8FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,170,0" />
 
-            <!-- Filter & Parameters Workspace Card -->
-            <Border Grid.Row="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
-                <StackPanel Spacing="16">
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.2*" />
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="CurrencyBox" Header="Currency" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}" SelectedItem="{x:Bind ViewModel.Currency, Mode=OneWay}" SelectionChanged="OnReportSelectionChanged" />
-                        <DatePicker x:Name="StartBox" Grid.Column="1" Header="Start date" HorizontalAlignment="Stretch" DateChanged="OnReportDateChanged" />
-                        <DatePicker x:Name="EndBox" Grid.Column="2" Header="End date" HorizontalAlignment="Stretch" DateChanged="OnReportDateChanged" />
-                        <Button Grid.Column="3" VerticalAlignment="Bottom" MinWidth="100" Click="OnApplyClick" Content="Apply" />
-                    </Grid>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock VerticalAlignment="Center" Style="{StaticResource SumaCaptionTextStyle}" Text="PRESETS:" Margin="0,0,4,0" />
-                        <Button Click="OnPresetClick" Tag="MonthToDate" Content="Month to date" />
-                        <Button Click="OnPresetClick" Tag="LastMonth" Content="Last month" />
-                        <Button Click="OnPresetClick" Tag="Last30Days" Content="Last 30 days" />
-                        <Button Click="OnPresetClick" Tag="YearToDate" Content="Year to date" />
-                    </StackPanel>
+                <!-- Left atmospheric mist -->
+                <Ellipse Width="420" Height="260" Fill="#1A4A624E" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-20,0,0" />
+
+                <!-- Flying cranes in serene sky -->
+                <Canvas HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Height="100" Margin="0,25,340,0">
+                    <Path Data="M 10,40 Q 20,30 30,40 Q 40,30 50,40" Stroke="#5A556B5A" StrokeThickness="2" />
+                    <Path Data="M 52,24 Q 60,16 68,24 Q 76,16 84,24" Stroke="#4A556B5A" StrokeThickness="1.6" />
+                    <Path Data="M 80,48 Q 87,42 94,48 Q 101,42 108,48" Stroke="#3E556B5A" StrokeThickness="1.4" />
+                </Canvas>
+
+                <!-- Distant Mountain Ridge -->
+                <Path Data="M 0,330 C 180,240 380,270 620,180 C 850,110 1100,200 1350,140 C 1600,80 1850,170 2100,125 L 2100,440 L 0,440 Z" Fill="#28667A68" VerticalAlignment="Bottom" Stretch="Fill" Height="330" />
+
+                <!-- Mid-ground Rolling Ridge -->
+                <Path Data="M 0,370 C 220,270 480,320 780,220 C 1050,140 1350,240 1620,180 C 1850,135 2000,190 2100,175 L 2100,440 L 0,440 Z" Fill="#3C556C58" VerticalAlignment="Bottom" Stretch="Fill" Height="270" />
+
+                <!-- Foreground Lush Knolls -->
+                <Path Data="M 0,390 C 280,300 600,240 920,310 C 1220,340 1520,240 1820,280 C 1960,295 2040,265 2100,275 L 2100,440 L 0,440 Z" Fill="#4C435A47" VerticalAlignment="Bottom" Stretch="Fill" Height="200" />
+
+                <!-- Stylized trees on right ridge -->
+                <Canvas VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="280" Width="440">
+                    <Ellipse Width="18" Height="42" Fill="#72364C3B" Canvas.Left="180" Canvas.Top="125" />
+                    <Rectangle Width="2" Height="16" Fill="#85303D32" Canvas.Left="188" Canvas.Top="157" />
+
+                    <Ellipse Width="24" Height="52" Fill="#7D364C3B" Canvas.Left="228" Canvas.Top="130" />
+                    <Rectangle Width="2.5" Height="18" Fill="#85303D32" Canvas.Left="239" Canvas.Top="170" />
+
+                    <Ellipse Width="16" Height="36" Fill="#66364C3B" Canvas.Left="295" Canvas.Top="115" />
+                    <Rectangle Width="2" Height="14" Fill="#85303D32" Canvas.Left="302" Canvas.Top="143" />
+                </Canvas>
+
+                <!-- Multi-stop Vertical Fade Overlay -->
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#00F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="0.55" />
+                            <GradientStop Color="#40F8F7F3" Offset="0.72" />
+                            <GradientStop Color="#A0F8F7F3" Offset="0.88" />
+                            <GradientStop Color="#FFF8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Side Feathering -->
+                <Rectangle HorizontalAlignment="Left" Width="100" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#40F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+                <Rectangle HorizontalAlignment="Right" Width="100" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                            <GradientStop Color="#40F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Grid>
+
+            <!-- Row 0: Header & Executive Controls -->
+            <Grid Grid.Row="0" ColumnSpacing="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="4" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="Reports &amp; Analytics" />
+                    <TextBlock FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Real-time financial performance, cash flow timeline, and category distribution." />
                 </StackPanel>
+
+                <!-- Top Right Actions: Currency selector + Export CSV -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                    <ComboBox x:Name="CurrencyBox" Width="110" Height="38" CornerRadius="8"
+                              ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}"
+                              SelectedItem="{x:Bind ViewModel.Currency, Mode=OneWay}"
+                              SelectionChanged="OnReportSelectionChanged" />
+                    <Button Click="OnExportClick" IsEnabled="{Binding CanExport}" Height="38" CornerRadius="8" Padding="16,0" Background="{StaticResource SumaSurfaceBrush}" BorderBrush="{StaticResource SumaBorderBrush}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE74E;" FontSize="14" />
+                            <TextBlock Text="Export CSV" FontWeight="Medium" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <!-- Row 1: Period Presets & Date Filter Bar Card -->
+            <Border Grid.Row="1" Background="{StaticResource SumaSurfaceBrush}" BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="18,14">
+                <Grid ColumnSpacing="16" RowSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Presets Flow -->
+                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" Style="{StaticResource SumaCaptionTextStyle}" Text="PERIOD:" Margin="0,0,4,0" FontWeight="SemiBold" />
+                        <Button x:Name="BtnPresetThisMonth" Click="OnPresetClick" Tag="MonthToDate" Content="This Month" Style="{StaticResource ReportPresetButtonStyle}" />
+                        <Button x:Name="BtnPresetLastMonth" Click="OnPresetClick" Tag="LastMonth" Content="Last Month" Style="{StaticResource ReportPresetButtonStyle}" />
+                        <Button x:Name="BtnPreset30Days" Click="OnPresetClick" Tag="Last30Days" Content="Last 30 Days" Style="{StaticResource ReportPresetButtonStyle}" />
+                        <Button x:Name="BtnPresetLast3Months" Click="OnPresetClick" Tag="Last3Months" Content="Last 3 Months" Style="{StaticResource ReportPresetButtonStyle}" />
+                        <Button x:Name="BtnPresetThisYear" Click="OnPresetClick" Tag="YearToDate" Content="This Year" Style="{StaticResource ReportPresetButtonStyle}" />
+                        <Button x:Name="BtnPresetLastYear" Click="OnPresetClick" Tag="LastYear" Content="Last Year" Style="{StaticResource ReportPresetButtonStyle}" />
+                    </StackPanel>
+
+                    <!-- Date Range Inputs + Apply -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <DatePicker x:Name="StartBox" DateChanged="OnReportDateChanged" />
+                        <TextBlock Text="–" VerticalAlignment="Center" Foreground="{StaticResource SumaTextSecondaryBrush}" FontWeight="SemiBold" />
+                        <DatePicker x:Name="EndBox" DateChanged="OnReportDateChanged" />
+                        <Button Click="OnApplyClick" Height="36" CornerRadius="8" Padding="16,0" Background="#264E36" Foreground="#FFFFFFFF" FontWeight="SemiBold">
+                            <TextBlock Text="Apply" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
             </Border>
 
-            <!-- Section Navigation Bar & Export Action -->
+            <!-- Row 2: Section Tabs Navigation (Pill styled) -->
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Click="OnSectionClick" Tag="CashFlow" Content="Cash Flow" />
-                    <Button Click="OnSectionClick" Tag="Categories" Content="Categories" />
-                    <Button Click="OnSectionClick" Tag="Accounts" Content="Accounts" />
-                    <Button Click="OnSectionClick" Tag="Budget" Content="Budget" />
-                </StackPanel>
-                <Button Grid.Column="1" Click="OnExportClick" IsEnabled="{Binding CanExport}" Content="Export CSV" />
+
+                <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="20" Padding="4" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <Button x:Name="TabBtnCashFlow" Click="OnSectionClick" Tag="CashFlow" Content="Cash Flow" Style="{StaticResource ReportActivePillButtonStyle}" />
+                        <Button x:Name="TabBtnCategories" Click="OnSectionClick" Tag="Categories" Content="Categories" Style="{StaticResource ReportPillButtonStyle}" />
+                        <Button x:Name="TabBtnAccounts" Click="OnSectionClick" Tag="Accounts" Content="Accounts" Style="{StaticResource ReportPillButtonStyle}" />
+                        <Button x:Name="TabBtnBudget" Click="OnSectionClick" Tag="Budget" Content="Budget" Style="{StaticResource ReportPillButtonStyle}" />
+                    </StackPanel>
+                </Border>
             </Grid>
 
-            <!-- Loading & Error Indicators -->
+            <!-- Row 3: Loading & Error Notifications -->
             <StackPanel Grid.Row="3" Spacing="8">
-                <ProgressRing IsActive="{Binding IsLoading}" />
+                <ProgressRing IsActive="{Binding IsLoading}" HorizontalAlignment="Center" />
                 <InfoBar IsOpen="{Binding HasError}" Severity="Error" Message="{Binding ErrorMessage}" />
             </StackPanel>
 
-            <!-- Report Workspace Content Panels -->
+            <!-- Row 4: Dynamic Report Workspaces -->
             <Grid Grid.Row="4">
-                <!-- 1. Cash Flow Panel -->
-                <StackPanel x:Name="CashFlowPanel" Spacing="24">
-                    <!-- Hero KPI Card -->
-                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="32,28">
-                        <StackPanel Spacing="10">
-                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET CASH FLOW" />
-                            <TextBlock FontFamily="Segoe UI Variable Display" FontSize="44" FontWeight="SemiBold" Text="{x:Bind NetCashFlowText, Mode=OneTime}" />
-                            <TextBlock Style="{StaticResource SumaBodySecondaryTextStyle}" Text="Net financial movement across all accounts and categories during the selected period." />
-                        </StackPanel>
-                    </Border>
 
-                    <!-- Breakdown KPI Grid -->
-                    <Grid ColumnSpacing="20">
+                <!-- 1. CASH FLOW PANEL -->
+                <StackPanel x:Name="CashFlowPanel" Spacing="22">
+
+                    <!-- 4 Top Executive Summary KPI Cards (100% Dynamic with live period comparisons) -->
+                    <Grid ColumnSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
-                            <StackPanel Spacing="6">
-                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="GROSS INCOME" />
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind GrossIncomeText, Mode=OneTime}" />
+
+                        <!-- Card 1: Gross Income -->
+                        <Border Style="{StaticResource ReportKpiCardStyle}">
+                            <StackPanel Spacing="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="GROSS INCOME" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                    <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15" Background="#EAF5EA" HorizontalAlignment="Right">
+                                        <FontIcon Glyph="&#xE8A7;" FontSize="13" Foreground="#2E7D32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                                <TextBlock FontFamily="Segoe UI Variable Display" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind GrossIncomeValueText, Mode=OneTime}" />
+                                <Border Background="#F4F7F4" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
+                                    <TextBlock FontSize="11" FontWeight="Medium" Foreground="{x:Bind GrossIncomeComparisonColor, Mode=OneTime}" Text="{x:Bind GrossIncomeComparisonText, Mode=OneTime}" />
+                                </Border>
                             </StackPanel>
                         </Border>
-                        <Border Grid.Column="1" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
-                            <StackPanel Spacing="6">
-                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="GROSS EXPENSE" />
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind GrossExpenseText, Mode=OneTime}" />
+
+                        <!-- Card 2: Net Expense -->
+                        <Border Grid.Column="1" Style="{StaticResource ReportKpiCardStyle}">
+                            <StackPanel Spacing="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET EXPENSE" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                    <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15" Background="#FDEDEC" HorizontalAlignment="Right">
+                                        <FontIcon Glyph="&#xE8A8;" FontSize="13" Foreground="#C62828" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                                <TextBlock FontFamily="Segoe UI Variable Display" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind NetExpenseValueText, Mode=OneTime}" />
+                                <Border Background="#FDF4F4" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
+                                    <TextBlock FontSize="11" FontWeight="Medium" Foreground="{x:Bind NetExpenseComparisonColor, Mode=OneTime}" Text="{x:Bind NetExpenseComparisonText, Mode=OneTime}" />
+                                </Border>
                             </StackPanel>
                         </Border>
-                        <Border Grid.Column="2" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
-                            <StackPanel Spacing="6">
-                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="REFUNDS" />
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind RefundsText, Mode=OneTime}" />
+
+                        <!-- Card 3: Refunds -->
+                        <Border Grid.Column="2" Style="{StaticResource ReportKpiCardStyle}">
+                            <StackPanel Spacing="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="REFUNDS" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                    <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15" Background="#EDF4FC" HorizontalAlignment="Right">
+                                        <FontIcon Glyph="&#xE72C;" FontSize="13" Foreground="#1976D2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                                <TextBlock FontFamily="Segoe UI Variable Display" FontSize="26" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind RefundsValueText, Mode=OneTime}" />
+                                <Border Background="#F3F7FB" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
+                                    <TextBlock FontSize="11" FontWeight="Medium" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="{x:Bind RefundsComparisonText, Mode=OneTime}" />
+                                </Border>
                             </StackPanel>
                         </Border>
-                        <Border Grid.Column="3" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerLarge}" Padding="20,18">
-                            <StackPanel Spacing="6">
-                                <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET EXPENSE" />
-                                <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind NetExpenseText, Mode=OneTime}" />
+
+                        <!-- Card 4: Net Cash Flow (Hero) -->
+                        <Border Grid.Column="3" Style="{StaticResource ReportKpiCardStyle}" Background="#F0F7F2" BorderBrush="#CBE3D1">
+                            <StackPanel Spacing="10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="NET CASH FLOW" FontWeight="SemiBold" Foreground="#264E36" />
+                                    <Border Grid.Column="1" Width="30" Height="30" CornerRadius="15" Background="#264E36" HorizontalAlignment="Right">
+                                        <FontIcon Glyph="&#xE930;" FontSize="13" Foreground="#FFFFFFFF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </Grid>
+                                <TextBlock FontFamily="Segoe UI Variable Display" FontSize="26" FontWeight="SemiBold" Foreground="#1E3F2B" Text="{x:Bind NetCashFlowValueText, Mode=OneTime}" />
+                                <Border Background="#E1EFE5" CornerRadius="6" Padding="8,4" HorizontalAlignment="Left">
+                                    <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="#264E36" Text="{x:Bind NetCashFlowComparisonText, Mode=OneTime}" />
+                                </Border>
                             </StackPanel>
                         </Border>
                     </Grid>
+
+                    <!-- Main 2-Column Analytics Workspace Grid -->
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="62*" />
+                            <ColumnDefinition Width="38*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- LEFT COLUMN: Combo Chart + Breakdown Table -->
+                        <StackPanel Spacing="20">
+
+                            <!-- 1. Cash Flow Over Time Combo Chart Card -->
+                            <Border Style="{StaticResource ReportSectionCardStyle}">
+                                <StackPanel Spacing="16">
+                                    <!-- Card Header & Controls -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Cash Flow Over Time" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Dual income and expense bars with net cash flow trend line" />
+                                        </StackPanel>
+
+                                        <!-- Granularity Toggle: Daily | Weekly | Monthly -->
+                                        <Border Grid.Column="1" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <Button x:Name="GranularityDailyBtn" Click="OnGranularityClick" Tag="Daily" Content="Daily" Style="{StaticResource ReportSmallToggleButtonStyle}" Background="#264E36" Foreground="#FFFFFFFF" />
+                                                <Button x:Name="GranularityWeeklyBtn" Click="OnGranularityClick" Tag="Weekly" Content="Weekly" Style="{StaticResource ReportSmallToggleButtonStyle}" />
+                                                <Button x:Name="GranularityMonthlyBtn" Click="OnGranularityClick" Tag="Monthly" Content="Monthly" Style="{StaticResource ReportSmallToggleButtonStyle}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Chart Legend -->
+                                    <StackPanel Orientation="Horizontal" Spacing="18" HorizontalAlignment="Right">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="#264E36" VerticalAlignment="Center" />
+                                            <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Income" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="#E76F51" VerticalAlignment="Center" />
+                                            <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Expense" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Line X1="0" Y1="5" X2="14" Y2="5" Stroke="#1E3F2B" StrokeThickness="2.5" VerticalAlignment="Center" />
+                                            <Ellipse Width="6" Height="6" Fill="#1E3F2B" Margin="-10,0,0,0" VerticalAlignment="Center" />
+                                            <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Net Cash Flow" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Chart Canvas Container -->
+                                    <Grid Height="260" Background="#06000000" CornerRadius="10">
+                                        <!-- Interactive Native Canvas -->
+                                        <Canvas x:Name="CashFlowChartCanvas" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" SizeChanged="OnChartCanvasSizeChanged" />
+
+                                        <!-- Empty State (Shown if 0 transactions recorded) -->
+                                        <StackPanel x:Name="ChartEmptyState" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Visibility="Collapsed">
+                                            <FontIcon Glyph="&#xE9D9;" FontSize="28" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock Text="No transaction activity recorded for this period." FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 2. Cash Flow Breakdown Table Card -->
+                            <Border Style="{StaticResource ReportSectionCardStyle}">
+                                <StackPanel Spacing="16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Cash Flow Breakdown" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Proportional visual net distribution" />
+                                        </StackPanel>
+
+                                        <!-- Breakdown Mode Toggle: [ By Category ] | [ By Account ] -->
+                                        <Border Grid.Column="1" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="8" Padding="2" VerticalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="2">
+                                                <Button x:Name="BreakdownCategoryBtn" Click="OnBreakdownModeClick" Tag="ByCategory" Content="By Category" Style="{StaticResource ReportSmallToggleButtonStyle}" Background="#264E36" Foreground="#FFFFFFFF" />
+                                                <Button x:Name="BreakdownAccountBtn" Click="OnBreakdownModeClick" Tag="ByAccount" Content="By Account" Style="{StaticResource ReportSmallToggleButtonStyle}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Table Header -->
+                                    <Grid BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="8,8,8,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2.5*" />
+                                            <ColumnDefinition Width="1.5*" />
+                                            <ColumnDefinition Width="1.5*" />
+                                            <ColumnDefinition Width="1.5*" />
+                                            <ColumnDefinition Width="2*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="NAME" Style="{StaticResource SumaCaptionTextStyle}" FontWeight="SemiBold" />
+                                        <TextBlock Grid.Column="1" Text="INCOME" Style="{StaticResource SumaCaptionTextStyle}" FontWeight="SemiBold" TextAlignment="Right" />
+                                        <TextBlock Grid.Column="2" Text="EXPENSE" Style="{StaticResource SumaCaptionTextStyle}" FontWeight="SemiBold" TextAlignment="Right" />
+                                        <TextBlock Grid.Column="3" Text="NET" Style="{StaticResource SumaCaptionTextStyle}" FontWeight="SemiBold" TextAlignment="Right" />
+                                        <TextBlock Grid.Column="4" Text="DISTRIBUTION" Style="{StaticResource SumaCaptionTextStyle}" FontWeight="SemiBold" TextAlignment="Center" />
+                                    </Grid>
+
+                                    <!-- Dynamic Items -->
+                                    <ItemsControl ItemsSource="{x:Bind ViewModel.BreakdownItems, Mode=OneWay}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="viewModels:CashFlowBreakdownItem">
+                                                <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="8,10">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="2.5*" />
+                                                            <ColumnDefinition Width="1.5*" />
+                                                            <ColumnDefinition Width="1.5*" />
+                                                            <ColumnDefinition Width="1.5*" />
+                                                            <ColumnDefinition Width="2*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <!-- Name with Icon -->
+                                                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                            <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                                            <TextBlock Text="{x:Bind Name}" Style="{StaticResource SumaBodyTextStyle}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
+                                                        </StackPanel>
+
+                                                        <!-- Income -->
+                                                        <TextBlock Grid.Column="1" Text="{x:Bind FormattedIncome}" Style="{StaticResource SumaBodyTextStyle}" TextAlignment="Right" VerticalAlignment="Center" Foreground="#264E36" />
+
+                                                        <!-- Expense -->
+                                                        <TextBlock Grid.Column="2" Text="{x:Bind FormattedExpense}" Style="{StaticResource SumaBodyTextStyle}" TextAlignment="Right" VerticalAlignment="Center" Foreground="#C62828" />
+
+                                                        <!-- Net -->
+                                                        <TextBlock Grid.Column="3" Text="{x:Bind FormattedNet}" Style="{StaticResource SumaBodyTextStyle}" TextAlignment="Right" VerticalAlignment="Center" FontWeight="SemiBold" Foreground="{x:Bind NetIndicatorBrush}" />
+
+                                                        <!-- Proportional Visual Net Bar -->
+                                                        <Grid Grid.Column="4" Margin="12,0,0,0" Height="8" Background="#10000000" CornerRadius="4" VerticalAlignment="Center">
+                                                            <ProgressBar Value="{x:Bind NetMagnitudePercent}" Maximum="100" Foreground="{x:Bind NetIndicatorBrush}" Background="Transparent" Height="8" CornerRadius="4" />
+                                                        </Grid>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Table Footer Totals Row -->
+                                    <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="8" Padding="12,10">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*" />
+                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="1.5*" />
+                                                <ColumnDefinition Width="2*" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Total" FontWeight="SemiBold" Style="{StaticResource SumaBodyTextStyle}" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="1" Text="{x:Bind ViewModel.BreakdownTotalIncomeFormatted, Mode=OneWay}" FontWeight="SemiBold" TextAlignment="Right" Foreground="#264E36" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="2" Text="{x:Bind ViewModel.BreakdownTotalExpenseFormatted, Mode=OneWay}" FontWeight="SemiBold" TextAlignment="Right" Foreground="#C62828" VerticalAlignment="Center" />
+                                            <TextBlock Grid.Column="3" Text="{x:Bind ViewModel.BreakdownTotalNetFormatted, Mode=OneWay}" FontWeight="Bold" TextAlignment="Right" Foreground="#1E3F2B" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+
+                        <!-- RIGHT COLUMN: Donut Chart + Executive Insights -->
+                        <StackPanel Grid.Column="1" Spacing="20">
+
+                            <!-- 1. Top Expense Categories Donut Chart Card -->
+                            <Border Style="{StaticResource ReportSectionCardStyle}">
+                                <StackPanel Spacing="16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Top Expense Categories" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Spending distribution by percentage" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Background="#FDF4F4" CornerRadius="8" Padding="10,4" VerticalAlignment="Center">
+                                            <TextBlock Text="{x:Bind ViewModel.TotalExpenseFormatted, Mode=OneWay}" FontWeight="SemiBold" FontSize="12" Foreground="#C62828" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Donut Canvas & Center Summary -->
+                                    <Grid Height="200" HorizontalAlignment="Center" Width="200">
+                                        <Canvas x:Name="DonutChartCanvas" Width="200" Height="200" HorizontalAlignment="Center" VerticalAlignment="Center" SizeChanged="OnDonutCanvasSizeChanged" />
+
+                                        <!-- Center Text in Donut Hole -->
+                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="EXPENSES" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock Text="{x:Bind ViewModel.TotalExpenseFormatted, Mode=OneWay}" FontSize="15" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" HorizontalAlignment="Center" />
+                                        </StackPanel>
+
+                                        <!-- Empty State overlay if no expenses -->
+                                        <Border x:Name="DonutEmptyState" Visibility="Collapsed" Width="180" Height="180" CornerRadius="90" BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="1.5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="No expenses&#x0a;recorded" TextWrapping="Wrap" TextAlignment="Center" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Dynamic Donut Category Legend Items -->
+                                    <ItemsControl ItemsSource="{x:Bind ViewModel.TopExpenseDonutItems, Mode=OneWay}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="viewModels:ReportCategoryDonutItem">
+                                                <Grid Padding="4,6">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Ellipse Width="10" Height="10" Fill="{x:Bind ColorBrush}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                                    <TextBlock Grid.Column="1" Text="{x:Bind CategoryName}" Style="{StaticResource SumaBodyTextStyle}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+                                                    <Border Grid.Column="2" Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="6" Padding="6,2" Margin="8,0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{x:Bind FormattedPercentage}" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource SumaTextSecondaryBrush}" />
+                                                    </Border>
+                                                    <TextBlock Grid.Column="3" Text="{x:Bind FormattedAmount}" Style="{StaticResource SumaBodyTextStyle}" FontWeight="Medium" VerticalAlignment="Center" TextAlignment="Right" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- 2. Dynamic Insights & Observations Card with Mascot -->
+                            <Border Style="{StaticResource ReportSectionCardStyle}">
+                                <StackPanel Spacing="16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Executive Insights" />
+                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Algorithmic financial health analysis" />
+                                        </StackPanel>
+
+                                        <!-- Mascot Accent: sumoanalytics.png -->
+                                        <Image Grid.Column="1" Source="ms-appx:///Assets/Mascot/sumoanalytics.png" Width="44" Height="44" Stretch="Uniform" VerticalAlignment="Center" />
+                                    </Grid>
+
+                                    <!-- Dynamic Insight Observations List -->
+                                    <ItemsControl ItemsSource="{x:Bind ViewModel.Insights, Mode=OneWay}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="viewModels:ReportInsightItem">
+                                                <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="10" Padding="14,12" Margin="0,0,0,10">
+                                                    <Grid ColumnSpacing="12">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <Border Width="34" Height="34" CornerRadius="17" Background="#EAF5EA" VerticalAlignment="Top">
+                                                            <FontIcon Glyph="{x:Bind Glyph}" FontSize="15" Foreground="#264E36" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Border>
+
+                                                        <StackPanel Grid.Column="1" Spacing="3">
+                                                            <TextBlock Text="{x:Bind Title}" FontWeight="SemiBold" FontSize="13" Foreground="{StaticResource SumaTextPrimaryBrush}" />
+                                                            <TextBlock Text="{x:Bind Description}" TextWrapping="Wrap" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" LineHeight="17" />
+                                                        </StackPanel>
+                                                    </Grid>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
 
-                <!-- 2. Categories Panel -->
-                <StackPanel x:Name="CategoriesPanel" Visibility="Collapsed" Spacing="16">
+                <!-- 2. CATEGORIES PANEL -->
+                <StackPanel x:Name="CategoriesPanel" Visibility="Collapsed" Spacing="18">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Click="OnCategoryModeClick" Tag="Expense" Content="Expense" />
-                        <Button Click="OnCategoryModeClick" Tag="Income" Content="Income" />
+                        <Button x:Name="CategoryExpenseBtn" Click="OnCategoryModeClick" Tag="Expense" Content="Expense Categories" Style="{StaticResource ReportActivePillButtonStyle}" />
+                        <Button x:Name="CategoryIncomeBtn" Click="OnCategoryModeClick" Tag="Income" Content="Income Categories" Style="{StaticResource ReportPillButtonStyle}" />
                     </StackPanel>
-                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                    <Border Style="{StaticResource ReportSectionCardStyle}">
                         <ItemsControl ItemsSource="{x:Bind CategoryRows, Mode=OneTime}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                                    <Border BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="0,14">
                                         <TextBlock Style="{StaticResource SumaBodyTextStyle}" Text="{Binding}" />
                                     </Border>
                                 </DataTemplate>
@@ -133,14 +622,14 @@
                     </Border>
                 </StackPanel>
 
-                <!-- 3. Accounts Panel -->
-                <Grid x:Name="AccountsPanel" Visibility="Collapsed" ColumnSpacing="28">
+                <!-- 3. ACCOUNTS PANEL -->
+                <Grid x:Name="AccountsPanel" Visibility="Collapsed" ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
-                        <StackPanel Spacing="12">
+                    <Border Style="{StaticResource ReportSectionCardStyle}">
+                        <StackPanel Spacing="14">
                             <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Account Movements" />
                             <ItemsControl ItemsSource="{x:Bind AccountRows, Mode=OneTime}">
                                 <ItemsControl.ItemTemplate>
@@ -153,9 +642,9 @@
                             </ItemsControl>
                         </StackPanel>
                     </Border>
-                    <Border Grid.Column="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
-                        <StackPanel Spacing="12">
-                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Movement detail" />
+                    <Border Grid.Column="1" Style="{StaticResource ReportSectionCardStyle}">
+                        <StackPanel Spacing="14">
+                            <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Movement Details" />
                             <ItemsControl ItemsSource="{x:Bind DetailRows, Mode=OneTime}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -169,29 +658,29 @@
                     </Border>
                 </Grid>
 
-                <!-- 4. Budget Panel -->
-                <Grid x:Name="BudgetPanel" Visibility="Collapsed" ColumnSpacing="28">
+                <!-- 4. BUDGET PANEL -->
+                <Grid x:Name="BudgetPanel" Visibility="Collapsed" ColumnSpacing="24">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="380" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Spacing="16">
-                        <ComboBox x:Name="BudgetBox" Header="Budget" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.Budgets, Mode=OneTime}" DisplayMemberPath="Name" SelectionChanged="OnBudgetChanged" />
-                        <Border Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
+                        <ComboBox x:Name="BudgetBox" Header="Select Budget" HorizontalAlignment="Stretch" ItemsSource="{x:Bind ViewModel.Budgets, Mode=OneWay}" DisplayMemberPath="Name" SelectionChanged="OnBudgetChanged" />
+                        <Border Style="{StaticResource ReportSectionCardStyle}">
                             <StackPanel Spacing="12">
                                 <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="{x:Bind BudgetTitleText, Mode=OneTime}" />
                                 <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaCaptionTextStyle}" Text="{x:Bind BudgetPeriodText, Mode=OneTime}" />
-                                <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12" Margin="0,4">
+                                <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12" Margin="0,4">
                                     <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind BudgetExpectedIncomeText, Mode=OneTime}" />
                                 </Border>
-                                <Border Background="{StaticResource SumaSurfaceBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
+                                <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="{StaticResource SumaCornerMedium}" Padding="16,12">
                                     <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaBodyTextStyle}" Text="{x:Bind BudgetTotalsText, Mode=OneTime}" />
                                 </Border>
                             </StackPanel>
                         </Border>
                     </StackPanel>
-                    <Border Grid.Column="1" Style="{StaticResource SumaPlaceholderSurfaceStyle}" Padding="24">
-                        <StackPanel Spacing="12">
+                    <Border Grid.Column="1" Style="{StaticResource ReportSectionCardStyle}">
+                        <StackPanel Spacing="14">
                             <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Budget Allocations" />
                             <ItemsControl ItemsSource="{x:Bind BudgetRows, Mode=OneTime}">
                                 <ItemsControl.ItemTemplate>
@@ -205,6 +694,7 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+
             </Grid>
         </Grid>
     </ScrollViewer>

@@ -49,7 +49,9 @@ public sealed class RecurringTransactionConfiguration : IEntityTypeConfiguration
             .ConfigureMoney("amount_minor");
         builder.Property(recurring => recurring.FrequencyUnit)
             .HasColumnName("frequency_unit")
-            .HasConversion<string>()
+            .HasConversion(
+                unit => unit.ToString(),
+                value => ParseFrequencyUnit(value))
             .HasMaxLength(16)
             .IsRequired();
         builder.Property(recurring => recurring.IntervalCount)
@@ -92,4 +94,14 @@ public sealed class RecurringTransactionConfiguration : IEntityTypeConfiguration
             .HasForeignKey(recurring => recurring.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
     }
+
+    private static RecurrenceFrequencyUnit ParseFrequencyUnit(string value) =>
+        value.Trim() switch
+        {
+            "Day" or "Daily" => RecurrenceFrequencyUnit.Day,
+            "Week" or "Weekly" => RecurrenceFrequencyUnit.Week,
+            "Month" or "Monthly" => RecurrenceFrequencyUnit.Month,
+            "Year" or "Yearly" or "Annual" or "Annually" => RecurrenceFrequencyUnit.Year,
+            _ => Enum.Parse<RecurrenceFrequencyUnit>(value, true)
+        };
 }
