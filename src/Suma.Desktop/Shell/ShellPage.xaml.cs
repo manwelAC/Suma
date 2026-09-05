@@ -16,9 +16,25 @@ public sealed partial class ShellPage : Page
         InitializeComponent();
         DataContext = ViewModel;
         Loaded += OnLoaded;
+        SizeChanged += (_, args) => UpdateSidebar(args.NewSize.Width);
     }
 
     public ShellViewModel ViewModel { get; }
+
+    private void UpdateSidebar(double width)
+    {
+        bool compact = width < 1100;
+        SidebarColumn.Width = new GridLength(compact ? 80 : 224);
+        SidebarBrand.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
+        foreach (var item in new[] { OverviewNavigationItem, AccountsNavigationItem, ActivityNavigationItem,
+                     PlanningNavigationItem, ReportsNavigationItem, SettingsNavigationItem })
+        {
+            if (item.Content is Grid content)
+                foreach (var label in content.Children.OfType<TextBlock>())
+                    label.Visibility = compact ? Visibility.Collapsed : Visibility.Visible;
+            ToolTipService.SetToolTip(item, compact ? item.Tag?.ToString() : null);
+        }
+    }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {

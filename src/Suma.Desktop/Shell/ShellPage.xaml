@@ -10,7 +10,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="224" />
+            <ColumnDefinition x:Name="SidebarColumn" Width="224" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -23,7 +23,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <StackPanel Margin="8,0,8,32" Spacing="4">
+                <StackPanel x:Name="SidebarBrand" Margin="8,0,8,32" Spacing="4">
                     <TextBlock
                         Foreground="{ThemeResource SumaShellTextPrimaryBrush}"
                         Style="{StaticResource SumaWordmarkTextStyle}"

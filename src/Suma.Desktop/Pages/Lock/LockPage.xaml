@@ -212,10 +212,11 @@
         </Border>
 
         <!-- Middle Content: Mascot + Unlock Card -->
-        <Grid Grid.Row="1" x:Name="ContentGrid" HorizontalAlignment="Center" VerticalAlignment="Center" ColumnSpacing="64" Margin="32,16">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center">
+        <Grid x:Name="ContentGrid" MaxWidth="904" HorizontalAlignment="Stretch" VerticalAlignment="Center" ColumnSpacing="64" Margin="24,16">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition x:Name="MascotColDef" Width="Auto" />
-                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <!-- Mascot Illustration with Grounding Shadow -->
@@ -245,7 +246,7 @@
             <!-- Unlock Card -->
             <Border
                 Grid.Column="1"
-                Width="440"
+                x:Name="UnlockCard" MaxWidth="440" HorizontalAlignment="Stretch"
                 Background="#FDFDFD"
                 BorderBrush="{StaticResource SumaBorderBrush}"
                 BorderThickness="1"
@@ -268,31 +269,31 @@
                         </StackPanel>
 
                         <!-- PIN Boxes / Input Area -->
-                        <Grid HorizontalAlignment="Center" Margin="0,8,0,0" Tapped="OnPinBoxesTapped">
+                        <Grid HorizontalAlignment="Stretch" Margin="0,8,0,0" Tapped="OnPinBoxesTapped">
                             <Grid.RenderTransform>
                                 <CompositeTransform x:Name="PinBoxesTransform" CenterX="165" CenterY="26" />
                             </Grid.RenderTransform>
                             <!-- 6 Visual PIN Boxes -->
-                            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                                <Border x:Name="Box0" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                            <Grid ColumnSpacing="10"><Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                <Border x:Name="Box0" Grid.Column="0" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot0" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box1" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                <Border x:Name="Box1" Grid.Column="1" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot1" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box2" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                <Border x:Name="Box2" Grid.Column="2" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot2" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box3" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                <Border x:Name="Box3" Grid.Column="3" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot3" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box4" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                <Border x:Name="Box4" Grid.Column="4" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot4" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                                <Border x:Name="Box5" Width="46" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
+                                <Border x:Name="Box5" Grid.Column="5" Height="52" CornerRadius="12" Background="#FFFDFDFD" BorderBrush="#FFE4E2DC" BorderThickness="1.5">
                                     <TextBlock x:Name="Dot5" Text="●" FontSize="16" Foreground="#FF3E5C3B" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
                                 </Border>
-                            </StackPanel>
+                            </Grid>
 
                             <!-- Invisible PasswordBox that receives focus and input -->
                             <PasswordBox
@@ -368,6 +369,8 @@
                 </Grid>
             </Border>
         </Grid>
+
+        </ScrollViewer>
 
         <!-- Bottom Privacy Footer -->
         <Border Grid.Row="2" Margin="0,12,0,24" HorizontalAlignment="Center">

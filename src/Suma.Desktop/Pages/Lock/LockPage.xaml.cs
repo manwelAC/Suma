@@ -36,7 +36,10 @@ public sealed partial class LockPage : Page
         if (availableWidth <= 0) availableWidth = ActualWidth;
         if (availableWidth <= 0) return;
 
-        if (availableWidth < 860)
+        ContentGrid.ColumnSpacing = availableWidth < 1000 ? 0 : 64;
+        UnlockCard.Padding = new Thickness(availableWidth < 480 ? 16 : 36);
+
+        if (availableWidth < 1000)
         {
             MascotColDef.Width = new GridLength(0);
             MascotContainer.Visibility = Visibility.Collapsed;

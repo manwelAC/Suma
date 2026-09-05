@@ -1,7 +1,7 @@
 <Page
     x:Class="Suma.Desktop.Pages.Reports.ReportsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:layout="using:Suma.Desktop.Common"
     xmlns:viewModels="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
 
@@ -84,7 +84,7 @@
             </Grid.RowDefinitions>
 
             <!-- Panoramic Atmospheric Background Landscape (Signature Suma Theme) -->
-            <Grid Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="440" Margin="-36,-24,-36,0" IsHitTestVisible="False">
+            <Canvas x:Name="LandscapeCanvas" Grid.Row="0" Grid.RowSpan="3" Margin="-36,-24,-36,0" IsHitTestVisible="False"><Grid Width="{Binding ActualWidth, ElementName=LandscapeCanvas}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="440" IsHitTestVisible="False">
                 <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
                 <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
                 <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
@@ -151,22 +151,22 @@
                         </LinearGradientBrush>
                     </Rectangle.Fill>
                 </Rectangle>
-            </Grid>
+            </Grid></Canvas>
 
             <!-- Row 0: Header & Executive Controls -->
-            <Grid Grid.Row="0" ColumnSpacing="20">
+            <Grid Grid.Row="0" ColumnSpacing="20" layout:ResponsiveGrid.MinimumColumnWidth="440">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Spacing="4" VerticalAlignment="Center">
-                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="Reports &amp; Analytics" />
-                    <TextBlock FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Real-time financial performance, cash flow timeline, and category distribution." />
+                    <TextBlock TextWrapping="Wrap" FontFamily="Segoe UI Variable Display" FontSize="30" FontWeight="SemiBold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="Reports &amp; Analytics" />
+                    <TextBlock TextWrapping="Wrap" FontSize="14" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Real-time financial performance, cash flow timeline, and category distribution." />
                 </StackPanel>
 
                 <!-- Top Right Actions: Currency selector + Export CSV -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                <layout:WrapPanel Grid.Column="1" Spacing="12" VerticalAlignment="Center">
                     <ComboBox x:Name="CurrencyBox" Width="110" Height="38" CornerRadius="8"
                               ItemsSource="{x:Bind ViewModel.Currencies, Mode=OneWay}"
                               SelectedItem="{x:Bind ViewModel.Currency, Mode=OneWay}"
@@ -177,19 +177,19 @@
                             <TextBlock Text="Export CSV" FontWeight="Medium" />
                         </StackPanel>
                     </Button>
-                </StackPanel>
+                </layout:WrapPanel>
             </Grid>
 
             <!-- Row 1: Period Presets & Date Filter Bar Card -->
             <Border Grid.Row="1" Background="{StaticResource SumaSurfaceBrush}" BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="1" CornerRadius="14" Padding="18,14">
-                <Grid ColumnSpacing="16" RowSpacing="12">
+                <Grid ColumnSpacing="16" RowSpacing="12" layout:ResponsiveGrid.MinimumColumnWidth="800">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Presets Flow -->
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <layout:WrapPanel Spacing="8" VerticalAlignment="Center">
                         <TextBlock VerticalAlignment="Center" Style="{StaticResource SumaCaptionTextStyle}" Text="PERIOD:" Margin="0,0,4,0" FontWeight="SemiBold" />
                         <Button x:Name="BtnPresetThisMonth" Click="OnPresetClick" Tag="MonthToDate" Content="This Month" Style="{StaticResource ReportPresetButtonStyle}" />
                         <Button x:Name="BtnPresetLastMonth" Click="OnPresetClick" Tag="LastMonth" Content="Last Month" Style="{StaticResource ReportPresetButtonStyle}" />
@@ -197,17 +197,17 @@
                         <Button x:Name="BtnPresetLast3Months" Click="OnPresetClick" Tag="Last3Months" Content="Last 3 Months" Style="{StaticResource ReportPresetButtonStyle}" />
                         <Button x:Name="BtnPresetThisYear" Click="OnPresetClick" Tag="YearToDate" Content="This Year" Style="{StaticResource ReportPresetButtonStyle}" />
                         <Button x:Name="BtnPresetLastYear" Click="OnPresetClick" Tag="LastYear" Content="Last Year" Style="{StaticResource ReportPresetButtonStyle}" />
-                    </StackPanel>
+                    </layout:WrapPanel>
 
                     <!-- Date Range Inputs + Apply -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <layout:WrapPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center">
                         <DatePicker x:Name="StartBox" DateChanged="OnReportDateChanged" />
                         <TextBlock Text="–" VerticalAlignment="Center" Foreground="{StaticResource SumaTextSecondaryBrush}" FontWeight="SemiBold" />
                         <DatePicker x:Name="EndBox" DateChanged="OnReportDateChanged" />
                         <Button Click="OnApplyClick" Height="36" CornerRadius="8" Padding="16,0" Background="#264E36" Foreground="#FFFFFFFF" FontWeight="SemiBold">
                             <TextBlock Text="Apply" />
                         </Button>
-                    </StackPanel>
+                    </layout:WrapPanel>
                 </Grid>
             </Border>
 
@@ -219,12 +219,12 @@
                 </Grid.ColumnDefinitions>
 
                 <Border Background="{StaticResource SumaSurfaceSecondaryBrush}" CornerRadius="20" Padding="4" HorizontalAlignment="Left">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
+                    <layout:WrapPanel Spacing="4">
                         <Button x:Name="TabBtnCashFlow" Click="OnSectionClick" Tag="CashFlow" Content="Cash Flow" Style="{StaticResource ReportActivePillButtonStyle}" />
                         <Button x:Name="TabBtnCategories" Click="OnSectionClick" Tag="Categories" Content="Categories" Style="{StaticResource ReportPillButtonStyle}" />
                         <Button x:Name="TabBtnAccounts" Click="OnSectionClick" Tag="Accounts" Content="Accounts" Style="{StaticResource ReportPillButtonStyle}" />
                         <Button x:Name="TabBtnBudget" Click="OnSectionClick" Tag="Budget" Content="Budget" Style="{StaticResource ReportPillButtonStyle}" />
-                    </StackPanel>
+                    </layout:WrapPanel>
                 </Border>
             </Grid>
 
@@ -241,7 +241,7 @@
                 <StackPanel x:Name="CashFlowPanel" Spacing="22">
 
                     <!-- 4 Top Executive Summary KPI Cards (100% Dynamic with live period comparisons) -->
-                    <Grid ColumnSpacing="16">
+                    <Grid ColumnSpacing="16" layout:ResponsiveGrid.MinimumColumnWidth="260">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
@@ -331,7 +331,7 @@
                     </Grid>
 
                     <!-- Main 2-Column Analytics Workspace Grid -->
-                    <Grid ColumnSpacing="20">
+                    <Grid ColumnSpacing="20" layout:ResponsiveGrid.MinimumColumnWidth="580">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="62*" />
                             <ColumnDefinition Width="38*" />
@@ -344,7 +344,7 @@
                             <Border Style="{StaticResource ReportSectionCardStyle}">
                                 <StackPanel Spacing="16">
                                     <!-- Card Header & Controls -->
-                                    <Grid>
+                                    <Grid layout:ResponsiveGrid.MinimumColumnWidth="360">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -352,7 +352,7 @@
 
                                         <StackPanel Spacing="2">
                                             <TextBlock Style="{StaticResource SumaSectionTitleTextStyle}" Text="Cash Flow Over Time" />
-                                            <TextBlock Style="{StaticResource SumaCaptionTextStyle}" Text="Dual income and expense bars with net cash flow trend line" />
+                                            <TextBlock TextWrapping="Wrap" Style="{StaticResource SumaCaptionTextStyle}" Text="Dual income and expense bars with net cash flow trend line" />
                                         </StackPanel>
 
                                         <!-- Granularity Toggle: Daily | Weekly | Monthly -->
@@ -366,7 +366,7 @@
                                     </Grid>
 
                                     <!-- Chart Legend -->
-                                    <StackPanel Orientation="Horizontal" Spacing="18" HorizontalAlignment="Right">
+                                    <layout:WrapPanel Spacing="18" HorizontalAlignment="Right">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <Rectangle Width="10" Height="10" RadiusX="2" RadiusY="2" Fill="#264E36" VerticalAlignment="Center" />
                                             <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Income" VerticalAlignment="Center" />
@@ -380,7 +380,7 @@
                                             <Ellipse Width="6" Height="6" Fill="#1E3F2B" Margin="-10,0,0,0" VerticalAlignment="Center" />
                                             <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Net Cash Flow" VerticalAlignment="Center" />
                                         </StackPanel>
-                                    </StackPanel>
+                                    </layout:WrapPanel>
 
                                     <!-- Chart Canvas Container -->
                                     <Grid Height="260" Background="#06000000" CornerRadius="10">
@@ -390,7 +390,7 @@
                                         <!-- Empty State (Shown if 0 transactions recorded) -->
                                         <StackPanel x:Name="ChartEmptyState" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8" Visibility="Collapsed">
                                             <FontIcon Glyph="&#xE9D9;" FontSize="28" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
-                                            <TextBlock Text="No transaction activity recorded for this period." FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock TextWrapping="Wrap" Text="No transaction activity recorded for this period." FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" HorizontalAlignment="Center" />
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
@@ -399,7 +399,7 @@
                             <!-- 2. Cash Flow Breakdown Table Card -->
                             <Border Style="{StaticResource ReportSectionCardStyle}">
                                 <StackPanel Spacing="16">
-                                    <Grid>
+                                    <Grid layout:ResponsiveGrid.MinimumColumnWidth="360">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -419,6 +419,8 @@
                                         </Border>
                                     </Grid>
 
+                                    <ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Disabled" VerticalScrollMode="Disabled" HorizontalContentAlignment="Stretch">
+                                    <StackPanel MinWidth="580" Spacing="16">
                                     <!-- Table Header -->
                                     <Grid BorderBrush="{StaticResource SumaBorderBrush}" BorderThickness="0,0,0,1" Padding="8,8,8,10">
                                         <Grid.ColumnDefinitions>
@@ -450,10 +452,10 @@
                                                         </Grid.ColumnDefinitions>
 
                                                         <!-- Name with Icon -->
-                                                        <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                        <layout:WrapPanel Spacing="8" VerticalAlignment="Center">
                                                             <FontIcon Glyph="{x:Bind IconGlyph}" FontSize="13" Foreground="{StaticResource SumaTextSecondaryBrush}" />
                                                             <TextBlock Text="{x:Bind Name}" Style="{StaticResource SumaBodyTextStyle}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
-                                                        </StackPanel>
+                                                        </layout:WrapPanel>
 
                                                         <!-- Income -->
                                                         <TextBlock Grid.Column="1" Text="{x:Bind FormattedIncome}" Style="{StaticResource SumaBodyTextStyle}" TextAlignment="Right" VerticalAlignment="Center" Foreground="#264E36" />
@@ -490,6 +492,7 @@
                                             <TextBlock Grid.Column="3" Text="{x:Bind ViewModel.BreakdownTotalNetFormatted, Mode=OneWay}" FontWeight="Bold" TextAlignment="Right" Foreground="#1E3F2B" VerticalAlignment="Center" />
                                         </Grid>
                                     </Border>
+                                    </StackPanel></ScrollViewer>
                                 </StackPanel>
                             </Border>
 
@@ -501,7 +504,7 @@
                             <!-- 1. Top Expense Categories Donut Chart Card -->
                             <Border Style="{StaticResource ReportSectionCardStyle}">
                                 <StackPanel Spacing="16">
-                                    <Grid>
+                                    <Grid layout:ResponsiveGrid.MinimumColumnWidth="360">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -558,7 +561,7 @@
                             <!-- 2. Dynamic Insights & Observations Card with Mascot -->
                             <Border Style="{StaticResource ReportSectionCardStyle}">
                                 <StackPanel Spacing="16">
-                                    <Grid>
+                                    <Grid layout:ResponsiveGrid.MinimumColumnWidth="360">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
@@ -623,7 +626,7 @@
                 </StackPanel>
 
                 <!-- 3. ACCOUNTS PANEL -->
-                <Grid x:Name="AccountsPanel" Visibility="Collapsed" ColumnSpacing="24">
+                <Grid x:Name="AccountsPanel" Visibility="Collapsed" ColumnSpacing="24" layout:ResponsiveGrid.MinimumColumnWidth="420">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
@@ -659,7 +662,7 @@
                 </Grid>
 
                 <!-- 4. BUDGET PANEL -->
-                <Grid x:Name="BudgetPanel" Visibility="Collapsed" ColumnSpacing="24">
+                <Grid x:Name="BudgetPanel" Visibility="Collapsed" ColumnSpacing="24" layout:ResponsiveGrid.MinimumColumnWidth="420">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="380" />
                         <ColumnDefinition Width="*" />

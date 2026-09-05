@@ -34,6 +34,8 @@ public sealed partial class OverviewPage : Page
         if (availableWidth <= 0) return;
 
         RootGrid.MaxWidth = availableWidth;
+        HeaderTitleColDef.Width = new GridLength(1, GridUnitType.Star);
+        HeaderControlsColDef.Width = availableWidth < 880 ? new GridLength(0) : GridLength.Auto;
 
         if (availableWidth >= 1020)
         {
@@ -76,7 +78,7 @@ public sealed partial class OverviewPage : Page
             Grid.SetRow(RecentActivityCard, 0);
             Grid.SetColumnSpan(RecentActivityCard, 1);
         }
-        else if (availableWidth >= 680)
+        else if (availableWidth >= 880)
         {
             // Header: Side-by-side
             Grid.SetRow(HeaderControlsStack, 0);
@@ -85,7 +87,7 @@ public sealed partial class OverviewPage : Page
             HeaderControlsStack.Margin = new Thickness(0);
 
             // Hero Artwork
-            bool showArt = availableWidth >= 760;
+            bool showArt = availableWidth >= 1000;
             HeroArtColDef.Width = showArt ? GridLength.Auto : new GridLength(0);
             HeroArtContainer.Visibility = showArt ? Visibility.Visible : Visibility.Collapsed;
 

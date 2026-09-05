@@ -46,7 +46,7 @@ public static class SumaDialog
         string? subtitle = null,
         bool isDestructive = false)
     {
-        var targetWidth = GetWidth(size);
+        var targetWidth = Math.Min(GetWidth(size), Math.Max(320, xamlRoot.Size.Width - 48));
         var contentWidth = targetWidth - 48;
         var dialog = new ContentDialog
         {
@@ -142,7 +142,7 @@ public static class SumaDialog
         var bodyContainer = new ScrollViewer
         {
             Content = body,
-            MaxHeight = 520,
+            MaxHeight = Math.Min(520, Math.Max(120, xamlRoot.Size.Height - 220)),
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto
         };
@@ -162,7 +162,7 @@ public static class SumaDialog
         string cancelButtonText = "Cancel",
         ModalSize size = ModalSize.Medium)
     {
-        var targetWidth = GetWidth(size);
+        var targetWidth = Math.Min(GetWidth(size), Math.Max(320, xamlRoot.Size.Width - 48));
         var contentWidth = targetWidth - 48;
         var dialog = new ContentDialog
         {

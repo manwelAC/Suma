@@ -40,6 +40,7 @@ public sealed partial class ActivityPage : Page
 
         var compact = availableWidth < 900;
         var standard = availableWidth is >= 900 and < 1250;
+        HeaderActionsColumn.Width = compact ? new GridLength(0) : GridLength.Auto;
 
         Grid.SetColumn(HeaderActions, compact ? 0 : 1);
         Grid.SetRow(HeaderActions, compact ? 1 : 0);
@@ -69,6 +70,21 @@ public sealed partial class ActivityPage : Page
 
     private void LayoutToolbar(bool compact, bool standard)
     {
+        if (compact)
+        {
+            // Two useful columns; do not reserve space for the desktop-only columns.
+            for (int index = 0; index < ToolbarGrid.ColumnDefinitions.Count; index++)
+                ToolbarGrid.ColumnDefinitions[index].Width = index < 2
+                    ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+            while (ToolbarGrid.RowDefinitions.Count < 4)
+                ToolbarGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            foreach (var row in ToolbarGrid.RowDefinitions) row.Height = GridLength.Auto;
+            Place(DateRangeButton, 0, 0); Place(CategoryFilter, 1, 0);
+            Place(AccountFilter, 0, 1); Place(TypeFilter, 1, 1);
+            Place(SearchContainer, 0, 2); Grid.SetColumnSpan(SearchContainer, 2);
+            Place(AddTransactionButton, 0, 3); Grid.SetColumnSpan(AddTransactionButton, 2);
+            return;
+        }
         if (!compact && !standard)
         {
             ToolbarGrid.ColumnDefinitions[0].Width = new GridLength(195);
