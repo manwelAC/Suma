@@ -5,8 +5,12 @@
     xmlns:viewModels="using:Suma.Desktop.ViewModels"
     Background="{StaticResource SumaBackgroundBrush}">
 
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <Grid x:Name="RootGrid" Padding="36,28,36,32" MaxWidth="1600" HorizontalAlignment="Stretch" RowSpacing="24">
+    <ScrollViewer
+        HorizontalScrollBarVisibility="Disabled"
+        VerticalScrollBarVisibility="Auto"
+        HorizontalScrollMode="Disabled"
+        VerticalScrollMode="Auto">
+        <Grid x:Name="RootGrid" Padding="36,24,36,32" HorizontalAlignment="Stretch" RowSpacing="20">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -15,6 +19,67 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
+            <!-- Panoramic Atmospheric Background Landscape with Seamless Edge Fades Behind Cards -->
+            <Grid Grid.Row="0" Grid.RowSpan="5" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="460" Margin="-36,-24,-36,0" IsHitTestVisible="False">
+                <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
+                <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
+                <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
+                <Ellipse Width="170" Height="170" Fill="#4C8FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,30,170,0" />
+
+                <!-- Left atmospheric mist -->
+                <Ellipse Width="420" Height="260" Fill="#1A4A624E" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-20,0,0" />
+
+                <!-- Flying cranes in the serene sky -->
+                <Canvas HorizontalAlignment="Right" VerticalAlignment="Top" Width="300" Height="100" Margin="0,30,360,0">
+                    <Path Data="M 10,40 Q 20,30 30,40 Q 40,30 50,40" Stroke="#5A556B5A" StrokeThickness="2" />
+                    <Path Data="M 52,24 Q 60,16 68,24 Q 76,16 84,24" Stroke="#4A556B5A" StrokeThickness="1.6" />
+                    <Path Data="M 80,48 Q 87,42 94,48 Q 101,42 108,48" Stroke="#3E556B5A" StrokeThickness="1.4" />
+                </Canvas>
+
+                <!-- Layer 1: Distant majestic mountain ridge (farthest, tall peaks) -->
+                <Path Data="M 0,340 C 180,240 380,280 620,180 C 850,100 1100,200 1350,130 C 1600,70 1850,170 2100,120 L 2100,480 L 0,480 Z" Fill="#2F667A68" VerticalAlignment="Bottom" Stretch="Fill" Height="340" />
+
+                <!-- Layer 2: Mid-ground rolling mountain range -->
+                <Path Data="M 0,380 C 220,270 480,330 780,220 C 1050,140 1350,250 1620,180 C 1850,130 2000,190 2100,170 L 2100,480 L 0,480 Z" Fill="#44556C58" VerticalAlignment="Bottom" Stretch="Fill" Height="280" />
+
+                <!-- Layer 3: Foreground lush rolling knolls -->
+                <Path Data="M 0,400 C 280,300 600,240 920,310 C 1220,340 1520,240 1820,280 C 1960,295 2040,265 2100,275 L 2100,480 L 0,480 Z" Fill="#58435A47" VerticalAlignment="Bottom" Stretch="Fill" Height="210" />
+
+                <!-- Multi-stop Vertical Fade Overlay: Keeps top vivid, melts seamlessly into page background (#FFF8F7F3) at bottom -->
+                <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                            <GradientStop Color="#00F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="0.52" />
+                            <GradientStop Color="#2AF8F7F3" Offset="0.68" />
+                            <GradientStop Color="#85F8F7F3" Offset="0.84" />
+                            <GradientStop Color="#FAF8F7F3" Offset="0.97" />
+                            <GradientStop Color="#FFF8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Left Soft Feathering -->
+                <Rectangle HorizontalAlignment="Left" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <!-- Right Soft Feathering -->
+                <Rectangle HorizontalAlignment="Right" Width="120" VerticalAlignment="Stretch">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush StartPoint="1,0" EndPoint="0,0">
+                            <GradientStop Color="#50F8F7F3" Offset="0.0" />
+                            <GradientStop Color="#00F8F7F3" Offset="1.0" />
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+            </Grid>
 
             <!-- Row 0: Header -->
             <Grid x:Name="HeaderGrid" Grid.Row="0" ColumnSpacing="20" RowSpacing="12">
@@ -61,77 +126,56 @@
                 </Border.Background>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.3*" />
-                        <ColumnDefinition x:Name="HeroArtColDef" Width="*" MaxWidth="440" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition x:Name="HeroArtColDef" Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <!-- Left ATS Content -->
-                    <StackPanel Grid.Column="0" Padding="36,32,24,32" Spacing="10">
+                    <StackPanel Grid.Column="0" Padding="32,28,20,28" Spacing="10">
                         <TextBlock Text="AVAILABLE TO SPEND" FontSize="11" FontWeight="Bold" Foreground="#FF4C634A" CharacterSpacing="60" />
-                        <TextBlock Text="{x:Bind ViewModel.AvailableToSpendDisplay, Mode=OneWay}" FontFamily="Segoe UI Variable Display" FontSize="44" FontWeight="Bold" Foreground="#FF182B17" />
-                        <TextBlock Text="Included account balances minus protected budget remaining." FontSize="13" Foreground="#FF4A5F48" Margin="0,0,0,12" />
+                        <TextBlock Text="{x:Bind ViewModel.AvailableToSpendDisplay, Mode=OneWay}" FontFamily="Segoe UI Variable Display" FontSize="38" FontWeight="Bold" Foreground="#FF182B17" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="Included account balances minus protected budget remaining." FontSize="13" Foreground="#FF4A5F48" Margin="0,0,0,8" TextWrapping="Wrap" />
 
-                        <StackPanel Orientation="Horizontal" Spacing="40">
+                        <StackPanel Orientation="Horizontal" Spacing="36">
                             <!-- Included Balance Stat -->
                             <StackPanel Spacing="4">
                                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                     <Ellipse Width="7" Height="7" Fill="#FF4A7C59" VerticalAlignment="Center" />
-                                    <TextBlock Text="INCLUDED BALANCE" FontSize="11" FontWeight="Bold" Foreground="#FF5D725B" CharacterSpacing="40" />
+                                    <TextBlock Text="INCLUDED BALANCE" FontSize="10" FontWeight="Bold" Foreground="#FF5D725B" CharacterSpacing="40" />
                                 </StackPanel>
-                                <TextBlock Text="{x:Bind ViewModel.IncludedBalanceDisplay, Mode=OneWay}" FontSize="18" FontWeight="SemiBold" Foreground="#FF182B17" />
+                                <TextBlock Text="{x:Bind ViewModel.IncludedBalanceDisplay, Mode=OneWay}" FontSize="17" FontWeight="SemiBold" Foreground="#FF182B17" />
                             </StackPanel>
 
                             <!-- Protected Budget Stat -->
                             <StackPanel Spacing="4">
                                 <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                     <Ellipse Width="7" Height="7" Fill="#FF9AAFA0" VerticalAlignment="Center" />
-                                    <TextBlock Text="PROTECTED BUDGET" FontSize="11" FontWeight="Bold" Foreground="#FF5D725B" CharacterSpacing="40" />
+                                    <TextBlock Text="PROTECTED BUDGET" FontSize="10" FontWeight="Bold" Foreground="#FF5D725B" CharacterSpacing="40" />
                                 </StackPanel>
-                                <TextBlock Text="{x:Bind ViewModel.ProtectedReserveDisplay, Mode=OneWay}" FontSize="18" FontWeight="SemiBold" Foreground="#FF182B17" />
+                                <TextBlock Text="{x:Bind ViewModel.ProtectedReserveDisplay, Mode=OneWay}" FontSize="17" FontWeight="SemiBold" Foreground="#FF182B17" />
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- Right Subtle Vector Landscape Artwork with Soft Fade -->
-                    <Grid Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="460">
-                        <!-- Translucent glowing sun -->
-                        <Ellipse Width="120" Height="120" Fill="#24FFFFFF" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,18,90,0" />
+                    <!-- Right Atmospheric Vector Illustration -->
+                    <Grid x:Name="HeroArtContainer" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,18" IsHitTestVisible="False">
+                        <Canvas Width="140" Height="95">
+                            <!-- Sun halo -->
+                            <Ellipse Width="54" Height="54" Fill="#208FA28C" Canvas.Left="55" Canvas.Top="2" />
+                            <!-- Distant ridge -->
+                            <Path Data="M0,80 Q50,35 100,70 T140,65 L140,95 L0,95 Z" Fill="#246D8C72" />
+                            <!-- Near ridge -->
+                            <Path Data="M0,90 Q45,52 95,85 T140,75 L140,95 L0,95 Z" Fill="#38556B5A" />
+                            <!-- Pines -->
+                            <Path Data="M38,42 L46,58 L30,58 Z" Fill="#5A364C3B" />
+                            <Rectangle Width="2" Height="7" Fill="#40364C3B" Canvas.Left="37" Canvas.Top="58" />
 
-                        <!-- Rolling hills layered vector paths starting smoothly from baseline Y=240 -->
-                        <Path Data="M 0,240 C 90,240 160,110 260,110 Q 360,110 460,70 L 460,240 Z" Fill="#1E6F806D" VerticalAlignment="Bottom" Stretch="Fill" Height="130" />
-                        <Path Data="M 20,240 C 120,240 190,140 290,140 Q 380,140 460,95 L 460,240 Z" Fill="#2A6F806D" VerticalAlignment="Bottom" Stretch="Fill" Height="105" />
-                        <Path Data="M 40,240 C 140,240 220,165 310,165 Q 390,165 460,120 L 460,240 Z" Fill="#3C6F806D" VerticalAlignment="Bottom" Stretch="Fill" Height="80" />
+                            <Path Data="M64,30 L74,52 L54,52 Z" Fill="#6A364C3B" />
+                            <Rectangle Width="2" Height="8" Fill="#40364C3B" Canvas.Left="63" Canvas.Top="52" />
 
-                        <!-- Subtle trees -->
-                        <Canvas VerticalAlignment="Bottom" Height="160" Width="460">
-                            <!-- Tree 1 -->
-                            <Ellipse Width="16" Height="32" Fill="#556F806D" Canvas.Left="280" Canvas.Top="70" />
-                            <Rectangle Width="2" Height="14" Fill="#77556054" Canvas.Left="287" Canvas.Top="94" />
-
-                            <!-- Tree 2 -->
-                            <Ellipse Width="20" Height="40" Fill="#666F806D" Canvas.Left="320" Canvas.Top="75" />
-                            <Rectangle Width="2" Height="16" Fill="#77556054" Canvas.Left="329" Canvas.Top="105" />
-
-                            <!-- Tree 3 -->
-                            <Ellipse Width="14" Height="28" Fill="#446F806D" Canvas.Left="370" Canvas.Top="60" />
-                            <Rectangle Width="2" Height="12" Fill="#77556054" Canvas.Left="376" Canvas.Top="82" />
-
-                            <!-- Tree 4 -->
-                            <Ellipse Width="18" Height="36" Fill="#556F806D" Canvas.Left="400" Canvas.Top="80" />
-                            <Rectangle Width="2" Height="14" Fill="#77556054" Canvas.Left="408" Canvas.Top="108" />
+                            <Path Data="M108,46 L116,62 L100,62 Z" Fill="#55364C3B" />
+                            <Rectangle Width="2" Height="7" Fill="#40364C3B" Canvas.Left="107" Canvas.Top="62" />
                         </Canvas>
-
-                        <!-- Soft feather/fade gradient overlay on the left of the artwork -->
-                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False">
-                            <Rectangle.Fill>
-                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                    <GradientStop Color="#FFE8EFE5" Offset="0.0" />
-                                    <GradientStop Color="#DDE8EFE5" Offset="0.15" />
-                                    <GradientStop Color="#77E8EFE5" Offset="0.45" />
-                                    <GradientStop Color="#00E8EFE5" Offset="0.80" />
-                                </LinearGradientBrush>
-                            </Rectangle.Fill>
-                        </Rectangle>
                     </Grid>
                 </Grid>
             </Border>

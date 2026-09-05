@@ -43,6 +43,27 @@ public sealed class SettingsViewModel(ISettingsOperations operations) : Observab
         finally { if (staged is not null) { try { await operations.DiscardStagedRestoreAsync(staged, CancellationToken.None); } catch { } } IsDataBusy = false; }
     }
 
+    public async Task RunResetDataAsync(Func<Task<bool>> confirmAsync, CancellationToken cancellationToken = default)
+    {
+        if (IsDataBusy) return;
+        IsDataBusy = true;
+        ClearMessages();
+        try
+        {
+            if (!await confirmAsync()) return;
+            await operations.ResetAllDataAsync(cancellationToken);
+            SuccessMessage = "All financial data has been erased. Your app is now fresh and clean.";
+        }
+        catch
+        {
+            ErrorMessage = "Suma could not reset the data. Please try again.";
+        }
+        finally
+        {
+            IsDataBusy = false;
+        }
+    }
+
     private async Task MutatePinAsync(Func<Task> mutation, bool enabledAfter, string successMessage)
     {
         if (IsSecurityBusy) return; IsSecurityBusy = true; ClearMessages();

@@ -10,4 +10,5 @@ public interface IFinanceBackupStore
     Task<string> StageAsync(string candidatePath, CancellationToken cancellationToken = default);
     Task MarkPendingAsync(string stagedPath, CancellationToken cancellationToken = default);
     Task DiscardStagedAsync(string stagedPath, CancellationToken cancellationToken = default);
+    Task ResetDataAsync(CancellationToken cancellationToken = default);
 }

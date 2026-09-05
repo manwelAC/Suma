@@ -55,6 +55,31 @@ public sealed class FinanceBackupStore(SumaRuntimePaths paths) : IFinanceBackupS
         return Task.CompletedTask;
     }
 
+    public async Task ResetDataAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var connectionString = ConnectionString(paths.DatabasePath, SqliteOpenMode.ReadWrite);
+        await using var connection = new SqliteConnection(connectionString);
+        await connection.OpenAsync(cancellationToken);
+        await using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            PRAGMA foreign_keys = OFF;
+            DELETE FROM goal_contributions;
+            DELETE FROM savings_goals;
+            DELETE FROM recurring_occurrences;
+            DELETE FROM recurring_transactions;
+            DELETE FROM budget_allocations;
+            DELETE FROM budgets;
+            DELETE FROM transactions;
+            DELETE FROM accounts;
+            DELETE FROM categories;
+            PRAGMA foreign_keys = ON;
+            VACUUM;
+            """;
+        await command.ExecuteNonQueryAsync(cancellationToken);
+    }
+
     internal static void Backup(string sourcePath, string destinationPath, bool recreateDestination)
     {
         if (Path.GetFullPath(sourcePath).Equals(Path.GetFullPath(destinationPath), StringComparison.OrdinalIgnoreCase)) throw new IOException("Backup destination must differ from the active database.");

@@ -22,8 +22,8 @@ public sealed partial class OverviewPage : Page
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        await ViewModel.LoadAsync();
         UpdateResponsiveLayout(ActualWidth);
+        await ViewModel.LoadAsync();
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e) => UpdateResponsiveLayout(e.NewSize.Width);
@@ -33,7 +33,9 @@ public sealed partial class OverviewPage : Page
         if (availableWidth <= 0) availableWidth = ActualWidth;
         if (availableWidth <= 0) return;
 
-        if (availableWidth >= 1120)
+        RootGrid.MaxWidth = availableWidth;
+
+        if (availableWidth >= 1020)
         {
             // Header: Side-by-side
             Grid.SetRow(HeaderControlsStack, 0);
@@ -42,7 +44,8 @@ public sealed partial class OverviewPage : Page
             HeaderControlsStack.Margin = new Thickness(0);
 
             // Hero Artwork visible
-            HeroArtColDef.Width = new GridLength(1, GridUnitType.Star);
+            HeroArtColDef.Width = GridLength.Auto;
+            HeroArtContainer.Visibility = Visibility.Visible;
 
             // Mid Dashboard: 3 columns, 1 row
             MidCol0.Width = new GridLength(1, GridUnitType.Star);
@@ -73,7 +76,7 @@ public sealed partial class OverviewPage : Page
             Grid.SetRow(RecentActivityCard, 0);
             Grid.SetColumnSpan(RecentActivityCard, 1);
         }
-        else if (availableWidth >= 780)
+        else if (availableWidth >= 680)
         {
             // Header: Side-by-side
             Grid.SetRow(HeaderControlsStack, 0);
@@ -82,7 +85,9 @@ public sealed partial class OverviewPage : Page
             HeaderControlsStack.Margin = new Thickness(0);
 
             // Hero Artwork
-            HeroArtColDef.Width = availableWidth >= 920 ? new GridLength(1, GridUnitType.Star) : new GridLength(0);
+            bool showArt = availableWidth >= 760;
+            HeroArtColDef.Width = showArt ? GridLength.Auto : new GridLength(0);
+            HeroArtContainer.Visibility = showArt ? Visibility.Visible : Visibility.Collapsed;
 
             // Mid Dashboard: 2 columns (Accounts & Budget row 0, Savings spans row 1)
             MidCol0.Width = new GridLength(1, GridUnitType.Star);
@@ -123,6 +128,7 @@ public sealed partial class OverviewPage : Page
 
             // Hero Artwork hidden
             HeroArtColDef.Width = new GridLength(0);
+            HeroArtContainer.Visibility = Visibility.Collapsed;
 
             // Mid Dashboard: 1 column, stacked
             MidCol0.Width = new GridLength(1, GridUnitType.Star);

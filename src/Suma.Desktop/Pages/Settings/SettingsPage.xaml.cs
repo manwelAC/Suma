@@ -48,6 +48,31 @@ public sealed partial class SettingsPage : Page
         }
     }
     private async void OnRestore(object sender, RoutedEventArgs e) { await ViewModel.RunRestoreAsync(PickRestoreSourceAsync, ConfirmRestoreAsync); Refresh(); }
+    private async void OnResetData(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.RunResetDataAsync(ConfirmResetAsync);
+        Refresh();
+        if (!string.IsNullOrEmpty(ViewModel.SuccessMessage))
+        {
+            var successDialog = SumaDialog.CreateSuccess(
+                XamlRoot,
+                "Data Reset Complete",
+                "All local accounts, transactions, budgets, and goals have been deleted. You are now starting fresh.",
+                "Done");
+            _ = await successDialog.ShowAsync();
+        }
+    }
+    private async Task<bool> ConfirmResetAsync()
+    {
+        var dialog = SumaDialog.CreateDestructive(
+            XamlRoot,
+            "Erase all financial data?",
+            "This will permanently delete all accounts, transactions, budgets, recurring expenses, and savings goals from your device.",
+            "This action cannot be undone. Consider creating a backup first if you want to keep any current records.",
+            destructiveButtonText: "Erase Everything",
+            cancelButtonText: "Cancel");
+        return await dialog.ShowAsync() == ContentDialogResult.Primary;
+    }
     private async Task<string?> PickBackupDestinationAsync(string suggestedName) { var picker = new FileSavePicker { SuggestedFileName = Path.GetFileNameWithoutExtension(suggestedName) }; picker.FileTypeChoices.Add("Suma backup", [".suma-backup"]); InitializePicker(picker); return (await picker.PickSaveFileAsync())?.Path; }
     private async Task<string?> PickRestoreSourceAsync() { var picker = new FileOpenPicker(); picker.FileTypeFilter.Add(".suma-backup"); InitializePicker(picker); return (await picker.PickSingleFileAsync())?.Path; }
     private async Task<bool> ConfirmRestoreAsync()

@@ -15,6 +15,7 @@ public sealed class SettingsOperations(IServiceScopeFactory scopeFactory) : ISet
     public Task<string> ValidateAndStageRestoreAsync(string sourcePath, CancellationToken cancellationToken = default) => Backup(service => service.ValidateAndStageAsync(sourcePath, cancellationToken));
     public Task ConfirmRestoreAsync(string stagedPath, CancellationToken cancellationToken = default) => Backup(service => service.MarkPendingAsync(stagedPath, cancellationToken));
     public Task DiscardStagedRestoreAsync(string stagedPath, CancellationToken cancellationToken = default) => Backup(service => service.DiscardStagedAsync(stagedPath, cancellationToken));
+    public Task ResetAllDataAsync(CancellationToken cancellationToken = default) => Backup(service => service.ResetDataAsync(cancellationToken));
     private async Task Security(Func<PinSecurityService, Task> action) { await using var scope = scopeFactory.CreateAsyncScope(); await action(scope.ServiceProvider.GetRequiredService<PinSecurityService>()); }
     private async Task<T> Security<T>(Func<PinSecurityService, Task<T>> action) { await using var scope = scopeFactory.CreateAsyncScope(); return await action(scope.ServiceProvider.GetRequiredService<PinSecurityService>()); }
     private async Task Backup(Func<FinanceBackupService, Task> action) { await using var scope = scopeFactory.CreateAsyncScope(); await action(scope.ServiceProvider.GetRequiredService<FinanceBackupService>()); }

@@ -11,4 +11,5 @@ public interface ISettingsOperations
     Task<string> ValidateAndStageRestoreAsync(string sourcePath, CancellationToken cancellationToken = default);
     Task ConfirmRestoreAsync(string stagedPath, CancellationToken cancellationToken = default);
     Task DiscardStagedRestoreAsync(string stagedPath, CancellationToken cancellationToken = default);
+    Task ResetAllDataAsync(CancellationToken cancellationToken = default);
 }

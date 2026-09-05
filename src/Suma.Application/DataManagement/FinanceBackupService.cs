@@ -14,4 +14,5 @@ public sealed class FinanceBackupService(IFinanceBackupStore store)
     }
     public Task MarkPendingAsync(string stagedPath, CancellationToken cancellationToken = default) => store.MarkPendingAsync(stagedPath, cancellationToken);
     public Task DiscardStagedAsync(string stagedPath, CancellationToken cancellationToken = default) => store.DiscardStagedAsync(stagedPath, cancellationToken);
+    public Task ResetDataAsync(CancellationToken cancellationToken = default) => store.ResetDataAsync(cancellationToken);
 }

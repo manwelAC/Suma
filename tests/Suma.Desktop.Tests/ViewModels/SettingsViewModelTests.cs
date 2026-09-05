@@ -56,10 +56,28 @@ public sealed class SettingsViewModelTests
         operations.ValidPin = true; Assert.True(await viewModel.UnlockAsync("1234", Token)); Assert.Null(viewModel.ErrorMessage);
     }
 
+    [Fact]
+    public async Task Reset_data_erases_all_data_when_confirmed_and_aborts_when_cancelled()
+    {
+        var operations = new FakeOperations();
+        var viewModel = new SettingsViewModel(operations);
+
+        // Cancelled
+        await viewModel.RunResetDataAsync(() => Task.FromResult(false), Token);
+        Assert.Equal(0, operations.Resets);
+        Assert.Null(viewModel.SuccessMessage);
+
+        // Confirmed
+        await viewModel.RunResetDataAsync(() => Task.FromResult(true), Token);
+        Assert.Equal(1, operations.Resets);
+        Assert.NotNull(viewModel.SuccessMessage);
+        Assert.False(viewModel.IsDataBusy);
+    }
+
     private static CancellationToken Token => TestContext.Current.CancellationToken;
     private sealed class FakeOperations : ISettingsOperations
     {
-        public bool Enabled; public bool ValidPin = true; public bool DelayPin; public bool DelayBackup; public bool DataFailure; public Exception? PinFailure; public int PinMutations; public int Backups; public int Stages; public int Confirms; public int Discards;
+        public bool Enabled; public bool ValidPin = true; public bool DelayPin; public bool DelayBackup; public bool DataFailure; public Exception? PinFailure; public int PinMutations; public int Backups; public int Stages; public int Confirms; public int Discards; public int Resets;
         public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously); public TaskCompletionSource Release { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         public Task<bool> IsPinEnabledAsync(CancellationToken cancellationToken = default) => Task.FromResult(Enabled);
         public Task<bool> VerifyPinAsync(string pin, CancellationToken cancellationToken = default) => Task.FromResult(ValidPin);
@@ -71,5 +89,6 @@ public sealed class SettingsViewModelTests
         public Task<string> ValidateAndStageRestoreAsync(string sourcePath, CancellationToken cancellationToken = default) { Stages++; if (DataFailure) throw new ApplicationValidationException("That file is not a valid Suma backup."); return Task.FromResult("staged"); }
         public Task ConfirmRestoreAsync(string stagedPath, CancellationToken cancellationToken = default) { Confirms++; return Task.CompletedTask; }
         public Task DiscardStagedRestoreAsync(string stagedPath, CancellationToken cancellationToken = default) { Discards++; return Task.CompletedTask; }
+        public Task ResetAllDataAsync(CancellationToken cancellationToken = default) { Resets++; if (DataFailure) throw new IOException(); return Task.CompletedTask; }
     }
 }
