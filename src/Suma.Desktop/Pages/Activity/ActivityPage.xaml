@@ -12,6 +12,7 @@
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="16" />
             <Setter Property="Padding" Value="20,18" />
+            <Setter Property="MinHeight" Value="136" />
         </Style>
 
         <Style x:Key="ActivityToolbarFilterStyle" TargetType="ComboBox">
@@ -158,7 +159,7 @@
             </Grid.RowDefinitions>
 
             <!-- Panoramic Atmospheric Background Landscape with Seamless Edge Fades Behind Cards -->
-            <Canvas x:Name="LandscapeCanvas" Grid.Row="0" Grid.RowSpan="4" Margin="-36,-24,-36,0" IsHitTestVisible="False"><Grid Width="{Binding ActualWidth, ElementName=LandscapeCanvas}" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="460" IsHitTestVisible="False">
+            <Grid x:Name="LandscapeCanvas" Grid.Row="0" Grid.RowSpan="4" Margin="-36,-24,-36,0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="460" IsHitTestVisible="False">
                 <!-- Warm ambient morning sun & radiant atmospheric haze in top-right -->
                 <Ellipse Width="540" Height="320" Fill="#208FA28C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-40,10,0" />
                 <Ellipse Width="360" Height="240" Fill="#307A8E7C" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,0,80,0" />
@@ -241,7 +242,7 @@
                         </LinearGradientBrush>
                     </Rectangle.Fill>
                 </Rectangle>
-            </Grid></Canvas>
+            </Grid>
 
             <!-- Row 0: Header -->
             <Grid x:Name="HeaderGrid" Grid.Row="0" ColumnSpacing="20" RowSpacing="12">
@@ -290,9 +291,6 @@
                             <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="INCOME IN VIEW" />
                             <TextBlock FontSize="22" FontWeight="Bold" Foreground="#2E7D32" Text="{x:Bind ViewModel.IncomeDisplay, Mode=OneWay}" />
                             <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Actual ledger income" />
-                            <TextBlock Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}">
-                                <Run Text="vs last month  " /><Run FontWeight="SemiBold" Foreground="#2E7D32" Text="▲ 12.5%" />
-                            </TextBlock>
                         </StackPanel>
 
                         <Border HorizontalAlignment="Right" VerticalAlignment="Top" Width="34" Height="34" CornerRadius="17" Background="#EDF5EE">
@@ -308,9 +306,6 @@
                             <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="EXPENSES IN VIEW" />
                             <TextBlock FontSize="22" FontWeight="Bold" Foreground="#C74B3E" Text="{x:Bind ViewModel.ExpenseDisplay, Mode=OneWay}" />
                             <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Before refunds" />
-                            <TextBlock Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}">
-                                <Run Text="vs last month  " /><Run FontWeight="SemiBold" Foreground="#2E7D32" Text="▲ 8.3%" />
-                            </TextBlock>
                         </StackPanel>
 
                         <Border HorizontalAlignment="Right" VerticalAlignment="Top" Width="34" Height="34" CornerRadius="17" Background="#FDEEEC">
@@ -326,9 +321,6 @@
                             <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="NET FLOW IN VIEW" />
                             <TextBlock FontSize="22" FontWeight="Bold" Foreground="#2E7D32" Text="{x:Bind ViewModel.NetFlowDisplay, Mode=OneWay}" />
                             <TextBlock FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}" Text="Income − expenses + refunds" />
-                            <TextBlock Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}">
-                                <Run Text="vs last month  " /><Run FontWeight="SemiBold" Foreground="#2E7D32" Text="▲ 28.1%" />
-                            </TextBlock>
                         </StackPanel>
 
                         <Border HorizontalAlignment="Right" VerticalAlignment="Top" Width="34" Height="34" CornerRadius="17" Background="#EDF5EE">
@@ -343,9 +335,6 @@
                         <StackPanel Spacing="6">
                             <TextBlock FontSize="11" FontWeight="Bold" Foreground="{StaticResource SumaTextSecondaryBrush}" CharacterSpacing="40" Text="TRANSACTIONS" />
                             <TextBlock FontSize="28" FontWeight="Bold" Foreground="{StaticResource SumaTextPrimaryBrush}" Text="{x:Bind ViewModel.Items.Count, Mode=OneWay}" />
-                            <TextBlock Margin="0,18,0,0" FontSize="12" Foreground="{StaticResource SumaTextSecondaryBrush}">
-                                <Run Text="vs last month  " /><Run FontWeight="SemiBold" Foreground="#2E7D32" Text="▲ 6" />
-                            </TextBlock>
                         </StackPanel>
 
                         <Border HorizontalAlignment="Right" VerticalAlignment="Top" Width="34" Height="34" CornerRadius="17" Background="#EDF5EE">

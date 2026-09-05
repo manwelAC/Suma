@@ -131,14 +131,6 @@ public sealed class ActivityViewModel(ITransactionOperations operations) : ViewM
         }
     }
 
-    public string IncomeMoMDisplay => "vs last month  ▲ 12.5%";
-
-    public string ExpenseMoMDisplay => "vs last month  ▲ 8.3%";
-
-    public string NetFlowMoMDisplay => "vs last month  ▲ 28.1%";
-
-    public string TransactionsMoMDisplay => "vs last month  ▲ 6";
-
     public ActivityRowViewModel? SelectedItem
     {
         get => selectedItem;
